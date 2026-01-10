@@ -10,6 +10,15 @@ interface WatchedContent {
   watched_at: string;
 }
 
+interface WatchlistContent {
+  tmdb_id: number;
+  type: "movie" | "tv" | "documentary";
+  title: string;
+  poster_path: string | null;
+  release_date: string | null;
+  added_at: string;
+}
+
 interface LibraryTabsProps {
   initialTab?: "watched" | "to_watch" | "favourites";
 }
@@ -22,37 +31,67 @@ export default function LibraryTabs(
 ) {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [watchedContent, setWatchedContent] = useState<WatchedContent[]>([]);
+  const [watchlistContent, setWatchlistContent] = useState<
+    WatchlistContent[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!IS_BROWSER || activeTab !== "watched") {
+    if (!IS_BROWSER) {
       setLoading(false);
       return;
     }
 
-    // Fetch watched content
-    const fetchWatchedContent = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await fetch("/api/library/watched");
+    if (activeTab === "watched") {
+      // Fetch watched content
+      const fetchWatchedContent = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+          const response = await fetch("/api/library/watched");
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch watched content");
+          if (!response.ok) {
+            throw new Error("Failed to fetch watched content");
+          }
+
+          const data = await response.json();
+          setWatchedContent(data.content || []);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "An error occurred");
+          console.error("Error fetching watched content:", err);
+        } finally {
+          setLoading(false);
         }
+      };
 
-        const data = await response.json();
-        setWatchedContent(data.content || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-        console.error("Error fetching watched content:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      fetchWatchedContent();
+    } else if (activeTab === "to_watch") {
+      // Fetch watchlist content
+      const fetchWatchlistContent = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+          const response = await fetch("/api/library/watchlist");
 
-    fetchWatchedContent();
+          if (!response.ok) {
+            throw new Error("Failed to fetch watchlist content");
+          }
+
+          const data = await response.json();
+          setWatchlistContent(data.content || []);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "An error occurred");
+          console.error("Error fetching watchlist content:", err);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchWatchlistContent();
+    } else {
+      setLoading(false);
+    }
   }, [activeTab]);
 
   const getPosterUrl = (posterPath: string | null): string => {
@@ -174,8 +213,58 @@ export default function LibraryTabs(
       )}
 
       {activeTab === "to_watch" && (
-        <div class="text-center py-8">
-          <p class="text-gray-600">To Watch list coming soon.</p>
+        <div>
+          {loading && (
+            <div class="text-center py-8">
+              <p class="text-gray-600">Loading...</p>
+            </div>
+          )}
+
+          {error && (
+            <div class="text-center py-8">
+              <p class="text-red-600">Error: {error}</p>
+            </div>
+          )}
+
+          {!loading && !error && watchlistContent.length === 0 && (
+            <div class="text-center py-8">
+              <p class="text-gray-600">Your watchlist is empty.</p>
+              <p class="text-gray-500 text-sm mt-2">
+                Add content to your watchlist to see it here.
+              </p>
+            </div>
+          )}
+
+          {!loading && !error && watchlistContent.length > 0 && (
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {watchlistContent.map((item) => (
+                <a
+                  href={`/content/${item.tmdb_id}`}
+                  key={`${item.type}-${item.tmdb_id}`}
+                  class="block group hover:scale-105 transition-transform"
+                >
+                  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <img
+                      src={getPosterUrl(item.poster_path)}
+                      alt={item.title}
+                      class="w-full aspect-[2/3] object-cover"
+                      loading="lazy"
+                    />
+                    <div class="p-3">
+                      <h3 class="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-indigo-600">
+                        {item.title}
+                      </h3>
+                      <div class="mt-2">
+                        <p class="text-xs text-gray-500">
+                          Added: {formatDate(item.added_at)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
