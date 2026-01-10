@@ -170,6 +170,55 @@ export interface MovieDetails {
 }
 
 /**
+ * Movie search result from TMDB API (simplified version from search endpoint)
+ */
+export interface TMDBMovieSearchResult {
+  id: number;
+  title: string;
+  overview: string;
+  release_date: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  vote_average: number;
+  vote_count: number;
+  [key: string]: unknown; // Allow additional fields
+}
+
+/**
+ * TMDB search response structure
+ */
+export interface TMDBSearchResponse {
+  page: number;
+  results: TMDBMovieSearchResult[];
+  total_pages: number;
+  total_results: number;
+}
+
+/**
+ * Internal content model matching database schema
+ */
+export interface Content {
+  tmdb_id: number;
+  type: "movie" | "tv" | "documentary";
+  title: string;
+  overview: string | null;
+  release_date: string | null;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  metadata: Record<string, unknown>;
+}
+
+/**
+ * Paginated search results
+ */
+export interface SearchResults {
+  page: number;
+  total_pages: number;
+  total_results: number;
+  results: Content[];
+}
+
+/**
  * Fetch movie details by TMDB ID
  *
  * @param movieId TMDB movie ID
@@ -186,9 +235,65 @@ export async function getMovieById(movieId: number): Promise<MovieDetails> {
 }
 
 /**
+ * Map TMDB movie search result to internal content model
+ *
+ * @param tmdbMovie TMDB movie search result
+ * @returns Internal content model
+ */
+function mapTMDBMovieToContent(tmdbMovie: TMDBMovieSearchResult): Content {
+  return {
+    tmdb_id: tmdbMovie.id,
+    type: "movie",
+    title: tmdbMovie.title,
+    overview: tmdbMovie.overview || null,
+    release_date: tmdbMovie.release_date || null,
+    poster_path: tmdbMovie.poster_path || null,
+    backdrop_path: tmdbMovie.backdrop_path || null,
+    metadata: {
+      vote_average: tmdbMovie.vote_average,
+      vote_count: tmdbMovie.vote_count,
+    },
+  };
+}
+
+/**
+ * Search for movies using TMDB API with pagination
+ *
+ * @param query Search query string
+ * @param page Page number (default: 1)
+ * @returns Paginated search results mapped to internal content model
+ * @throws Error if API request fails
+ */
+export async function searchMovies(
+  query: string,
+  page: number = 1,
+): Promise<SearchResults> {
+  if (!query || typeof query !== "string" || query.trim().length === 0) {
+    throw new Error("Search query must be a non-empty string");
+  }
+
+  if (!Number.isInteger(page) || page < 1) {
+    throw new Error(`Page number must be a positive integer, got: ${page}`);
+  }
+
+  const response = await request<TMDBSearchResponse>("/search/movie", {
+    query: query.trim(),
+    page,
+  });
+
+  return {
+    page: response.page,
+    total_pages: response.total_pages,
+    total_results: response.total_results,
+    results: response.results.map(mapTMDBMovieToContent),
+  };
+}
+
+/**
  * TMDB API client instance
  */
 export const tmdbClient = {
   getMovieById,
+  searchMovies,
   request,
 };
