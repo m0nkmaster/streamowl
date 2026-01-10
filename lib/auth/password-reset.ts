@@ -4,7 +4,7 @@
  * Provides functions for generating, storing, and validating password reset tokens
  */
 
-import { query, transaction } from "../db.ts";
+import { query } from "../db.ts";
 
 /**
  * Generate a cryptographically secure random token for password reset

@@ -526,3 +526,16 @@
 - Active state indication: Navigation highlights active route using `isActive()` function that checks if current path matches or starts with link href, provides visual feedback for current page
 - Conditional navigation links: Navigation shows different links based on authentication status - authenticated users see Library and Dashboard links, guests only see Home, Browse, and Search
 - Mobile menu state: Uses Preact `useState` hook to manage mobile menu open/closed state, closes menu when navigation link is clicked for better UX
+
+## Authentication - Password Reset Implementation
+
+- Password reset tokens table: Created `password_reset_tokens` table with user_id, token, expires_at, used_at, and timestamps, includes indexes on token, user_id, and expires_at for efficient lookups and cleanup
+- Token generation: Use cryptographically secure random token generation (32 bytes, base64 encoded, URL-safe) similar to CSRF tokens, tokens expire after 24 hours by default
+- Password reset utilities: Created `lib/auth/password-reset.ts` with functions for creating, validating, and marking tokens as used, includes function to invalidate all tokens for a user after successful reset
+- Email sending module: Created `lib/email/sender.ts` for email functionality, currently logs to console for development/testing but structured to integrate with email service providers (SendGrid, AWS SES, etc.)
+- Forgot password page: Created `/routes/forgot-password.tsx` page with form to request password reset, shows success message after submission (doesn't reveal if email exists to prevent user enumeration)
+- Password reset request API: Created `/api/forgot-password` endpoint that generates reset token, sends email, and always returns success message (prevents user enumeration attacks)
+- Password reset page: Created `/routes/reset-password.tsx` page that validates token from URL query parameter, shows form for new password if token valid, displays error if token missing/expired/used
+- Password reset API: Created `/api/reset-password` endpoint that validates token, checks password match, updates user password, marks token as used, and invalidates all other tokens for the user
+- Login page integration: Added "Forgot your password?" link to login page, displays success message when redirected after password reset
+- Security considerations: Password reset flow prevents user enumeration (always returns success), validates tokens before use, marks tokens as used to prevent reuse, invalidates all tokens after successful reset, uses CSRF protection on all forms

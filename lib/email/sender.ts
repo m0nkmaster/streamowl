@@ -12,11 +12,11 @@
  * @param resetToken Password reset token
  * @param resetUrl Full URL to password reset page
  */
-export async function sendPasswordResetEmail(
+export function sendPasswordResetEmail(
   to: string,
-  resetToken: string,
+  _resetToken: string,
   resetUrl: string,
-): Promise<void> {
+): void {
   // In production, this would send an actual email via an email service provider
   // For now, we'll log to console for development/testing
   console.log("=".repeat(80));
