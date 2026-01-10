@@ -856,3 +856,13 @@
 - Refactoring duplicate code: Replaced duplicate `isPremiumUser()` functions in `lib/ai/recommendation-rate-limit.ts`, `routes/api/recommendations/chat.ts`, `routes/api/recommendations/[tmdb_id]/chat.ts`, `routes/api/recommendations/mood.ts`, and `routes/api/user/premium.ts` with shared utility import
 - Premium features gated: Custom lists (unlimited for premium), AI recommendations (unlimited for premium), AI chat/conversation (premium only), mood-based recommendations (premium only)
 - Upgrade modal: Existing upgrade prompt UI in `CreateListModal` already handles `LIST_LIMIT_REACHED` error code and displays upgrade message with link to `/premium` page
+
+## Skeleton Loading States
+
+- Skeleton components: Created reusable `SkeletonCard` component for content poster placeholders and `SkeletonContentDetail` component for detail page placeholders
+- Animation: Used Tailwind's `animate-pulse` utility class for skeleton loading animation, provides smooth pulsing effect during loading
+- Component structure: Skeleton cards match actual content card dimensions (aspect-[2/3] for posters) to prevent layout shift when content loads
+- Implementation pattern: Replace text-based loading messages with skeleton grids that match the final content layout, improves perceived performance
+- Integration points: Added skeleton loading to SearchPage (12 cards), BrowsePage (12 cards), NewReleases (12 cards), ContinueWatching (6 cards), LibraryTabs (12 cards per tab), and RecommendationFeed (3 cards)
+- Grid consistency: Skeleton cards use same `ContentGrid` component as actual content to ensure consistent spacing and responsive layout
+- Loading state management: Skeleton displays when `loading` state is true, replaced by actual content when loading completes, maintains existing error handling

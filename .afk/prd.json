@@ -973,7 +973,7 @@
         "Step 3: Navigate to content detail page",
         "Step 4: Verify skeleton shows before content loads"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "ui-toast-notifications",
