@@ -27,7 +27,7 @@ interface PublicProfilePageProps {
  * Only accessible if user has public_profile_enabled set to true
  */
 export const handler: Handlers<PublicProfilePageProps> = {
-  async GET(req, ctx) {
+  async GET(_req, ctx) {
     const userId = ctx.params.user_id;
 
     try {
@@ -125,6 +125,8 @@ export const handler: Handlers<PublicProfilePageProps> = {
   },
 };
 
-export default function PublicProfile({ data }: PageProps<PublicProfilePageProps>) {
+export default function PublicProfile(
+  { data }: PageProps<PublicProfilePageProps>,
+) {
   return <PublicProfilePage {...data} />;
 }

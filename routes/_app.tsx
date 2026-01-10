@@ -28,6 +28,12 @@ export default function App({ Component, data }: PageProps<AppProps>) {
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Stream Owl</title>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#86efac" />
+        <meta
+          name="description"
+          content="Wise recommendations, one stream at a time. Discover where movies, TV shows, and documentaries are available across streaming services."
+        />
         <style>
           {`
           @keyframes slide-in {
