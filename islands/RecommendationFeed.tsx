@@ -1,6 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import type { RecommendationCandidate } from "../lib/ai/recommendations.ts";
+import RecommendationChat from "./RecommendationChat.tsx";
 
 interface RecommendationsResponse {
   recommendations: RecommendationCandidate[];
@@ -22,6 +23,34 @@ export default function RecommendationFeed() {
   const [loadingWatchlist, setLoadingWatchlist] = useState<
     Record<number, boolean>
   >({});
+  const [isPremium, setIsPremium] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [selectedRecommendation, setSelectedRecommendation] = useState<
+    {
+      tmdbId: number;
+      title: string;
+    } | null
+  >(null);
+
+  // Fetch premium status on mount
+  useEffect(() => {
+    const fetchPremiumStatus = async () => {
+      if (!IS_BROWSER) return;
+
+      try {
+        const response = await fetch("/api/user/premium");
+        if (response.ok) {
+          const data = await response.json();
+          setIsPremium(data.isPremium || false);
+        }
+      } catch (err) {
+        // Silently fail - user might not be authenticated
+        console.error("Error fetching premium status:", err);
+      }
+    };
+
+    fetchPremiumStatus();
+  }, []);
 
   // Fetch recommendations on mount
   useEffect(() => {
@@ -194,6 +223,23 @@ export default function RecommendationFeed() {
     }
   };
 
+  // Handle opening chat
+  const handleOpenChat = (e: Event, rec: RecommendationCandidate) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelectedRecommendation({
+      tmdbId: rec.tmdb_id,
+      title: rec.title,
+    });
+    setChatOpen(true);
+  };
+
+  // Handle closing chat
+  const handleCloseChat = () => {
+    setChatOpen(false);
+    setSelectedRecommendation(null);
+  };
+
   return (
     <section class="mb-12">
       <div class="flex items-center justify-between mb-6">
@@ -296,36 +342,61 @@ export default function RecommendationFeed() {
                   />
                 </svg>
               </button>
-              {/* Add to Watchlist button */}
-              <button
-                type="button"
-                onClick={(e) => handleWatchlistToggle(e, rec.tmdb_id)}
-                disabled={loadingWatchlist[rec.tmdb_id]}
-                class={`absolute bottom-4 right-4 px-3 py-1.5 rounded-lg text-sm font-medium transition-all opacity-0 group-hover:opacity-100 ${
-                  watchlistStatuses[rec.tmdb_id]
-                    ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                    : "bg-white text-gray-800 hover:bg-gray-100 shadow-md"
-                } ${
-                  loadingWatchlist[rec.tmdb_id]
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
-                aria-label={watchlistStatuses[rec.tmdb_id]
-                  ? "Remove from watchlist"
-                  : "Add to watchlist"}
-                title={watchlistStatuses[rec.tmdb_id]
-                  ? "Remove from watchlist"
-                  : "Add to watchlist"}
-              >
-                {loadingWatchlist[rec.tmdb_id]
-                  ? "Loading..."
-                  : watchlistStatuses[rec.tmdb_id]
-                  ? "✓ In Watchlist"
-                  : "Add to Watchlist"}
-              </button>
+              {/* Action buttons */}
+              <div class="absolute bottom-4 right-4 flex gap-2">
+                {/* Tell me more button (premium only) */}
+                {isPremium && (
+                  <button
+                    type="button"
+                    onClick={(e) => handleOpenChat(e, rec)}
+                    class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all opacity-0 group-hover:opacity-100 bg-indigo-600 text-white hover:bg-indigo-700 shadow-md"
+                    aria-label="Tell me more about this recommendation"
+                    title="Tell me more"
+                  >
+                    Tell me more
+                  </button>
+                )}
+                {/* Add to Watchlist button */}
+                <button
+                  type="button"
+                  onClick={(e) => handleWatchlistToggle(e, rec.tmdb_id)}
+                  disabled={loadingWatchlist[rec.tmdb_id]}
+                  class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all opacity-0 group-hover:opacity-100 ${
+                    watchlistStatuses[rec.tmdb_id]
+                      ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                      : "bg-white text-gray-800 hover:bg-gray-100 shadow-md"
+                  } ${
+                    loadingWatchlist[rec.tmdb_id]
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                  aria-label={watchlistStatuses[rec.tmdb_id]
+                    ? "Remove from watchlist"
+                    : "Add to watchlist"}
+                  title={watchlistStatuses[rec.tmdb_id]
+                    ? "Remove from watchlist"
+                    : "Add to watchlist"}
+                >
+                  {loadingWatchlist[rec.tmdb_id]
+                    ? "Loading..."
+                    : watchlistStatuses[rec.tmdb_id]
+                    ? "✓ In Watchlist"
+                    : "Add to Watchlist"}
+                </button>
+              </div>
             </div>
           ))}
         </div>
+      )}
+
+      {/* Chat interface */}
+      {chatOpen && selectedRecommendation && (
+        <RecommendationChat
+          tmdbId={selectedRecommendation.tmdbId}
+          contentTitle={selectedRecommendation.title}
+          isOpen={chatOpen}
+          onClose={handleCloseChat}
+        />
       )}
 
       {/* Empty State */}
