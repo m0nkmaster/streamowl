@@ -349,7 +349,7 @@
         "Step 3: Verify synopsis, runtime, release date, and rating display",
         "Step 4: Verify cast list with photos displays"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "content-detail-streaming-availability",
