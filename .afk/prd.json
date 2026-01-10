@@ -622,7 +622,7 @@
         "Step 3: Verify streaming availability updates to new region",
         "Step 4: Verify preference persists across sessions"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "database-pgvector-setup",
