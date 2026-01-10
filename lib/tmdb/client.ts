@@ -935,6 +935,60 @@ export async function getTvSimilar(
 }
 
 /**
+ * External IDs response from TMDB API
+ */
+export interface ExternalIds {
+  id: number;
+  imdb_id: string | null;
+  facebook_id: string | null;
+  instagram_id: string | null;
+  twitter_id: string | null;
+  wikidata_id?: string | null;
+  freebase_mid?: string | null;
+  freebase_id?: string | null;
+  tvdb_id?: number | null;
+  tvrage_id?: number | null;
+}
+
+/**
+ * Fetch external IDs for a movie by TMDB ID
+ * This includes IMDb ID, social media IDs, etc.
+ *
+ * @param movieId TMDB movie ID
+ * @returns External IDs including IMDb ID
+ * @throws Error if movie not found or API request fails
+ */
+export async function getMovieExternalIds(
+  movieId: number,
+): Promise<ExternalIds> {
+  if (!Number.isInteger(movieId) || movieId <= 0) {
+    throw new Error(`Invalid movie ID: ${movieId}`);
+  }
+
+  const externalIds = await request<ExternalIds>(
+    `/movie/${movieId}/external_ids`,
+  );
+  return externalIds;
+}
+
+/**
+ * Fetch external IDs for a TV show by TMDB ID
+ * This includes IMDb ID, social media IDs, etc.
+ *
+ * @param tvId TMDB TV show ID
+ * @returns External IDs including IMDb ID
+ * @throws Error if TV show not found or API request fails
+ */
+export async function getTvExternalIds(tvId: number): Promise<ExternalIds> {
+  if (!Number.isInteger(tvId) || tvId <= 0) {
+    throw new Error(`Invalid TV show ID: ${tvId}`);
+  }
+
+  const externalIds = await request<ExternalIds>(`/tv/${tvId}/external_ids`);
+  return externalIds;
+}
+
+/**
  * TMDB API client instance
  */
 export const tmdbClient = {
@@ -954,5 +1008,7 @@ export const tmdbClient = {
   extractTrailerKey,
   getMovieSimilar,
   getTvSimilar,
+  getMovieExternalIds,
+  getTvExternalIds,
   request,
 };

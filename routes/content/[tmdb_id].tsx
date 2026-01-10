@@ -4,10 +4,12 @@ import {
   type CategorisedWatchProviders,
   extractTrailerKey,
   getMovieDetails,
+  getMovieExternalIds,
   getMovieSimilar,
   getMovieVideos,
   getMovieWatchProvidersByRegion,
   getTvDetails,
+  getTvExternalIds,
   getTvSimilar,
   getTvVideos,
   getTvWatchProvidersByRegion,
@@ -17,6 +19,10 @@ import {
   type TvDetails,
   type WatchProvider,
 } from "../../lib/tmdb/client.ts";
+import {
+  type AggregateRatings as AggregateRatingsType,
+  getRatingsByImdbId,
+} from "../../lib/omdb/client.ts";
 import { getRegionName, getUserRegion } from "../../lib/region.ts";
 import {
   getBackdropSrcSet,
@@ -37,6 +43,7 @@ import RatingComponent from "../../islands/RatingComponent.tsx";
 import NotesComponent from "../../islands/NotesComponent.tsx";
 import TagsComponent from "../../islands/TagsComponent.tsx";
 import ContentGrid from "../../components/ContentGrid.tsx";
+import AggregateRatings from "../../components/AggregateRatings.tsx";
 
 interface Tag {
   id: string;
@@ -56,6 +63,7 @@ interface ContentDetailPageProps {
   userTags: Tag[];
   isAuthenticated: boolean;
   region: SupportedRegion;
+  externalRatings: AggregateRatingsType | null;
 }
 
 /**
@@ -146,6 +154,23 @@ export const handler: Handlers<ContentDetailPageProps> = {
       console.error("Failed to fetch similar titles:", error);
     }
 
+    // Fetch external IDs and ratings from OMDb (IMDb, Rotten Tomatoes)
+    let externalRatings: AggregateRatingsType | null = null;
+    try {
+      // Get external IDs (including IMDb ID) from TMDB
+      const externalIds = contentType === "movie"
+        ? await getMovieExternalIds(contentId)
+        : await getTvExternalIds(contentId);
+
+      // If we have an IMDb ID, fetch ratings from OMDb
+      if (externalIds?.imdb_id) {
+        externalRatings = await getRatingsByImdbId(externalIds.imdb_id);
+      }
+    } catch (error) {
+      // Log error but don't fail the page if external ratings fail
+      console.error("Failed to fetch external ratings:", error);
+    }
+
     // Fetch user status, rating, notes, and tags if authenticated
     let userStatus: "watched" | "to_watch" | "favourite" | null = null;
     let userRating: number | null = null;
@@ -210,6 +235,7 @@ export const handler: Handlers<ContentDetailPageProps> = {
       userTags,
       isAuthenticated: session !== null,
       region,
+      externalRatings,
     });
   },
 };
@@ -263,13 +289,6 @@ function formatReleaseDate(dateString: string | null): string {
   } catch {
     return dateString;
   }
-}
-
-/**
- * Helper function to format rating
- */
-function formatRating(voteAverage: number): string {
-  return voteAverage.toFixed(1);
 }
 
 /**
@@ -327,6 +346,7 @@ export default function ContentDetailPage(
     userTags,
     isAuthenticated,
     region,
+    externalRatings,
   } = data;
   const isMovie = contentType === "movie";
   const title = isMovie
@@ -389,15 +409,21 @@ export default function ContentDetailPage(
                 {formatRuntime(runtime)}
               </div>
               <div>
-                <span class="font-semibold">Rating:</span>{" "}
-                {formatRating(content.vote_average)}/10 (
-                {content.vote_count.toLocaleString()} votes)
-              </div>
-              <div>
                 <span class="font-semibold">Type:</span>{" "}
                 <span class="uppercase">{contentType}</span>
               </div>
             </div>
+
+            {/* Aggregate Ratings Section */}
+            <AggregateRatings
+              tmdb={{
+                rating: content.vote_average,
+                voteCount: content.vote_count,
+              }}
+              imdb={externalRatings?.imdb}
+              rottenTomatoes={externalRatings?.rottenTomatoes}
+              metacritic={externalRatings?.metacritic}
+            />
 
             {/* Genres */}
             {content.genres && content.genres.length > 0 && (
