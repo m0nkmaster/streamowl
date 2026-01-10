@@ -251,3 +251,6 @@
 - Result links: Each result card links to `/content/{tmdb_id}` detail page (to be implemented in future story)
 - API response caching: Search API endpoint includes Cache-Control header (1 hour) for HTTP caching of search results
 - Type safety: Use TypeScript interfaces (SearchResponse, Content) for type-safe handling of search data throughout the component
+- Combined search results sorting: When combining movie and TV search results, sort by relevance using vote_average (descending) as primary sort key, then vote_count (descending) as tiebreaker to maintain relevance ordering across content types
+- Relevance sorting: TMDB search results are already sorted by relevance within each category (movies/TV), but when combining results from separate API calls, explicit sorting is needed to maintain relevance across the unified results
+- Vote metadata access: Access vote_average and vote_count from Content.metadata object (stored as metadata.vote_average and metadata.vote_count) for sorting and filtering operations

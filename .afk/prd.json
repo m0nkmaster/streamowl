@@ -284,7 +284,7 @@
         "Step 3: Verify content type badge distinguishes movies from TV",
         "Step 4: Verify results are sorted by relevance"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "search-filter-by-type",
