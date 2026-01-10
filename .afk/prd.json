@@ -362,7 +362,7 @@
         "Step 3: Verify streaming service logos show with availability type",
         "Step 4: Click service link and verify deep link to streaming app/site"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "content-detail-trailer",

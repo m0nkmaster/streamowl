@@ -270,3 +270,9 @@
 - Rating display: Format vote_average to 1 decimal place and include vote_count with locale formatting for readability
 - Error handling: Return 404 status if content not found (both movie and TV fetch fail), return 400 for invalid content ID format
 - Type safety: Use TypeScript type guards and type assertions to safely handle MovieDetails vs TvDetails types in component
+- Watch providers fetching: Fetch watch providers in route handler using `getMovieWatchProvidersByRegion()` or `getTvWatchProvidersByRegion()` functions, defaulting to "US" region for now
+- Watch providers display: Display providers grouped by availability type (Stream/Rent/Buy/Free) with service logos and links to TMDB's watch page
+- Provider logo URLs: Use TMDB image base URL with w45 size for provider logos (`https://image.tmdb.org/t/p/w45${logo_path}`)
+- Watch provider links: Use TMDB's `link` field from `CategorisedWatchProviders` which provides a deep link to TMDB's page for watching content in that region
+- Graceful degradation: Handle watch provider fetch failures gracefully - log error but don't fail the page if providers are unavailable
+- Provider categorisation: TMDB categorises providers into subscription (flatrate), rent, buy, ads, and free arrays - display each category separately for clarity
