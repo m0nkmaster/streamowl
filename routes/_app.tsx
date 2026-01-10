@@ -1,26 +1,12 @@
-import { type Handlers, type PageProps } from "$fresh/server.ts";
-import { getSessionFromRequest } from "../lib/auth/middleware.ts";
+import { type PageProps } from "$fresh/server.ts";
 import Navigation from "../islands/Navigation.tsx";
 import Footer from "../components/Footer.tsx";
 
-interface AppProps {
-  currentPath: string;
-  isAuthenticated: boolean;
-}
-
-export const handler: Handlers<AppProps> = {
-  async GET(req, ctx) {
-    const session = await getSessionFromRequest(req);
-    const url = new URL(req.url);
-    return ctx.render({
-      currentPath: url.pathname,
-      isAuthenticated: session !== null,
-    });
-  },
-};
-
-export default function App({ Component, data }: PageProps<AppProps>) {
-  const { currentPath, isAuthenticated } = data;
+export default function App({ Component, url, data }: PageProps) {
+  // Get currentPath from Fresh's url prop (always available)
+  // Get isAuthenticated from route data if provided, default to false
+  const currentPath = url.pathname;
+  const isAuthenticated = data?.isAuthenticated ?? false;
 
   return (
     <html class="h-full">
@@ -34,6 +20,7 @@ export default function App({ Component, data }: PageProps<AppProps>) {
           name="description"
           content="Wise recommendations, one stream at a time. Discover where movies, TV shows, and documentaries are available across streaming services."
         />
+        <link rel="stylesheet" href="/styles.css" />
         <style>
           {`
           @keyframes slide-in {
