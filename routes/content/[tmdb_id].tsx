@@ -23,7 +23,14 @@ import FavouriteButton from "../../islands/FavouriteButton.tsx";
 import AddToListButton from "../../islands/AddToListButton.tsx";
 import RatingComponent from "../../islands/RatingComponent.tsx";
 import NotesComponent from "../../islands/NotesComponent.tsx";
+import TagsComponent from "../../islands/TagsComponent.tsx";
 import ContentGrid from "../../components/ContentGrid.tsx";
+
+interface Tag {
+  id: string;
+  name: string;
+  colour: string;
+}
 
 interface ContentDetailPageProps {
   content: MovieDetails | TvDetails;
@@ -34,6 +41,7 @@ interface ContentDetailPageProps {
   userStatus: "watched" | "to_watch" | "favourite" | null;
   userRating: number | null;
   userNotes: string | null;
+  userTags: Tag[];
   isAuthenticated: boolean;
   region: SupportedRegion;
 }
@@ -125,10 +133,11 @@ export const handler: Handlers<ContentDetailPageProps> = {
       console.error("Failed to fetch similar titles:", error);
     }
 
-    // Fetch user status, rating, and notes if authenticated
+    // Fetch user status, rating, notes, and tags if authenticated
     let userStatus: "watched" | "to_watch" | "favourite" | null = null;
     let userRating: number | null = null;
     let userNotes: string | null = null;
+    let userTags: Tag[] = [];
     const session = await getSessionFromRequest(_req);
     if (session) {
       try {
@@ -150,6 +159,26 @@ export const handler: Handlers<ContentDetailPageProps> = {
             userRating = userContent[0].rating;
             userNotes = userContent[0].notes;
           }
+
+          // Fetch tags applied to this content
+          const contentTags = await query<{
+            tag_id: string;
+            tag_name: string;
+            tag_colour: string;
+          }>(
+            `SELECT ct.tag_id, t.name AS tag_name, t.colour AS tag_colour
+             FROM content_tags ct
+             INNER JOIN tags t ON ct.tag_id = t.id
+             WHERE ct.content_id = $1 AND t.user_id = $2
+             ORDER BY t.name ASC`,
+            [contentRecord.id, session.userId],
+          );
+
+          userTags = contentTags.map((ct) => ({
+            id: ct.tag_id,
+            name: ct.tag_name,
+            colour: ct.tag_colour,
+          }));
         }
       } catch (error) {
         // Log error but don't fail the page if status fetch fails
@@ -166,6 +195,7 @@ export const handler: Handlers<ContentDetailPageProps> = {
       userStatus,
       userRating,
       userNotes,
+      userTags,
       isAuthenticated: session !== null,
       region,
     });
@@ -272,6 +302,7 @@ export default function ContentDetailPage(
     userStatus,
     userRating,
     userNotes,
+    userTags,
     isAuthenticated,
     region,
   } = data;
@@ -383,6 +414,13 @@ export default function ContentDetailPage(
                   <NotesComponent
                     tmdbId={tmdbId}
                     initialNotes={userNotes}
+                  />
+                </div>
+                {/* Tags Component */}
+                <div class="border-t pt-4">
+                  <TagsComponent
+                    tmdbId={tmdbId}
+                    initialTags={userTags}
                   />
                 </div>
               </div>

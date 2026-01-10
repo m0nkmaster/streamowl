@@ -544,7 +544,7 @@
         "Step 3: Verify tag appears on content",
         "Step 4: Apply same tag to another content item"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "tags-filter-library",
