@@ -13,6 +13,8 @@
  * web-push service or the npm web-push package via Deno's npm: specifier.
  */
 
+import { query } from "../db.ts";
+
 interface PushSubscription {
   endpoint: string;
   keys: {
@@ -20,6 +22,26 @@ interface PushSubscription {
     auth: string;
   };
 }
+
+/**
+ * Notification types that can be configured by users
+ */
+export type NotificationType =
+  | "new_releases"
+  | "recommendations"
+  | "leaving_soon"
+  | "weekly_digest"
+  | "test"; // test type always allowed
+
+/**
+ * Default notification preferences for new users
+ */
+export const DEFAULT_NOTIFICATION_PREFERENCES: Record<string, boolean> = {
+  new_releases: true,
+  recommendations: true,
+  leaving_soon: true,
+  weekly_digest: false,
+};
 
 interface NotificationPayload {
   title: string;
@@ -404,5 +426,116 @@ export function isPushConfigured(): boolean {
     return true;
   } catch {
     return false;
+  }
+}
+
+/**
+ * Check if a user has enabled a specific notification type
+ * @param userId - The user's ID
+ * @param notificationType - The type of notification to check
+ * @returns true if the notification type is enabled, false otherwise
+ */
+export async function isNotificationTypeEnabled(
+  userId: string,
+  notificationType: NotificationType,
+): Promise<boolean> {
+  // Test notifications are always allowed
+  if (notificationType === "test") {
+    return true;
+  }
+
+  try {
+    const result = await query<{ preferences: Record<string, unknown> | null }>(
+      `SELECT preferences FROM users WHERE id = $1`,
+      [userId],
+    );
+
+    if (result.length === 0) {
+      return false;
+    }
+
+    const preferences = result[0].preferences || {};
+    const notificationTypes = preferences.notification_types as
+      | Record<string, boolean>
+      | undefined;
+
+    // If no notification_types set, use defaults
+    if (!notificationTypes) {
+      return DEFAULT_NOTIFICATION_PREFERENCES[notificationType] ?? true;
+    }
+
+    // Check if the specific type is enabled, fall back to default if not set
+    return notificationTypes[notificationType] ??
+      DEFAULT_NOTIFICATION_PREFERENCES[notificationType] ?? true;
+  } catch (error) {
+    console.error("Error checking notification preferences:", error);
+    // Default to allowing notifications if we can't check preferences
+    return true;
+  }
+}
+
+/**
+ * Get all notification preferences for a user
+ * @param userId - The user's ID
+ * @returns The user's notification preferences merged with defaults
+ */
+export async function getUserNotificationPreferences(
+  userId: string,
+): Promise<Record<string, boolean>> {
+  try {
+    const result = await query<{ preferences: Record<string, unknown> | null }>(
+      `SELECT preferences FROM users WHERE id = $1`,
+      [userId],
+    );
+
+    if (result.length === 0) {
+      return { ...DEFAULT_NOTIFICATION_PREFERENCES };
+    }
+
+    const preferences = result[0].preferences || {};
+    const notificationTypes = preferences.notification_types as
+      | Record<string, boolean>
+      | undefined;
+
+    return {
+      ...DEFAULT_NOTIFICATION_PREFERENCES,
+      ...notificationTypes,
+    };
+  } catch (error) {
+    console.error("Error fetching notification preferences:", error);
+    return { ...DEFAULT_NOTIFICATION_PREFERENCES };
+  }
+}
+
+/**
+ * Send a push notification to a user only if they have enabled that notification type
+ * @param userId - The user's ID
+ * @param subscription - The push subscription
+ * @param payload - The notification payload
+ * @param notificationType - The type of notification being sent
+ * @returns true if notification was sent, false if skipped due to preferences
+ */
+export async function sendPushNotificationWithPreferenceCheck(
+  userId: string,
+  subscription: PushSubscription,
+  payload: NotificationPayload,
+  notificationType: NotificationType,
+): Promise<{ sent: boolean; reason?: string }> {
+  // Check if user has enabled this notification type
+  const isEnabled = await isNotificationTypeEnabled(userId, notificationType);
+
+  if (!isEnabled) {
+    return {
+      sent: false,
+      reason: `User has disabled ${notificationType} notifications`,
+    };
+  }
+
+  // Send the notification
+  try {
+    await sendPushNotification(subscription, payload);
+    return { sent: true };
+  } catch (error) {
+    throw error;
   }
 }
