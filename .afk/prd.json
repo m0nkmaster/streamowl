@@ -453,7 +453,7 @@
         "Step 3: Click watchlist icon and verify added without navigating away",
         "Step 4: Verify toast notification confirms action"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "rating-system",

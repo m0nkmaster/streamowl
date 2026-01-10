@@ -28,6 +28,23 @@ export default function App({ Component, data }: PageProps<AppProps>) {
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Stream Owl</title>
+        <style>
+          {`
+          @keyframes slide-in {
+            from {
+              transform: translateX(100%);
+              opacity: 0;
+            }
+            to {
+              transform: translateX(0);
+              opacity: 1;
+            }
+          }
+          .animate-slide-in {
+            animation: slide-in 0.3s ease-out;
+          }
+        `}
+        </style>
       </head>
       <body class="flex flex-col min-h-screen">
         <Navigation
