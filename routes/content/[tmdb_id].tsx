@@ -4,12 +4,15 @@ import {
   type CategorisedWatchProviders,
   extractTrailerKey,
   getMovieDetails,
+  getMovieSimilar,
   getMovieVideos,
   getMovieWatchProvidersByRegion,
   getTvDetails,
+  getTvSimilar,
   getTvVideos,
   getTvWatchProvidersByRegion,
   type MovieDetails,
+  type SearchResults,
   type SupportedRegion,
   type TvDetails,
 } from "../../lib/tmdb/client.ts";
@@ -19,12 +22,14 @@ import AddToWatchlistButton from "../../islands/AddToWatchlistButton.tsx";
 import FavouriteButton from "../../islands/FavouriteButton.tsx";
 import AddToListButton from "../../islands/AddToListButton.tsx";
 import RatingComponent from "../../islands/RatingComponent.tsx";
+import ContentGrid from "../../components/ContentGrid.tsx";
 
 interface ContentDetailPageProps {
   content: MovieDetails | TvDetails;
   contentType: "movie" | "tv";
   watchProviders: CategorisedWatchProviders | null;
   trailerKey: string | null;
+  similarTitles: SearchResults | null;
   userStatus: "watched" | "to_watch" | "favourite" | null;
   userRating: number | null;
   isAuthenticated: boolean;
@@ -97,6 +102,27 @@ export const handler: Handlers<ContentDetailPageProps> = {
       console.error("Failed to fetch videos:", error);
     }
 
+    // Fetch similar titles
+    let similarTitles: SearchResults | null = null;
+    try {
+      if (contentType === "movie") {
+        similarTitles = await getMovieSimilar(contentId, 1);
+        // Limit to 12 similar titles
+        if (similarTitles.results.length > 12) {
+          similarTitles.results = similarTitles.results.slice(0, 12);
+        }
+      } else {
+        similarTitles = await getTvSimilar(contentId, 1);
+        // Limit to 12 similar titles
+        if (similarTitles.results.length > 12) {
+          similarTitles.results = similarTitles.results.slice(0, 12);
+        }
+      }
+    } catch (error) {
+      // Log error but don't fail the page if similar titles fail
+      console.error("Failed to fetch similar titles:", error);
+    }
+
     // Fetch user status and rating if authenticated
     let userStatus: "watched" | "to_watch" | "favourite" | null = null;
     let userRating: number | null = null;
@@ -131,6 +157,7 @@ export const handler: Handlers<ContentDetailPageProps> = {
       contentType,
       watchProviders,
       trailerKey,
+      similarTitles,
       userStatus,
       userRating,
       isAuthenticated: session !== null,
@@ -235,6 +262,7 @@ export default function ContentDetailPage(
     contentType,
     watchProviders,
     trailerKey,
+    similarTitles,
     userStatus,
     userRating,
     isAuthenticated,
@@ -405,6 +433,49 @@ export default function ContentDetailPage(
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Similar Titles */}
+            {similarTitles && similarTitles.results.length > 0 && (
+              <div class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">
+                  Similar Titles
+                </h2>
+                <ContentGrid>
+                  {similarTitles.results.map((item) => (
+                    <a
+                      key={item.tmdb_id}
+                      href={`/content/${item.tmdb_id}`}
+                      class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow group"
+                    >
+                      <div class="relative w-full aspect-[2/3] bg-gray-200">
+                        <img
+                          src={getPosterUrl(item.poster_path)}
+                          alt={item.title}
+                          class="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                          loading="lazy"
+                        />
+                      </div>
+                      <div class="p-3">
+                        <p class="font-semibold text-sm text-gray-900 line-clamp-2 mb-1">
+                          {item.title}
+                        </p>
+                        <div class="flex items-center gap-2 text-xs text-gray-600">
+                          <span class="uppercase">{item.type}</span>
+                          {item.release_date && (
+                            <>
+                              <span>•</span>
+                              <span>
+                                {new Date(item.release_date).getFullYear()}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </ContentGrid>
               </div>
             )}
 

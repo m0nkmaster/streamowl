@@ -388,7 +388,7 @@
         "Step 3: Verify 6-12 similar titles display with posters",
         "Step 4: Click similar title and verify navigation to its detail page"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "content-detail-aggregate-ratings",

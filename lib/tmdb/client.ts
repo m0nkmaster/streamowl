@@ -809,6 +809,72 @@ export function extractTrailerKey(videos: VideosResponse): string | null {
 }
 
 /**
+ * Fetch similar movies for a movie by TMDB ID
+ *
+ * @param movieId TMDB movie ID
+ * @param page Page number (default: 1)
+ * @returns Paginated similar movies mapped to internal content model
+ * @throws Error if movie not found or API request fails
+ */
+export async function getMovieSimilar(
+  movieId: number,
+  page: number = 1,
+): Promise<SearchResults> {
+  if (!Number.isInteger(movieId) || movieId <= 0) {
+    throw new Error(`Invalid movie ID: ${movieId}`);
+  }
+
+  if (!Number.isInteger(page) || page < 1) {
+    throw new Error(`Page number must be a positive integer, got: ${page}`);
+  }
+
+  const response = await request<TMDBSearchResponse>(
+    `/movie/${movieId}/similar`,
+    { page },
+  );
+
+  return {
+    page: response.page,
+    total_pages: response.total_pages,
+    total_results: response.total_results,
+    results: response.results.map(mapTMDBMovieToContent),
+  };
+}
+
+/**
+ * Fetch similar TV shows for a TV show by TMDB ID
+ *
+ * @param tvId TMDB TV show ID
+ * @param page Page number (default: 1)
+ * @returns Paginated similar TV shows mapped to internal content model
+ * @throws Error if TV show not found or API request fails
+ */
+export async function getTvSimilar(
+  tvId: number,
+  page: number = 1,
+): Promise<SearchResults> {
+  if (!Number.isInteger(tvId) || tvId <= 0) {
+    throw new Error(`Invalid TV show ID: ${tvId}`);
+  }
+
+  if (!Number.isInteger(page) || page < 1) {
+    throw new Error(`Page number must be a positive integer, got: ${page}`);
+  }
+
+  const response = await request<TMDBSearchTVResponse>(
+    `/tv/${tvId}/similar`,
+    { page },
+  );
+
+  return {
+    page: response.page,
+    total_pages: response.total_pages,
+    total_results: response.total_results,
+    results: response.results.map(mapTMDBTVToContent),
+  };
+}
+
+/**
  * TMDB API client instance
  */
 export const tmdbClient = {
@@ -826,5 +892,7 @@ export const tmdbClient = {
   getMovieVideos,
   getTvVideos,
   extractTrailerKey,
+  getMovieSimilar,
+  getTvSimilar,
   request,
 };

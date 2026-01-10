@@ -612,3 +612,14 @@
 - Trailer display: Display trailer section only when `trailerKey` is available, use responsive YouTube embed iframe with 16:9 aspect ratio (padding-bottom: 56.25%), include proper iframe attributes (title, allow, allowFullScreen) for accessibility and security
 - Error handling: Video fetching errors are logged but don't fail the page (graceful degradation), ensures content detail page loads even if videos API is unavailable
 - Trailer placement: Trailer section displayed after synopsis and before cast section, provides visual break between text content and cast grid
+
+## Content Detail - Similar Titles Implementation
+
+- TMDB similar API endpoints: Use `/movie/{movie_id}/similar` and `/tv/{tv_id}/similar` endpoints to fetch similar content recommendations from TMDB
+- Similar response structure: TMDB similar API returns same structure as search API (`TMDBSearchResponse` or `TMDBSearchTVResponse`) with paginated results, can reuse existing mapping functions (`mapTMDBMovieToContent`, `mapTMDBTVToContent`)
+- Similar titles functions: Created `getMovieSimilar()` and `getTvSimilar()` functions in TMDB client following same pattern as other API functions, accept page parameter for pagination, use default cache TTL (24 hours) for similar content data
+- Result limiting: Limit similar titles to 12 items for display (slice results array), ensures reasonable number of recommendations without overwhelming the page
+- Similar titles display: Display similar titles section only when similar titles are available, use ContentGrid component for consistent responsive grid layout (2-6 columns based on viewport), display poster images, titles, content type badges, and release years
+- Navigation: Each similar title card links to `/content/{tmdb_id}` detail page, allows users to explore related content easily, uses hover effects for better UX
+- Error handling: Similar titles fetching errors are logged but don't fail the page (graceful degradation), ensures content detail page loads even if similar API is unavailable
+- Similar titles placement: Similar titles section displayed after cast section and before "Where to Watch" section, provides logical flow from cast to recommendations to streaming availability
