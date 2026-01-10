@@ -6,9 +6,17 @@ import {
   type RecommendationCandidate,
 } from "../../lib/ai/recommendations.ts";
 import { redisCache } from "../../lib/cache/redis.ts";
+import {
+  getRemainingRecommendations,
+  hasReachedRecommendationLimit,
+  incrementRecommendationUsage,
+} from "../../lib/ai/recommendation-rate-limit.ts";
 
 interface RecommendationsResponse {
   recommendations: RecommendationCandidate[];
+  rateLimitReached?: boolean;
+  remainingRecommendations?: number;
+  upgradePrompt?: string;
 }
 
 /**
@@ -36,7 +44,13 @@ export const handler: Handlers = {
       const cached = await redisCache.get<RecommendationCandidate[]>(cacheKey);
 
       if (cached) {
-        return new Response(JSON.stringify({ recommendations: cached }), {
+        // Return cached recommendations with rate limit info
+        const remaining = await getRemainingRecommendations(session.userId);
+        const response: RecommendationsResponse = {
+          recommendations: cached,
+          remainingRecommendations: remaining,
+        };
+        return new Response(JSON.stringify(response), {
           status: 200,
           headers: {
             "Content-Type": "application/json",
@@ -45,8 +59,26 @@ export const handler: Handlers = {
         });
       }
 
+      // Check if user has reached daily limit (for free tier users)
+      const limitReached = await hasReachedRecommendationLimit(session.userId);
+      if (limitReached) {
+        const remaining = await getRemainingRecommendations(session.userId);
+        const errorResponse: RecommendationsResponse = {
+          recommendations: [],
+          rateLimitReached: true,
+          remainingRecommendations: remaining,
+          upgradePrompt:
+            "You've reached your daily limit of 3 AI recommendations. Upgrade to premium for unlimited recommendations.",
+        };
+        return new Response(JSON.stringify(errorResponse), {
+          status: 403,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }
+
       // Generate recommendations (limit 3 for free tier)
-      // TODO: Check user tier and adjust limit accordingly
       const limit = 3;
       const candidates = await generateRecommendationCandidates(
         session.userId,
@@ -76,13 +108,20 @@ export const handler: Handlers = {
         }),
       );
 
+      // Increment usage counter (only for free tier users)
+      await incrementRecommendationUsage(session.userId);
+
       // Cache recommendations for 24 hours (until next day)
       const hoursUntilMidnight = 24 - new Date().getHours();
       const cacheTTL = hoursUntilMidnight * 3600; // Convert to seconds
       await redisCache.set(cacheKey, recommendationsWithExplanations, cacheTTL);
 
+      // Get remaining recommendations
+      const remaining = await getRemainingRecommendations(session.userId);
+
       const response: RecommendationsResponse = {
         recommendations: recommendationsWithExplanations,
+        remainingRecommendations: remaining,
       };
 
       return new Response(JSON.stringify(response), {

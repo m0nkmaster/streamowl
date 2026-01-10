@@ -407,16 +407,20 @@ export async function generateMoodBasedRecommendations(
   // Step 4: Generate explanations that reference the mood
   const recommendationsWithExplanations = await Promise.all(
     filteredRecords.slice(0, limit).map(async (record) => {
+      // Convert ContentRecord to RecommendationCandidate for explanation generation
+      const candidate: RecommendationCandidate = {
+        ...record,
+        similarity: 0.8, // Default similarity for mood-based recommendations
+        distance: 0.2,
+      };
       try {
         const explanation = await generateMoodBasedExplanation(
           userId,
-          record,
+          candidate,
           moodRequest,
         );
         return {
-          ...record,
-          similarity: 0.8, // Default similarity for mood-based recommendations
-          distance: 0.2,
+          ...candidate,
           explanation,
         };
       } catch (error) {
@@ -425,9 +429,7 @@ export async function generateMoodBasedRecommendations(
           error,
         );
         return {
-          ...record,
-          similarity: 0.8,
-          distance: 0.2,
+          ...candidate,
           explanation:
             `Based on your request for "${moodRequest}", we think you'll enjoy "${record.title}".`,
         };

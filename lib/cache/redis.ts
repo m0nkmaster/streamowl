@@ -202,6 +202,118 @@ class RedisCache {
     const key = this.generateCacheKey(endpoint, params);
     await this.set(key, value, ttlSeconds);
   }
+
+  /**
+   * Increment a counter value (for rate limiting)
+   * Returns the new value after increment
+   */
+  async increment(key: string, ttlSeconds?: number): Promise<number> {
+    if (!this.enabled) {
+      return 0;
+    }
+
+    try {
+      // Use INCR command, optionally with EXPIRE if TTL provided
+      const commands: (string | number)[] = ["INCR", key];
+      if (ttlSeconds !== undefined) {
+        // Use INCR with EXPIRE - first increment, then set expiry if key is new
+        // Note: Upstash REST API doesn't support multi-command transactions easily
+        // So we'll use INCR and then EXPIRE separately
+        const response = await fetch(`${this.redisUrl}`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${this.redisToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(commands),
+        });
+
+        if (!response.ok) {
+          console.warn(`Redis increment failed: ${response.status}`);
+          return 0;
+        }
+
+        const result = await response.json();
+        const newValue = parseInt(result.result || "0", 10);
+
+        // Set expiry if TTL provided (only if this is a new key)
+        if (ttlSeconds > 0 && newValue === 1) {
+          await fetch(`${this.redisUrl}`, {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${this.redisToken}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(["EXPIRE", key, ttlSeconds.toString()]),
+          });
+        }
+
+        return newValue;
+      } else {
+        const response = await fetch(`${this.redisUrl}`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${this.redisToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(commands),
+        });
+
+        if (!response.ok) {
+          console.warn(`Redis increment failed: ${response.status}`);
+          return 0;
+        }
+
+        const result = await response.json();
+        return parseInt(result.result || "0", 10);
+      }
+    } catch (error) {
+      console.warn(
+        `Redis increment error: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+      return 0;
+    }
+  }
+
+  /**
+   * Get an integer value from Redis
+   */
+  async getInt(key: string): Promise<number> {
+    if (!this.enabled) {
+      return 0;
+    }
+
+    try {
+      const response = await fetch(`${this.redisUrl}`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${this.redisToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(["GET", key]),
+      });
+
+      if (!response.ok) {
+        return 0;
+      }
+
+      const result = await response.json();
+      if (!result.result) {
+        return 0;
+      }
+
+      return parseInt(result.result, 10) || 0;
+    } catch (error) {
+      console.warn(
+        `Redis getInt error: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+      return 0;
+    }
+  }
 }
 
 // Singleton cache instance
