@@ -9,6 +9,13 @@
 import { query } from "../db.ts";
 import type { ContentRecord } from "../content.ts";
 import { type ChatMessage, generateChatCompletion } from "./openai.ts";
+import {
+  getMovieDetails,
+  getTvDetails,
+  searchMovies,
+  searchTv,
+} from "../tmdb/client.ts";
+import { getOrCreateContent } from "../content.ts";
 
 /**
  * Recommendation candidate with similarity score
@@ -266,5 +273,296 @@ Provide a brief, personalised explanation (2-3 sentences) that references specif
     console.error("Error generating recommendation explanation:", error);
     // Return a fallback explanation if GPT-4 call fails
     return `Based on your viewing history, we think you'll enjoy "${candidate.title}".`;
+  }
+}
+
+/**
+ * Generate mood-based recommendations using GPT-4 and TMDB search
+ *
+ * Uses GPT-4 to understand the mood/context request and generate search queries,
+ * then searches TMDB for matching content and filters based on user history.
+ *
+ * @param userId User ID (UUID)
+ * @param moodRequest User's mood/context request (e.g., "I want something light and funny tonight")
+ * @param limit Maximum number of recommendations to return (default: 5)
+ * @returns Array of mood-based recommendation candidates with explanations
+ */
+export async function generateMoodBasedRecommendations(
+  userId: string,
+  moodRequest: string,
+  limit: number = 5,
+): Promise<RecommendationCandidate[]> {
+  // Step 1: Use GPT-4 to understand the mood and generate search queries
+  const searchQueries = await generateSearchQueriesFromMood(moodRequest);
+
+  // Step 2: Search TMDB for matching content
+  const allTmdbIds: number[] = [];
+
+  for (const searchQuery of searchQueries) {
+    try {
+      // Search both movies and TV shows
+      const movieResults = await searchMovies(searchQuery, 1);
+      const tvResults = await searchTv(searchQuery, 1);
+
+      // Collect TMDB IDs from search results
+      for (const movie of movieResults.results.slice(0, 3)) {
+        allTmdbIds.push(movie.tmdb_id);
+      }
+
+      for (const tv of tvResults.results.slice(0, 3)) {
+        allTmdbIds.push(tv.tmdb_id);
+      }
+    } catch (error) {
+      console.error(`Error searching for "${searchQuery}":`, error);
+      // Continue with other queries
+    }
+  }
+
+  if (allTmdbIds.length === 0) {
+    return [];
+  }
+
+  // Fetch full details and create content records
+  const contentRecords: ContentRecord[] = [];
+  const processedIds = new Set<number>();
+
+  for (const tmdbId of allTmdbIds.slice(0, 15)) { // Limit to avoid too many API calls
+    if (processedIds.has(tmdbId)) continue;
+    processedIds.add(tmdbId);
+
+    try {
+      // Try movie first, then TV show
+      let contentRecord: ContentRecord | null = null;
+      try {
+        const movieDetails = await getMovieDetails(tmdbId);
+        await getOrCreateContent(movieDetails, "movie");
+        // Fetch from database to get the full record
+        const records = await query<ContentRecord>(
+          "SELECT * FROM content WHERE tmdb_id = $1",
+          [tmdbId],
+        );
+        if (records.length > 0) {
+          contentRecord = records[0];
+        }
+      } catch {
+        try {
+          const tvDetails = await getTvDetails(tmdbId);
+          await getOrCreateContent(tvDetails, "tv");
+          // Fetch from database to get the full record
+          const records = await query<ContentRecord>(
+            "SELECT * FROM content WHERE tmdb_id = $1",
+            [tmdbId],
+          );
+          if (records.length > 0) {
+            contentRecord = records[0];
+          }
+        } catch (error) {
+          console.error(`Error fetching details for TMDB ID ${tmdbId}:`, error);
+        }
+      }
+
+      if (contentRecord) {
+        contentRecords.push(contentRecord);
+      }
+    } catch (error) {
+      console.error(`Error processing TMDB ID ${tmdbId}:`, error);
+    }
+  }
+
+  if (contentRecords.length === 0) {
+    return [];
+  }
+
+  // Step 3: Filter out already watched content and dismissed recommendations
+  const watchedContentIds = await query<{ content_id: string }>(
+    `SELECT DISTINCT content_id 
+     FROM user_content 
+     WHERE user_id = $1 AND status = 'watched'`,
+    [userId],
+  );
+  const watchedTmdbIds = new Set(
+    watchedContentIds.length > 0
+      ? (await query<{ tmdb_id: number }>(
+        `SELECT tmdb_id FROM content WHERE id = ANY($1)`,
+        [watchedContentIds.map((w) => w.content_id)],
+      )).map((c) => c.tmdb_id)
+      : [],
+  );
+
+  const dismissedTmdbIds = await query<{ tmdb_id: number }>(
+    `SELECT DISTINCT dr.content_id as tmdb_id
+     FROM dismissed_recommendations dr
+     INNER JOIN content c ON dr.content_id = c.tmdb_id
+     WHERE dr.user_id = $1`,
+    [userId],
+  );
+  const dismissedSet = new Set(dismissedTmdbIds.map((d) => d.tmdb_id));
+
+  const filteredRecords = contentRecords.filter(
+    (record) =>
+      !watchedTmdbIds.has(record.tmdb_id) &&
+      !dismissedSet.has(record.tmdb_id),
+  );
+
+  // Step 4: Generate explanations that reference the mood
+  const recommendationsWithExplanations = await Promise.all(
+    filteredRecords.slice(0, limit).map(async (record) => {
+      try {
+        const explanation = await generateMoodBasedExplanation(
+          userId,
+          record,
+          moodRequest,
+        );
+        return {
+          ...record,
+          similarity: 0.8, // Default similarity for mood-based recommendations
+          distance: 0.2,
+          explanation,
+        };
+      } catch (error) {
+        console.error(
+          `Error generating explanation for ${record.title}:`,
+          error,
+        );
+        return {
+          ...record,
+          similarity: 0.8,
+          distance: 0.2,
+          explanation:
+            `Based on your request for "${moodRequest}", we think you'll enjoy "${record.title}".`,
+        };
+      }
+    }),
+  );
+
+  return recommendationsWithExplanations;
+}
+
+/**
+ * Generate search queries from mood request using GPT-4
+ *
+ * @param moodRequest User's mood/context request
+ * @returns Array of search query strings
+ */
+async function generateSearchQueriesFromMood(
+  moodRequest: string,
+): Promise<string[]> {
+  const messages: ChatMessage[] = [
+    {
+      role: "system",
+      content:
+        "You are a helpful assistant that understands movie and TV show moods and contexts. Given a user's mood request, generate 3-5 specific search queries that would help find content matching that mood. Return only a JSON array of search query strings, nothing else.",
+    },
+    {
+      role: "user",
+      content: `Generate search queries for this mood request: "${moodRequest}"
+
+Return a JSON array of 3-5 search query strings that would help find movies and TV shows matching this mood. Examples:
+- For "light and funny": ["comedy", "funny movies", "lighthearted"]
+- For "dark thriller": ["thriller", "dark mystery", "suspense"]
+- For "feel-good": ["feel good movies", "uplifting", "heartwarming"]
+
+Return only the JSON array, no other text.`,
+    },
+  ];
+
+  try {
+    const response = await generateChatCompletion(messages);
+    // Try to parse JSON array from response
+    const jsonMatch = response.match(/\[.*\]/s);
+    if (jsonMatch) {
+      const queries = JSON.parse(jsonMatch[0]);
+      if (
+        Array.isArray(queries) && queries.every((q) => typeof q === "string")
+      ) {
+        return queries.slice(0, 5); // Limit to 5 queries
+      }
+    }
+    // Fallback: use the mood request itself as a search query
+    return [moodRequest];
+  } catch (error) {
+    console.error("Error generating search queries from mood:", error);
+    // Fallback: use the mood request itself as a search query
+    return [moodRequest];
+  }
+}
+
+/**
+ * Generate mood-based explanation for a recommendation
+ *
+ * @param userId User ID (UUID)
+ * @param candidate Recommended content candidate
+ * @param moodRequest Original mood request
+ * @returns Natural language explanation referencing the mood
+ */
+async function generateMoodBasedExplanation(
+  userId: string,
+  candidate: RecommendationCandidate,
+  moodRequest: string,
+): Promise<string> {
+  // Get user's watched content history for context
+  const watchedContent = await query<WatchedContentItem>(
+    `SELECT 
+      c.title,
+      c.type,
+      c.release_date,
+      uc.rating
+    FROM user_content uc
+    INNER JOIN content c ON uc.content_id = c.id
+    WHERE uc.user_id = $1 
+      AND uc.status = 'watched'
+    ORDER BY uc.watched_at DESC
+    LIMIT 10`,
+    [userId],
+  );
+
+  const watchedSummary = watchedContent.length > 0
+    ? watchedContent.map((item) => {
+      const ratingText = item.rating !== null
+        ? ` (rated ${item.rating}/10)`
+        : "";
+      const year = item.release_date
+        ? ` (${new Date(item.release_date).getFullYear()})`
+        : "";
+      return `- ${item.title}${year}${ratingText}`;
+    }).join("\n")
+    : "No watched content yet.";
+
+  const candidateYear = candidate.release_date
+    ? ` (${new Date(candidate.release_date).getFullYear()})`
+    : "";
+  const candidateType = candidate.type === "movie" ? "movie" : "TV show";
+  const candidateOverview = candidate.overview || "No description available.";
+
+  const messages: ChatMessage[] = [
+    {
+      role: "system",
+      content:
+        "You are a helpful movie and TV recommendation assistant. Generate brief, personalised explanations for content recommendations that reference the user's mood request. Keep explanations concise (2-3 sentences) and explain why this content matches their mood request.",
+    },
+    {
+      role: "user",
+      content: `The user requested: "${moodRequest}"
+
+Here's their viewing history:
+${watchedSummary}
+
+Explain why this ${candidateType} "${candidate.title}"${candidateYear} matches their mood request.
+
+Description: ${candidateOverview}
+
+Provide a brief explanation (2-3 sentences) that:
+1. References their mood request ("${moodRequest}")
+2. Explains why this content matches that mood
+3. Optionally references their viewing history if relevant`,
+    },
+  ];
+
+  try {
+    const explanation = await generateChatCompletion(messages);
+    return explanation.trim();
+  } catch (error) {
+    console.error("Error generating mood-based explanation:", error);
+    return `Based on your request for "${moodRequest}", we think you'll enjoy "${candidate.title}".`;
   }
 }

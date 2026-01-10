@@ -25,6 +25,7 @@ export default function RecommendationFeed() {
   >({});
   const [isPremium, setIsPremium] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [generalChatOpen, setGeneralChatOpen] = useState(false);
   const [selectedRecommendation, setSelectedRecommendation] = useState<
     {
       tmdbId: number;
@@ -251,6 +252,14 @@ export default function RecommendationFeed() {
             Personalised recommendations based on your viewing history
           </p>
         </div>
+        {isPremium && (
+          <button
+            onClick={() => setGeneralChatOpen(true)}
+            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
+          >
+            Ask for Recommendations
+          </button>
+        )}
       </div>
 
       {/* Loading State */}
@@ -396,6 +405,16 @@ export default function RecommendationFeed() {
           contentTitle={selectedRecommendation.title}
           isOpen={chatOpen}
           onClose={handleCloseChat}
+        />
+      )}
+
+      {/* General Chat Modal for mood-based recommendations */}
+      {generalChatOpen && (
+        <RecommendationChat
+          isOpen={generalChatOpen}
+          onClose={() => {
+            setGeneralChatOpen(false);
+          }}
         />
       )}
 

@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import type { ChatMessage } from "../lib/ai/openai.ts";
+import type { RecommendationCandidate } from "../lib/ai/recommendations.ts";
 
 interface RecommendationChatProps {
-  tmdbId: number;
-  contentTitle: string;
+  tmdbId?: number; // Optional - if not provided, enables general chat mode
+  contentTitle?: string; // Optional - for display purposes
   isOpen: boolean;
   onClose: () => void;
 }
@@ -22,6 +23,9 @@ export default function RecommendationChat({
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [recommendations, setRecommendations] = useState<
+    RecommendationCandidate[]
+  >([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -56,7 +60,12 @@ export default function RecommendationChat({
     setError(null);
 
     try {
-      const response = await fetch(`/api/recommendations/${tmdbId}/chat`, {
+      // Use general chat endpoint if no tmdbId, otherwise use content-specific endpoint
+      const endpoint = tmdbId
+        ? `/api/recommendations/${tmdbId}/chat`
+        : `/api/recommendations/chat`;
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -79,6 +88,11 @@ export default function RecommendationChat({
       };
 
       setMessages([...updatedMessages, assistantMessage]);
+
+      // If recommendations are returned (mood-based request), display them
+      if (data.recommendations && Array.isArray(data.recommendations)) {
+        setRecommendations(data.recommendations);
+      }
     } catch (err) {
       const errorMessage = err instanceof Error
         ? err.message
@@ -108,10 +122,14 @@ export default function RecommendationChat({
         <div class="flex items-center justify-between p-4 border-b">
           <div>
             <h3 class="text-lg font-semibold text-gray-900">
-              Chat about "{contentTitle}"
+              {contentTitle
+                ? `Chat about "${contentTitle}"`
+                : "AI Recommendations Chat"}
             </h3>
             <p class="text-sm text-gray-500">
-              Ask questions about this recommendation
+              {contentTitle
+                ? "Ask questions about this recommendation"
+                : "Ask for recommendations by mood or context"}
             </p>
           </div>
           <button
@@ -142,11 +160,14 @@ export default function RecommendationChat({
           {messages.length === 0 && (
             <div class="text-center text-gray-500 py-8">
               <p class="mb-2">
-                Start a conversation about this recommendation!
+                {contentTitle
+                  ? "Start a conversation about this recommendation!"
+                  : "Start a conversation to get recommendations!"}
               </p>
               <p class="text-sm">
-                Ask questions like "Why do you think I'd like this?" or "What's
-                similar to this?"
+                {contentTitle
+                  ? 'Ask questions like "Why do you think I\'d like this?" or "What\'s similar to this?"'
+                  : 'Try: "I want something light and funny tonight" or "Recommend me a thriller"'}
               </p>
             </div>
           )}
@@ -200,6 +221,49 @@ export default function RecommendationChat({
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Recommendations Display */}
+        {recommendations.length > 0 && (
+          <div class="p-4 border-t bg-gray-50">
+            <h4 class="text-sm font-semibold text-gray-900 mb-3">
+              Recommendations for you:
+            </h4>
+            <div class="space-y-2">
+              {recommendations.map((rec) => (
+                <a
+                  href={`/content/${rec.tmdb_id}`}
+                  class="block p-3 bg-white rounded-lg border border-gray-200 hover:border-indigo-500 transition-colors"
+                  key={`${rec.type}-${rec.tmdb_id}`}
+                >
+                  <div class="flex items-start gap-3">
+                    {rec.poster_path && (
+                      <img
+                        src={`https://image.tmdb.org/t/p/w92${rec.poster_path}`}
+                        alt={rec.title}
+                        class="w-16 h-24 object-cover rounded"
+                      />
+                    )}
+                    <div class="flex-1 min-w-0">
+                      <h5 class="font-medium text-gray-900 truncate">
+                        {rec.title}
+                      </h5>
+                      <p class="text-xs text-gray-500 mb-1">
+                        {rec.type.toUpperCase()}
+                        {rec.release_date &&
+                          ` • ${new Date(rec.release_date).getFullYear()}`}
+                      </p>
+                      {rec.explanation && (
+                        <p class="text-sm text-gray-700 line-clamp-2">
+                          {rec.explanation}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Input */}
         <div class="p-4 border-t">
           <div class="flex gap-2">
@@ -208,7 +272,9 @@ export default function RecommendationChat({
               value={input}
               onInput={(e) => setInput((e.target as HTMLTextAreaElement).value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask a question about this recommendation..."
+              placeholder={contentTitle
+                ? "Ask a question about this recommendation..."
+                : "Try: 'I want something light and funny tonight'"}
               disabled={loading}
               rows={2}
               class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none disabled:bg-gray-100 disabled:cursor-not-allowed"

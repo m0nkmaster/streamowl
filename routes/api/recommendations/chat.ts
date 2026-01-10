@@ -1,26 +1,19 @@
 import { type Handlers } from "$fresh/server.ts";
-import { requireAuthForApi } from "../../../../lib/auth/middleware.ts";
-import { query } from "../../../../lib/db.ts";
+import { requireAuthForApi } from "../../../lib/auth/middleware.ts";
+import { query } from "../../../lib/db.ts";
 import {
   type ChatMessage,
   generateChatCompletion,
-} from "../../../../lib/ai/openai.ts";
-import { getOrCreateContent } from "../../../../lib/content.ts";
-import {
-  getMovieDetails,
-  getTvDetails,
-  type MovieDetails,
-  type TvDetails,
-} from "../../../../lib/tmdb/client.ts";
+} from "../../../lib/ai/openai.ts";
 import {
   generateMoodBasedRecommendations,
   type RecommendationCandidate,
-} from "../../../../lib/ai/recommendations.ts";
+} from "../../../lib/ai/recommendations.ts";
 import {
   createBadRequestResponse,
   createInternalServerErrorResponse,
   createUnauthorizedResponse,
-} from "../../../../lib/api/errors.ts";
+} from "../../../lib/api/errors.ts";
 
 interface ChatRequest {
   message: string;
@@ -88,11 +81,11 @@ async function getWatchedContentHistory(userId: string): Promise<string> {
 }
 
 /**
- * API handler for conversational AI chat about recommendations
- * Premium users only - allows discussing recommendations with AI
+ * API handler for general conversational AI chat about recommendations
+ * Premium users only - allows discussing recommendations and requesting mood-based recommendations
  */
 export const handler: Handlers = {
-  async POST(req, ctx) {
+  async POST(req) {
     try {
       // Require authentication
       const session = await requireAuthForApi(req);
@@ -116,12 +109,6 @@ export const handler: Handlers = {
 
       const message = body.message.trim();
 
-      // Get tmdb_id from route params
-      const tmdbId = parseInt(ctx.params.tmdb_id);
-      if (isNaN(tmdbId)) {
-        return createBadRequestResponse("Invalid content ID");
-      }
-
       // Check if this is a mood-based recommendation request
       // Look for patterns like "I want", "I need", "recommend me", "suggest", "something", etc.
       const moodPatterns = [
@@ -139,81 +126,36 @@ export const handler: Handlers = {
         pattern.test(message)
       );
 
-      // Fetch full content details from TMDB for context
-      // Try movie first, then TV show
-      let contentDetails: MovieDetails | TvDetails;
-      let contentType: "movie" | "tv";
-      try {
-        try {
-          contentDetails = await getMovieDetails(tmdbId);
-          contentType = "movie";
-        } catch {
-          contentDetails = await getTvDetails(tmdbId);
-          contentType = "tv";
-        }
-      } catch (error) {
-        console.error("Error fetching content details:", error);
-        return createBadRequestResponse("Failed to fetch content details");
-      }
-
-      // Get or create content record
-      await getOrCreateContent(contentDetails, contentType);
-
       // Get user's watched content history for context
       const watchedHistory = await getWatchedContentHistory(session.userId);
 
-      // Build conversation context
-      const releaseDate = contentType === "movie"
-        ? (contentDetails as MovieDetails).release_date
-        : (contentDetails as TvDetails).first_air_date;
-      const contentYear = releaseDate
-        ? ` (${new Date(releaseDate).getFullYear()})`
-        : "";
-      const contentTypeLabel = contentType === "movie" ? "movie" : "TV show";
-      const contentTitle = contentType === "movie"
-        ? (contentDetails as MovieDetails).title
-        : (contentDetails as TvDetails).name;
-      const contentOverview = contentDetails.overview ||
-        "No description available.";
-
-      // Build system message with context
-      // If it's a mood request, adjust the system message accordingly
+      // Build system message
       let systemMessageContent = "";
       if (isMoodRequest) {
         systemMessageContent =
-          `You are a helpful movie and TV recommendation assistant. The user is asking about a recommended ${contentTypeLabel} called "${contentTitle}"${contentYear}, but they're also requesting recommendations based on their mood: "${message}"
+          `You are a helpful movie and TV recommendation assistant. The user is requesting recommendations based on their mood or context: "${message}"
 
 Here's the user's viewing history:
 ${watchedHistory}
 
-Here's information about the recommended ${contentTypeLabel}:
-Title: ${contentTitle}${contentYear}
-Type: ${contentTypeLabel}
-Description: ${contentOverview}
-
-Provide helpful, contextual answers. If the user is asking for mood-based recommendations, acknowledge their request and provide relevant suggestions. Reference the user's viewing history when relevant. Keep responses conversational and concise (2-4 sentences typically, but can be longer if the question requires it).`;
+Provide helpful, contextual responses about recommendations that match their mood request. Reference their viewing history when relevant. Keep responses conversational and concise (2-4 sentences typically).`;
       } else {
         systemMessageContent =
-          `You are a helpful movie and TV recommendation assistant. The user is asking about a recommended ${contentTypeLabel} called "${contentTitle}"${contentYear}.
+          `You are a helpful movie and TV recommendation assistant.
 
 Here's the user's viewing history:
 ${watchedHistory}
 
-Here's information about the recommended ${contentTypeLabel}:
-Title: ${contentTitle}${contentYear}
-Type: ${contentTypeLabel}
-Description: ${contentOverview}
-
-Provide helpful, contextual answers about this recommendation. Reference the user's viewing history when relevant. Keep responses conversational and concise (2-4 sentences typically, but can be longer if the question requires it).`;
+Provide helpful, contextual responses about movie and TV recommendations. Reference their viewing history when relevant. Keep responses conversational and concise (2-4 sentences typically).`;
       }
 
-      const systemMessage: ChatMessage = {
-        role: "system",
-        content: systemMessageContent,
-      };
-
       // Build conversation messages
-      const messages: ChatMessage[] = [systemMessage];
+      const messages: ChatMessage[] = [
+        {
+          role: "system",
+          content: systemMessageContent,
+        },
+      ];
 
       // Add conversation history if provided
       if (body.conversationHistory && Array.isArray(body.conversationHistory)) {
@@ -227,7 +169,7 @@ Provide helpful, contextual answers about this recommendation. Reference the use
       // Add current user message
       messages.push({
         role: "user",
-        content: body.message.trim(),
+        content: message,
       });
 
       // Generate AI response
@@ -239,12 +181,17 @@ Provide helpful, contextual answers about this recommendation. Reference the use
 
       // If this was a mood request, include recommendations
       if (isMoodRequest) {
-        const recommendations = await generateMoodBasedRecommendations(
-          session.userId,
-          message,
-          5,
-        );
-        chatResponse.recommendations = recommendations;
+        try {
+          const recommendations = await generateMoodBasedRecommendations(
+            session.userId,
+            message,
+            5,
+          );
+          chatResponse.recommendations = recommendations;
+        } catch (error) {
+          console.error("Error generating mood-based recommendations:", error);
+          // Continue without recommendations - chat response is still valid
+        }
       }
 
       return new Response(JSON.stringify(chatResponse), {

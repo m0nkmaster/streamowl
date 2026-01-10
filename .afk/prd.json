@@ -765,7 +765,7 @@
         "Step 3: Verify recommendations match mood request",
         "Step 4: Verify explanations reference mood context"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "ai-rate-limiting-free",
