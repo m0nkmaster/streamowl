@@ -43,6 +43,36 @@ export function sendPasswordResetEmail(
 }
 
 /**
+ * Send an email verification email
+ *
+ * @param to Recipient email address
+ * @param verificationUrl Full URL to email verification endpoint
+ */
+export function sendVerificationEmail(
+  to: string,
+  verificationUrl: string,
+): void {
+  // In production, this would send an actual email via an email service provider
+  // For now, we'll log to console for development/testing
+  console.log("=".repeat(80));
+  console.log("EMAIL VERIFICATION");
+  console.log("=".repeat(80));
+  console.log(`To: ${to}`);
+  console.log(`Subject: Verify your email address`);
+  console.log("");
+  console.log(`Welcome to Stream Owl!`);
+  console.log("");
+  console.log(`Please click the link below to verify your email address:`);
+  console.log(`${verificationUrl}`);
+  console.log("");
+  console.log(`This link will expire in 48 hours.`);
+  console.log(`If you didn't create an account, please ignore this email.`);
+  console.log("=".repeat(80));
+
+  // TODO: Integrate with email service provider (SendGrid, AWS SES, etc.)
+}
+
+/**
  * Generate password reset URL from token
  *
  * @param baseUrl Base URL of the application (e.g., "https://example.com")
@@ -54,4 +84,18 @@ export function generatePasswordResetUrl(
   token: string,
 ): string {
   return `${baseUrl}/reset-password?token=${encodeURIComponent(token)}`;
+}
+
+/**
+ * Generate email verification URL from token
+ *
+ * @param baseUrl Base URL of the application (e.g., "https://example.com")
+ * @param token Email verification token
+ * @returns Full email verification URL
+ */
+export function generateVerificationUrl(
+  baseUrl: string,
+  token: string,
+): string {
+  return `${baseUrl}/api/auth/verify-email?token=${encodeURIComponent(token)}`;
 }

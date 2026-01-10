@@ -19,6 +19,11 @@ import {
   createInternalServerErrorResponse,
   createTooManyRequestsResponse,
 } from "../../lib/api/errors.ts";
+import { createEmailVerificationToken } from "../../lib/auth/email-verification.ts";
+import {
+  generateVerificationUrl,
+  sendVerificationEmail,
+} from "../../lib/email/sender.ts";
 
 interface SignupRequest {
   email: string;
@@ -108,6 +113,12 @@ export const handler: Handlers = {
 
       // Clear failed attempts on successful signup
       clearFailedAttempts(clientIp);
+
+      // Send email verification
+      const baseUrl = new URL(req.url).origin;
+      const verificationToken = await createEmailVerificationToken(newUser.id);
+      const verificationUrl = generateVerificationUrl(baseUrl, verificationToken);
+      sendVerificationEmail(newUser.email, verificationUrl);
 
       // Set session cookie and redirect to dashboard
       const headers = new Headers();
