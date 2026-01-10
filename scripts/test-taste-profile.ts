@@ -206,7 +206,9 @@ async function testNoWatchedContent() {
   const tasteEmbedding = await calculateAndStoreTasteProfile(userId);
 
   if (tasteEmbedding !== null) {
-    throw new Error("Taste embedding should be null for user with no watched content");
+    throw new Error(
+      "Taste embedding should be null for user with no watched content",
+    );
   }
 
   // Verify NULL stored in database
@@ -231,7 +233,12 @@ async function testNoContentEmbeddings() {
     `INSERT INTO content (tmdb_id, type, title, overview)
      VALUES ($1, $2, $3, $4)
      RETURNING id`,
-    [Math.floor(Math.random() * 1000000), "movie", "No Embedding Film", "A film without embedding"],
+    [
+      Math.floor(Math.random() * 1000000),
+      "movie",
+      "No Embedding Film",
+      "A film without embedding",
+    ],
   );
   const contentId = contentResult[0].id;
 
@@ -242,7 +249,9 @@ async function testNoContentEmbeddings() {
   const tasteEmbedding = await calculateAndStoreTasteProfile(userId);
 
   if (tasteEmbedding !== null) {
-    throw new Error("Taste embedding should be null when no content has embeddings");
+    throw new Error(
+      "Taste embedding should be null when no content has embeddings",
+    );
   }
 
   console.log("✓ Taste profile set to NULL when no content has embeddings");

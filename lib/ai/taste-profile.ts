@@ -57,7 +57,7 @@ export async function calculateAndStoreTasteProfile(
     // Normalise rating to 0-1 scale (rating is 0-10, so divide by 10)
     // Add small epsilon to ensure minimum weight for very low ratings
     const weight = Math.max(0.1, rating / 10);
-    
+
     embeddings.push(item.content_embedding);
     weights.push(weight);
   }

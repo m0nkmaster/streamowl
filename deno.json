@@ -30,7 +30,8 @@
     "test:xss": "deno run -A scripts/test-xss-prevention.ts",
     "test:migration-runner": "deno run -A scripts/test-migration-runner.ts",
     "test:content-embeddings": "deno run -A scripts/test-content-embeddings.ts",
-    "test:taste-profile": "deno run -A scripts/test-taste-profile.ts"
+    "test:taste-profile": "deno run -A scripts/test-taste-profile.ts",
+    "test:recommendation-candidates": "deno run -A scripts/test-recommendation-candidates.ts"
   },
   "lint": {
     "rules": {
