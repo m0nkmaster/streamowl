@@ -11,7 +11,7 @@
         "Step 3: Run deno task dev and confirm server starts on localhost",
         "Step 4: Navigate to homepage and verify Fresh welcome page renders"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "database-postgresql-setup",

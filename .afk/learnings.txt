@@ -1,0 +1,16 @@
+# Project Learnings
+
+## Fresh Framework Initialization
+
+- Fresh 2.0.0 is not yet available on deno.land/x. The latest stable version is Fresh 1.7.3, which works perfectly for this project.
+- Fresh project structure requires:
+  - `deno.json` with Fresh imports and tasks
+  - `dev.ts` for development server
+  - `main.ts` for production server
+  - `fresh.config.ts` for configuration
+  - `fresh.gen.ts` for route manifest (auto-generated)
+  - `routes/` directory for page routes
+  - `static/` directory for static assets
+- The dev server starts on localhost:8000 by default
+- Fresh uses Preact for components and supports TypeScript out of the box
+- The `deno task start` command runs the development server with hot reload
