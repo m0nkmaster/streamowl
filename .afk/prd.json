@@ -1116,7 +1116,7 @@
         "Step 3: Review code for raw SQL string concatenation",
         "Step 4: Verify all queries use parameterised statements"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "security-xss-prevention",

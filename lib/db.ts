@@ -54,7 +54,22 @@ export function getPool(): Pool {
 /**
  * Execute a query using the connection pool
  *
- * @param query SQL query string
+ * **SECURITY: SQL Injection Prevention**
+ * This function uses parameterised queries to prevent SQL injection attacks.
+ * Always use $1, $2, etc. placeholders in the query string and pass values
+ * in the params array. Never concatenate user input directly into SQL strings.
+ *
+ * ✅ CORRECT:
+ * ```ts
+ * await query("SELECT * FROM users WHERE email = $1", [userEmail]);
+ * ```
+ *
+ * ❌ WRONG (vulnerable to SQL injection):
+ * ```ts
+ * await query(`SELECT * FROM users WHERE email = '${userEmail}'`);
+ * ```
+ *
+ * @param query SQL query string with $1, $2, etc. placeholders
  * @param params Query parameters (for parameterised queries)
  * @returns Query result
  */

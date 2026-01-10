@@ -151,3 +151,12 @@
 - MovieDetails interface: Extended MovieDetails interface to include optional `credits?: Credits` and `images?: Images` fields
 - TvDetails interface: Created TvDetails interface similar to MovieDetails but with TV-specific fields (name instead of title, first_air_date instead of release_date, episode_run_time instead of runtime)
 - Content details test script: Created `scripts/test-tmdb-content-details.ts` to test fetching movie and TV details, verify credits and images are included, test error handling, added `deno task test:tmdb-content-details` to deno.json
+
+## Security - SQL Injection Prevention
+
+- Parameterised queries: All database queries use parameterised statements with $1, $2, etc. placeholders to prevent SQL injection attacks
+- Query function security: The `query()` function in `lib/db.ts` uses `queryObject()` with separate `text` and `args` parameters, ensuring user input is never concatenated into SQL strings
+- Code review verification: All queries in routes/api/ (login.ts, signup.ts) use parameterised queries with placeholders
+- Test script: Created `scripts/test-sql-injection-protection.ts` to verify SQL injection payloads are safely handled as literal strings, added `deno task test:sql-injection` to deno.json
+- Documentation: Added security documentation to `query()` function with examples of correct (parameterised) and incorrect (concatenated) usage patterns
+- Best practice: Never concatenate user input directly into SQL strings - always use parameterised queries with placeholders
