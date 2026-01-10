@@ -19,6 +19,15 @@ interface WatchlistContent {
   added_at: string;
 }
 
+interface FavouritesContent {
+  tmdb_id: number;
+  type: "movie" | "tv" | "documentary";
+  title: string;
+  poster_path: string | null;
+  release_date: string | null;
+  added_at: string;
+}
+
 interface LibraryTabsProps {
   initialTab?: "watched" | "to_watch" | "favourites";
 }
@@ -33,6 +42,9 @@ export default function LibraryTabs(
   const [watchedContent, setWatchedContent] = useState<WatchedContent[]>([]);
   const [watchlistContent, setWatchlistContent] = useState<
     WatchlistContent[]
+  >([]);
+  const [favouritesContent, setFavouritesContent] = useState<
+    FavouritesContent[]
   >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -89,6 +101,29 @@ export default function LibraryTabs(
       };
 
       fetchWatchlistContent();
+    } else if (activeTab === "favourites") {
+      // Fetch favourites content
+      const fetchFavouritesContent = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+          const response = await fetch("/api/library/favourites");
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch favourites content");
+          }
+
+          const data = await response.json();
+          setFavouritesContent(data.content || []);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "An error occurred");
+          console.error("Error fetching favourites content:", err);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchFavouritesContent();
     } else {
       setLoading(false);
     }
@@ -269,8 +304,58 @@ export default function LibraryTabs(
       )}
 
       {activeTab === "favourites" && (
-        <div class="text-center py-8">
-          <p class="text-gray-600">Favourites list coming soon.</p>
+        <div>
+          {loading && (
+            <div class="text-center py-8">
+              <p class="text-gray-600">Loading...</p>
+            </div>
+          )}
+
+          {error && (
+            <div class="text-center py-8">
+              <p class="text-red-600">Error: {error}</p>
+            </div>
+          )}
+
+          {!loading && !error && favouritesContent.length === 0 && (
+            <div class="text-center py-8">
+              <p class="text-gray-600">No favourites yet.</p>
+              <p class="text-gray-500 text-sm mt-2">
+                Mark content as favourite to see it here.
+              </p>
+            </div>
+          )}
+
+          {!loading && !error && favouritesContent.length > 0 && (
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {favouritesContent.map((item) => (
+                <a
+                  href={`/content/${item.tmdb_id}`}
+                  key={`${item.type}-${item.tmdb_id}`}
+                  class="block group hover:scale-105 transition-transform"
+                >
+                  <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <img
+                      src={getPosterUrl(item.poster_path)}
+                      alt={item.title}
+                      class="w-full aspect-[2/3] object-cover"
+                      loading="lazy"
+                    />
+                    <div class="p-3">
+                      <h3 class="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-indigo-600">
+                        {item.title}
+                      </h3>
+                      <div class="mt-2">
+                        <p class="text-xs text-gray-500">
+                          Added: {formatDate(item.added_at)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

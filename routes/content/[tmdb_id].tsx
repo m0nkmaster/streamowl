@@ -11,6 +11,7 @@ import {
 } from "../../lib/tmdb/client.ts";
 import MarkAsWatchedButton from "../../islands/MarkAsWatchedButton.tsx";
 import AddToWatchlistButton from "../../islands/AddToWatchlistButton.tsx";
+import FavouriteButton from "../../islands/FavouriteButton.tsx";
 
 interface ContentDetailPageProps {
   content: MovieDetails | TvDetails;
@@ -274,12 +275,16 @@ export default function ContentDetailPage(
 
             {/* Action Buttons */}
             {isAuthenticated && (
-              <div class="mb-6 flex gap-3">
+              <div class="mb-6 flex gap-3 flex-wrap">
                 <MarkAsWatchedButton
                   tmdbId={tmdbId}
                   initialStatus={userStatus}
                 />
                 <AddToWatchlistButton
+                  tmdbId={tmdbId}
+                  initialStatus={userStatus}
+                />
+                <FavouriteButton
                   tmdbId={tmdbId}
                   initialStatus={userStatus}
                 />
