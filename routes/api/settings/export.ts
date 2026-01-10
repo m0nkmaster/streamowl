@@ -1,5 +1,6 @@
 import { type Handlers } from "$fresh/server.ts";
 import { requireAuthForApi } from "../../../lib/auth/middleware.ts";
+import { isPremiumUser } from "../../../lib/auth/premium.ts";
 import { query } from "../../../lib/db.ts";
 import {
   createBadRequestResponse,
@@ -11,60 +12,56 @@ interface UserProfile {
   email: string;
   display_name: string | null;
   avatar_url: string | null;
-  preferences: Record<string, unknown>;
   created_at: Date;
 }
 
-interface UserContentRecord {
+interface UserContentItem {
   tmdb_id: number;
-  type: "movie" | "tv" | "documentary";
+  content_type: string;
   title: string;
-  status: "watched" | "to_watch" | "favourite";
+  status: string;
   rating: number | null;
   notes: string | null;
   watched_at: Date | null;
-  created_at: Date;
+  added_at: Date;
 }
 
-interface ListRecord {
-  id: string;
-  name: string;
-  description: string | null;
+interface ListItem {
+  list_name: string;
+  list_description: string | null;
   is_public: boolean;
-  created_at: Date;
-  items: {
-    tmdb_id: number;
-    type: "movie" | "tv" | "documentary";
-    title: string;
-    position: number;
-  }[];
+  tmdb_id: number;
+  content_type: string;
+  title: string;
+  position: number;
+  added_at: Date;
 }
 
-interface TagRecord {
-  id: string;
+interface Tag {
   name: string;
   colour: string;
-  created_at: Date;
-  content: {
-    tmdb_id: number;
-    type: "movie" | "tv" | "documentary";
-    title: string;
-  }[];
+}
+
+interface ContentTag {
+  tag_name: string;
+  tmdb_id: number;
+  content_type: string;
+  title: string;
 }
 
 interface ExportData {
   exportedAt: string;
-  user: {
+  profile: {
     email: string;
     displayName: string | null;
     avatarUrl: string | null;
     createdAt: string;
   };
-  content: {
+  library: {
     tmdbId: number;
-    type: "movie" | "tv" | "documentary";
+    contentType: string;
     title: string;
-    status: "watched" | "to_watch" | "favourite";
+    status: string;
     rating: number | null;
     notes: string | null;
     watchedAt: string | null;
@@ -74,21 +71,20 @@ interface ExportData {
     name: string;
     description: string | null;
     isPublic: boolean;
-    createdAt: string;
     items: {
       tmdbId: number;
-      type: "movie" | "tv" | "documentary";
+      contentType: string;
       title: string;
       position: number;
+      addedAt: string;
     }[];
   }[];
   tags: {
     name: string;
     colour: string;
-    createdAt: string;
     content: {
       tmdbId: number;
-      type: "movie" | "tv" | "documentary";
+      contentType: string;
       title: string;
     }[];
   }[];
@@ -98,113 +94,90 @@ interface ExportData {
  * Convert export data to CSV format
  * Creates multiple sections for different data types
  */
-function convertToCSV(data: ExportData): string {
+function toCSV(data: ExportData): string {
   const lines: string[] = [];
 
-  // User info section
-  lines.push("# User Profile");
+  // Helper to escape CSV values
+  const escapeCSV = (value: unknown): string => {
+    if (value === null || value === undefined) return "";
+    const str = String(value);
+    if (str.includes(",") || str.includes('"') || str.includes("\n")) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  // Profile section
+  lines.push("# Profile");
   lines.push("Email,Display Name,Avatar URL,Created At");
   lines.push(
     [
-      escapeCSV(data.user.email),
-      escapeCSV(data.user.displayName || ""),
-      escapeCSV(data.user.avatarUrl || ""),
-      data.user.createdAt,
+      escapeCSV(data.profile.email),
+      escapeCSV(data.profile.displayName),
+      escapeCSV(data.profile.avatarUrl),
+      escapeCSV(data.profile.createdAt),
     ].join(","),
   );
   lines.push("");
 
-  // Content section
-  lines.push("# Library Content");
+  // Library section
+  lines.push("# Library");
   lines.push(
-    "TMDB ID,Type,Title,Status,Rating,Notes,Watched At,Added At",
+    "TMDB ID,Content Type,Title,Status,Rating,Notes,Watched At,Added At",
   );
-  for (const item of data.content) {
+  for (const item of data.library) {
     lines.push(
       [
-        item.tmdbId,
-        item.type,
+        escapeCSV(item.tmdbId),
+        escapeCSV(item.contentType),
         escapeCSV(item.title),
-        item.status,
-        item.rating ?? "",
-        escapeCSV(item.notes || ""),
-        item.watchedAt || "",
-        item.addedAt,
+        escapeCSV(item.status),
+        escapeCSV(item.rating),
+        escapeCSV(item.notes),
+        escapeCSV(item.watchedAt),
+        escapeCSV(item.addedAt),
       ].join(","),
     );
   }
   lines.push("");
 
   // Lists section
-  lines.push("# Custom Lists");
+  lines.push("# Lists");
   lines.push(
-    "List Name,Description,Is Public,Created At,Item TMDB ID,Item Type,Item Title,Position",
+    "List Name,List Description,Is Public,TMDB ID,Content Type,Title,Position,Added At",
   );
   for (const list of data.lists) {
-    if (list.items.length === 0) {
-      // Empty list
+    for (const item of list.items) {
       lines.push(
         [
           escapeCSV(list.name),
-          escapeCSV(list.description || ""),
-          list.isPublic,
-          list.createdAt,
-          "",
-          "",
-          "",
-          "",
+          escapeCSV(list.description),
+          escapeCSV(list.isPublic),
+          escapeCSV(item.tmdbId),
+          escapeCSV(item.contentType),
+          escapeCSV(item.title),
+          escapeCSV(item.position),
+          escapeCSV(item.addedAt),
         ].join(","),
       );
-    } else {
-      for (const item of list.items) {
-        lines.push(
-          [
-            escapeCSV(list.name),
-            escapeCSV(list.description || ""),
-            list.isPublic,
-            list.createdAt,
-            item.tmdbId,
-            item.type,
-            escapeCSV(item.title),
-            item.position,
-          ].join(","),
-        );
-      }
     }
   }
   lines.push("");
 
   // Tags section
   lines.push("# Tags");
-  lines.push(
-    "Tag Name,Colour,Created At,Content TMDB ID,Content Type,Content Title",
-  );
+  lines.push("Tag Name,Tag Colour,TMDB ID,Content Type,Title");
   for (const tag of data.tags) {
-    if (tag.content.length === 0) {
-      // Empty tag
+    for (const item of tag.content) {
       lines.push(
         [
           escapeCSV(tag.name),
-          tag.colour,
-          tag.createdAt,
-          "",
-          "",
-          "",
+          escapeCSV(tag.colour),
+          escapeCSV(item.tmdbId),
+          escapeCSV(item.contentType),
+          escapeCSV(item.title),
         ].join(","),
       );
-    } else {
-      for (const item of tag.content) {
-        lines.push(
-          [
-            escapeCSV(tag.name),
-            tag.colour,
-            tag.createdAt,
-            item.tmdbId,
-            item.type,
-            escapeCSV(item.title),
-          ].join(","),
-        );
-      }
     }
   }
 
@@ -212,47 +185,24 @@ function convertToCSV(data: ExportData): string {
 }
 
 /**
- * Escape a value for CSV format
- */
-function escapeCSV(value: string): string {
-  if (value.includes(",") || value.includes('"') || value.includes("\n")) {
-    return `"${value.replace(/"/g, '""')}"`;
-  }
-  return value;
-}
-
-/**
  * API endpoint for exporting user data
- * GET: Export user's data in JSON or CSV format
  *
- * Query parameters:
- * - format: "json" (default) or "csv"
- *
- * Premium only feature
+ * GET /api/settings/export?format=json|csv
+ * - Premium users only
+ * - Returns all user data in the specified format
  */
 export const handler: Handlers = {
   async GET(req) {
     try {
       const session = await requireAuthForApi(req);
+      const userId = session.userId;
 
-      // Check if user is premium
-      const userResult = await query<{
-        preferences: Record<string, unknown>;
-      }>(
-        "SELECT preferences FROM users WHERE id = $1",
-        [session.userId],
-      );
-
-      if (userResult.length === 0) {
-        return createInternalServerErrorResponse("User not found");
-      }
-
-      const preferences = userResult[0].preferences || {};
-      const isPremium = preferences.premium === true;
-
+      // Check premium status
+      const isPremium = await isPremiumUser(userId);
       if (!isPremium) {
         return createForbiddenResponse(
-          "Data export is a premium feature. Please upgrade to access this feature.",
+          "Data export is a premium feature. Please upgrade to export your data.",
+          "PREMIUM_REQUIRED",
         );
       }
 
@@ -262,16 +212,16 @@ export const handler: Handlers = {
 
       if (format !== "json" && format !== "csv") {
         return createBadRequestResponse(
-          "Invalid format. Supported formats: json, csv",
+          "Invalid format. Use 'json' or 'csv'.",
           "format",
         );
       }
 
       // Fetch user profile
       const profileResult = await query<UserProfile>(
-        `SELECT email, display_name, avatar_url, preferences, created_at 
+        `SELECT email, display_name, avatar_url, created_at
          FROM users WHERE id = $1`,
-        [session.userId],
+        [userId],
       );
 
       if (profileResult.length === 0) {
@@ -280,143 +230,161 @@ export const handler: Handlers = {
 
       const profile = profileResult[0];
 
-      // Fetch all user content (watched, watchlist, favourites)
-      const contentResult = await query<UserContentRecord>(
+      // Fetch user library (user_content with content details)
+      const libraryResult = await query<UserContentItem>(
         `SELECT 
           c.tmdb_id,
-          c.type,
+          c.type AS content_type,
           c.title,
           uc.status,
           uc.rating,
           uc.notes,
           uc.watched_at,
-          uc.created_at
+          uc.created_at AS added_at
         FROM user_content uc
         INNER JOIN content c ON uc.content_id = c.id
         WHERE uc.user_id = $1
         ORDER BY uc.created_at DESC`,
-        [session.userId],
+        [userId],
       );
 
-      // Fetch user's lists with items
-      const listsResult = await query<{
-        id: string;
-        name: string;
-        description: string | null;
-        is_public: boolean;
-        created_at: Date;
-      }>(
-        `SELECT id, name, description, is_public, created_at 
-         FROM lists 
-         WHERE user_id = $1
-         ORDER BY created_at DESC`,
-        [session.userId],
+      // Fetch custom lists with their items
+      const listItemsResult = await query<ListItem>(
+        `SELECT 
+          l.name AS list_name,
+          l.description AS list_description,
+          l.is_public,
+          c.tmdb_id,
+          c.type AS content_type,
+          c.title,
+          li.position,
+          li.created_at AS added_at
+        FROM lists l
+        LEFT JOIN list_items li ON li.list_id = l.id
+        LEFT JOIN content c ON li.content_id = c.id
+        WHERE l.user_id = $1
+        ORDER BY l.name, li.position`,
+        [userId],
       );
 
-      // Fetch list items for each list
-      const lists: ListRecord[] = [];
-      for (const list of listsResult) {
-        const itemsResult = await query<{
-          tmdb_id: number;
-          type: "movie" | "tv" | "documentary";
-          title: string;
-          position: number;
-        }>(
-          `SELECT c.tmdb_id, c.type, c.title, li.position
-           FROM list_items li
-           INNER JOIN content c ON li.content_id = c.id
-           WHERE li.list_id = $1
-           ORDER BY li.position ASC`,
-          [list.id],
-        );
+      // Fetch tags
+      const tagsResult = await query<Tag>(
+        `SELECT name, colour FROM tags WHERE user_id = $1 ORDER BY name`,
+        [userId],
+      );
 
-        lists.push({
-          ...list,
-          items: itemsResult,
-        });
+      // Fetch content tagged by user
+      const contentTagsResult = await query<ContentTag>(
+        `SELECT 
+          t.name AS tag_name,
+          c.tmdb_id,
+          c.type AS content_type,
+          c.title
+        FROM content_tags ct
+        INNER JOIN tags t ON ct.tag_id = t.id
+        INNER JOIN content c ON ct.content_id = c.id
+        WHERE t.user_id = $1
+        ORDER BY t.name, c.title`,
+        [userId],
+      );
+
+      // Build lists structure
+      const listsMap = new Map<
+        string,
+        {
+          name: string;
+          description: string | null;
+          isPublic: boolean;
+          items: {
+            tmdbId: number;
+            contentType: string;
+            title: string;
+            position: number;
+            addedAt: string;
+          }[];
+        }
+      >();
+
+      for (const item of listItemsResult) {
+        if (!listsMap.has(item.list_name)) {
+          listsMap.set(item.list_name, {
+            name: item.list_name,
+            description: item.list_description,
+            isPublic: item.is_public,
+            items: [],
+          });
+        }
+
+        // Only add item if it has content (not an empty list)
+        if (item.tmdb_id !== null) {
+          listsMap.get(item.list_name)!.items.push({
+            tmdbId: item.tmdb_id,
+            contentType: item.content_type,
+            title: item.title,
+            position: item.position,
+            addedAt: item.added_at.toISOString(),
+          });
+        }
       }
 
-      // Fetch user's tags with content
-      const tagsResult = await query<{
-        id: string;
-        name: string;
-        colour: string;
-        created_at: Date;
-      }>(
-        `SELECT id, name, colour, created_at 
-         FROM tags 
-         WHERE user_id = $1
-         ORDER BY created_at DESC`,
-        [session.userId],
-      );
+      // Build tags structure with their content
+      const tagsMap = new Map<
+        string,
+        {
+          name: string;
+          colour: string;
+          content: {
+            tmdbId: number;
+            contentType: string;
+            title: string;
+          }[];
+        }
+      >();
 
-      // Fetch tagged content for each tag
-      const tags: TagRecord[] = [];
       for (const tag of tagsResult) {
-        const contentResult = await query<{
-          tmdb_id: number;
-          type: "movie" | "tv" | "documentary";
-          title: string;
-        }>(
-          `SELECT c.tmdb_id, c.type, c.title
-           FROM content_tags ct
-           INNER JOIN content c ON ct.content_id = c.id
-           WHERE ct.tag_id = $1`,
-          [tag.id],
-        );
-
-        tags.push({
-          ...tag,
-          content: contentResult,
+        tagsMap.set(tag.name, {
+          name: tag.name,
+          colour: tag.colour,
+          content: [],
         });
       }
 
-      // Build export data structure
+      for (const item of contentTagsResult) {
+        if (tagsMap.has(item.tag_name)) {
+          tagsMap.get(item.tag_name)!.content.push({
+            tmdbId: item.tmdb_id,
+            contentType: item.content_type,
+            title: item.title,
+          });
+        }
+      }
+
+      // Build export data
       const exportData: ExportData = {
         exportedAt: new Date().toISOString(),
-        user: {
+        profile: {
           email: profile.email,
           displayName: profile.display_name,
           avatarUrl: profile.avatar_url,
           createdAt: profile.created_at.toISOString(),
         },
-        content: contentResult.map((item) => ({
+        library: libraryResult.map((item) => ({
           tmdbId: item.tmdb_id,
-          type: item.type,
+          contentType: item.content_type,
           title: item.title,
           status: item.status,
           rating: item.rating,
           notes: item.notes,
           watchedAt: item.watched_at?.toISOString() || null,
-          addedAt: item.created_at.toISOString(),
+          addedAt: item.added_at.toISOString(),
         })),
-        lists: lists.map((list) => ({
-          name: list.name,
-          description: list.description,
-          isPublic: list.is_public,
-          createdAt: list.created_at.toISOString(),
-          items: list.items.map((item) => ({
-            tmdbId: item.tmdb_id,
-            type: item.type,
-            title: item.title,
-            position: item.position,
-          })),
-        })),
-        tags: tags.map((tag) => ({
-          name: tag.name,
-          colour: tag.colour,
-          createdAt: tag.created_at.toISOString(),
-          content: tag.content.map((item) => ({
-            tmdbId: item.tmdb_id,
-            type: item.type,
-            title: item.title,
-          })),
-        })),
+        lists: Array.from(listsMap.values()),
+        tags: Array.from(tagsMap.values()),
       };
 
       // Return in requested format
       if (format === "csv") {
-        const csv = convertToCSV(exportData);
+        const csv = toCSV(exportData);
         const filename = `streamowl-export-${
           new Date().toISOString().split("T")[0]
         }.csv`;
@@ -427,18 +395,19 @@ export const handler: Handlers = {
             "Content-Disposition": `attachment; filename="${filename}"`,
           },
         });
-      } else {
-        const filename = `streamowl-export-${
-          new Date().toISOString().split("T")[0]
-        }.json`;
-
-        return new Response(JSON.stringify(exportData, null, 2), {
-          headers: {
-            "Content-Type": "application/json; charset=utf-8",
-            "Content-Disposition": `attachment; filename="${filename}"`,
-          },
-        });
       }
+
+      // JSON format
+      const filename = `streamowl-export-${
+        new Date().toISOString().split("T")[0]
+      }.json`;
+
+      return new Response(JSON.stringify(exportData, null, 2), {
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Disposition": `attachment; filename="${filename}"`,
+        },
+      });
     } catch (error) {
       if (error instanceof Response) {
         return error;

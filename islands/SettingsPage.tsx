@@ -64,33 +64,47 @@ export default function SettingsPage({
   const [nameLoading, setNameLoading] = useState(false);
   const [nameSaved, setNameSaved] = useState(false);
 
-  // Avatar upload state
-  const [avatarUrl, setAvatarUrl] = useState(userProfile.avatarUrl);
-  const [avatarLoading, setAvatarLoading] = useState(false);
-  const [avatarError, setAvatarError] = useState<string | null>(null);
+  // Notification state
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationsSupported, setNotificationsSupported] = useState(false);
+  const [notificationPermission, setNotificationPermission] = useState<
+    NotificationPermission
+  >("default");
+  const [notificationLoading, setNotificationLoading] = useState(false);
+  const [testNotificationSent, setTestNotificationSent] = useState(false);
 
   // Data export state
   const [exportLoading, setExportLoading] = useState(false);
-  const [exportFormat, setExportFormat] = useState<"json" | "csv">("json");
+  const [exportError, setExportError] = useState<string | null>(null);
+  const [exportSuccess, setExportSuccess] = useState(false);
 
-  // Notification preferences state
-  const [notifNewReleases, setNotifNewReleases] = useState(
-    notificationPreferences.newReleases,
-  );
-  const [notifRecommendations, setNotifRecommendations] = useState(
-    notificationPreferences.recommendations,
-  );
-  const [notifWatchlistAvailable, setNotifWatchlistAvailable] = useState(
-    notificationPreferences.watchlistAvailable,
-  );
-  const [notifLoading, setNotifLoading] = useState<string | null>(null);
+  // Check notification support and status on mount
+  useEffect(() => {
+    if (
+      typeof globalThis !== "undefined" && "Notification" in globalThis &&
+      "serviceWorker" in navigator
+    ) {
+      setNotificationsSupported(true);
+      setNotificationPermission(Notification.permission);
 
-  // Account deletion state
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deletePassword, setDeletePassword] = useState("");
-  const [deleteConfirmEmail, setDeleteConfirmEmail] = useState("");
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
+      // Check if already subscribed
+      if (Notification.permission === "granted") {
+        checkNotificationSubscription();
+      }
+    }
+  }, []);
+
+  async function checkNotificationSubscription() {
+    try {
+      const response = await fetch("/api/notifications/subscribe");
+      if (response.ok) {
+        const data = await response.json();
+        setNotificationsEnabled(data.subscribed);
+      }
+    } catch (err) {
+      console.error("Failed to check notification subscription:", err);
+    }
+  }
 
   // Fetch current region preference on mount
   useEffect(() => {
@@ -232,89 +246,161 @@ export default function SettingsPage({
     setIsEditingName(false);
   };
 
-  const handleAvatarUpload = async (file: File) => {
-    setAvatarLoading(true);
-    setAvatarError(null);
+  /**
+   * Convert base64url string to Uint8Array for applicationServerKey
+   */
+  const urlBase64ToUint8Array = (base64String: string): Uint8Array => {
+    const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding)
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
 
-    try {
-      // Validate file type on client side
-      const allowedTypes = [
-        "image/jpeg",
-        "image/png",
-        "image/gif",
-        "image/webp",
-      ];
-      if (!allowedTypes.includes(file.type)) {
-        throw new Error("Invalid file type. Allowed: JPEG, PNG, GIF, WebP");
-      }
+    const rawData = atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
 
-      // Validate file size (2MB max)
-      if (file.size > 2 * 1024 * 1024) {
-        throw new Error("File too large. Maximum size is 2MB");
-      }
-
-      const formData = new FormData();
-      formData.append("avatar", file);
-
-      const response = await fetch("/api/settings/avatar", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Failed to upload avatar");
-      }
-
-      const data = await response.json();
-      setAvatarUrl(data.avatarUrl);
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
-      setAvatarError(
-        err instanceof Error ? err.message : "Failed to upload avatar",
-      );
-      setTimeout(() => setAvatarError(null), 5000);
-    } finally {
-      setAvatarLoading(false);
+    for (let i = 0; i < rawData.length; ++i) {
+      outputArray[i] = rawData.charCodeAt(i);
     }
+    return outputArray;
   };
 
-  const handleAvatarRemove = async () => {
-    setAvatarLoading(true);
-    setAvatarError(null);
-
-    try {
-      const response = await fetch("/api/settings/avatar", {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Failed to remove avatar");
-      }
-
-      setAvatarUrl(null);
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
-      setAvatarError(
-        err instanceof Error ? err.message : "Failed to remove avatar",
-      );
-      setTimeout(() => setAvatarError(null), 5000);
-    } finally {
-      setAvatarLoading(false);
-    }
-  };
-
-  const handleExportData = async () => {
-    setExportLoading(true);
+  const handleEnableNotifications = async () => {
+    setNotificationLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(
-        `/api/settings/export?format=${exportFormat}`,
+      // Request notification permission
+      const permission = await Notification.requestPermission();
+      setNotificationPermission(permission);
+
+      if (permission !== "granted") {
+        setError("Notification permission was denied");
+        return;
+      }
+
+      // Get the VAPID public key from the server
+      const vapidResponse = await fetch("/api/notifications/vapid-key");
+      if (!vapidResponse.ok) {
+        throw new Error("Failed to get VAPID key");
+      }
+      const { publicKey } = await vapidResponse.json();
+
+      if (!publicKey) {
+        throw new Error("Push notifications are not configured on this server");
+      }
+
+      // Wait for service worker to be ready
+      const registration = await navigator.serviceWorker.ready;
+
+      // Subscribe to push notifications
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicKey),
+      });
+
+      // Send subscription to server
+      const subscribeResponse = await fetch("/api/notifications/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subscription: subscription.toJSON(),
+        }),
+      });
+
+      if (!subscribeResponse.ok) {
+        throw new Error("Failed to save subscription");
+      }
+
+      setNotificationsEnabled(true);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      console.error("Failed to enable notifications:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to enable notifications",
       );
+    } finally {
+      setNotificationLoading(false);
+    }
+  };
+
+  const handleDisableNotifications = async () => {
+    setNotificationLoading(true);
+    setError(null);
+
+    try {
+      // Unsubscribe from push manager
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+
+      if (subscription) {
+        await subscription.unsubscribe();
+      }
+
+      // Update server
+      const response = await fetch("/api/notifications/subscribe", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to unsubscribe from notifications");
+      }
+
+      setNotificationsEnabled(false);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      console.error("Failed to disable notifications:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to disable notifications",
+      );
+    } finally {
+      setNotificationLoading(false);
+    }
+  };
+
+  const handleSendTestNotification = async () => {
+    setNotificationLoading(true);
+    setError(null);
+    setTestNotificationSent(false);
+
+    try {
+      const response = await fetch("/api/notifications/test", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to send test notification");
+      }
+
+      setTestNotificationSent(true);
+      setTimeout(() => setTestNotificationSent(false), 5000);
+    } catch (err) {
+      console.error("Failed to send test notification:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to send test notification",
+      );
+    } finally {
+      setNotificationLoading(false);
+    }
+  };
+
+  const handleExportData = async (format: "json" | "csv") => {
+    setExportLoading(true);
+    setExportError(null);
+    setExportSuccess(false);
+
+    try {
+      const response = await fetch(`/api/settings/export?format=${format}`);
 
       if (!response.ok) {
         const data = await response.json();
@@ -323,15 +409,15 @@ export default function SettingsPage({
 
       // Get filename from Content-Disposition header or generate one
       const contentDisposition = response.headers.get("Content-Disposition");
-      let filename = `streamowl-export.${exportFormat}`;
+      let filename = `streamowl-export.${format}`;
       if (contentDisposition) {
-        const match = contentDisposition.match(/filename="(.+)"/);
+        const match = contentDisposition.match(/filename="([^"]+)"/);
         if (match) {
           filename = match[1];
         }
       }
 
-      // Create blob and trigger download
+      // Create blob and download
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -342,122 +428,16 @@ export default function SettingsPage({
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      setExportSuccess(true);
+      setTimeout(() => setExportSuccess(false), 5000);
     } catch (err) {
-      setError(
+      console.error("Failed to export data:", err);
+      setExportError(
         err instanceof Error ? err.message : "Failed to export data",
       );
-      setTimeout(() => setError(null), 5000);
+      setTimeout(() => setExportError(null), 5000);
     } finally {
       setExportLoading(false);
-    }
-  };
-
-  const handleNotificationPreferenceChange = async (
-    preference: "newReleases" | "recommendations" | "watchlistAvailable",
-    enabled: boolean,
-  ) => {
-    setNotifLoading(preference);
-    setError(null);
-
-    // Optimistically update state
-    const prevValue = preference === "newReleases"
-      ? notifNewReleases
-      : preference === "recommendations"
-      ? notifRecommendations
-      : notifWatchlistAvailable;
-
-    if (preference === "newReleases") setNotifNewReleases(enabled);
-    else if (preference === "recommendations") setNotifRecommendations(enabled);
-    else setNotifWatchlistAvailable(enabled);
-
-    try {
-      const body: Record<string, boolean> = {};
-      if (preference === "newReleases") body.notificationNewReleases = enabled;
-      else if (preference === "recommendations") {
-        body.notificationRecommendations = enabled;
-      } else body.notificationWatchlistAvailable = enabled;
-
-      const response = await fetch("/api/settings/notifications", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(
-          data.message || "Failed to update notification preference",
-        );
-      }
-
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
-      // Revert on error
-      if (preference === "newReleases") setNotifNewReleases(prevValue);
-      else if (preference === "recommendations") {
-        setNotifRecommendations(prevValue);
-      } else setNotifWatchlistAvailable(prevValue);
-
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to update notification preference",
-      );
-      setTimeout(() => setError(null), 5000);
-    } finally {
-      setNotifLoading(null);
-    }
-  };
-
-  const handleDeleteAccount = async () => {
-    setDeleteLoading(true);
-    setDeleteError(null);
-
-    try {
-      const body: { password?: string; confirmEmail?: string } = {};
-
-      if (accountInfo.requiresPassword) {
-        if (!deletePassword) {
-          setDeleteError("Please enter your password to confirm deletion");
-          setDeleteLoading(false);
-          return;
-        }
-        body.password = deletePassword;
-      } else {
-        if (!deleteConfirmEmail) {
-          setDeleteError("Please enter your email address to confirm deletion");
-          setDeleteLoading(false);
-          return;
-        }
-        body.confirmEmail = deleteConfirmEmail;
-      }
-
-      const response = await fetch("/api/settings/account", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Failed to delete account");
-      }
-
-      // Redirect to home page after successful deletion
-      globalThis.location.href = "/";
-    } catch (err) {
-      setDeleteError(
-        err instanceof Error ? err.message : "Failed to delete account",
-      );
-    } finally {
-      setDeleteLoading(false);
     }
   };
 
@@ -808,89 +788,86 @@ export default function SettingsPage({
               </div>
             )}
 
+            {/* Data Export - Premium Only */}
             {isPremium && (
               <div class="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
                 <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                   Export Data
                 </h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
                   Download all your data including your library, custom lists,
-                  tags, ratings, and notes.
+                  ratings, notes, and tags.
                 </p>
-                <div class="flex flex-col sm:flex-row gap-4">
-                  <div class="flex items-center gap-3">
-                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Format:
-                    </label>
-                    <select
-                      value={exportFormat}
-                      onChange={(e) =>
-                        setExportFormat(
-                          e.currentTarget.value as "json" | "csv",
-                        )}
-                      disabled={exportLoading}
-                      class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 text-sm"
-                    >
-                      <option value="json">JSON</option>
-                      <option value="csv">CSV</option>
-                    </select>
+
+                {exportSuccess && (
+                  <div class="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
+                    <p class="text-sm text-green-800 dark:text-green-200">
+                      ✓ Data exported successfully!
+                    </p>
                   </div>
+                )}
+
+                {exportError && (
+                  <div class="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+                    <p class="text-sm text-red-800 dark:text-red-200">
+                      {exportError}
+                    </p>
+                  </div>
+                )}
+
+                <div class="flex flex-wrap gap-3">
                   <button
                     type="button"
-                    onClick={handleExportData}
+                    onClick={() => handleExportData("json")}
                     disabled={exportLoading}
                     class={`inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
                       exportLoading ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                   >
-                    {exportLoading
-                      ? (
-                        <>
-                          <svg
-                            class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              class="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              stroke-width="4"
-                            />
-                            <path
-                              class="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            />
-                          </svg>
-                          Exporting...
-                        </>
-                      )
-                      : (
-                        <>
-                          <svg
-                            class="-ml-1 mr-2 h-4 w-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                            />
-                          </svg>
-                          Export Data
-                        </>
-                      )}
+                    <svg
+                      class="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                      />
+                    </svg>
+                    {exportLoading ? "Exporting..." : "Export as JSON"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleExportData("csv")}
+                    disabled={exportLoading}
+                    class={`inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                      exportLoading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    <svg
+                      class="w-4 h-4 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                      />
+                    </svg>
+                    {exportLoading ? "Exporting..." : "Export as CSV"}
                   </button>
                 </div>
+
                 <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                  JSON format is recommended for backups. CSV is useful for
-                  spreadsheet analysis.
+                  Your export will include your profile,
+                  watched/watchlist/favourite content, custom lists, ratings,
+                  notes, and tags.
                 </p>
               </div>
             )}
