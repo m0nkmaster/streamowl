@@ -39,6 +39,62 @@ async function updatePremiumStatus(
 }
 
 /**
+ * Update user subscription details in database
+ */
+async function updateSubscriptionDetails(
+  userId: string,
+  customerId: string,
+  subscriptionId: string,
+  currentPeriodEnd: number,
+  planName: string | null,
+): Promise<void> {
+  await query(
+    `UPDATE users 
+     SET preferences = jsonb_set(
+       jsonb_set(
+         jsonb_set(
+           jsonb_set(
+             COALESCE(preferences, '{}'::jsonb),
+             '{stripe_customer_id}',
+             $1::jsonb
+           ),
+           '{stripe_subscription_id}',
+           $2::jsonb
+         ),
+         '{subscription_current_period_end}',
+         $3::jsonb
+       ),
+       '{subscription_plan_name}',
+       $4::jsonb
+     )
+     WHERE id = $5`,
+    [
+      JSON.stringify(customerId),
+      JSON.stringify(subscriptionId),
+      JSON.stringify(currentPeriodEnd),
+      planName ? JSON.stringify(planName) : "null",
+      userId,
+    ],
+  );
+}
+
+/**
+ * Clear subscription details when subscription is cancelled
+ */
+async function clearSubscriptionDetails(userId: string): Promise<void> {
+  await query(
+    `UPDATE users 
+     SET preferences = preferences 
+       - 'stripe_customer_id' 
+       - 'stripe_subscription_id' 
+       - 'subscription_current_period_end' 
+       - 'subscription_plan_name'
+     WHERE id = $1`,
+    [userId],
+  );
+}
+
+/**
  * Get user ID from Stripe event metadata or customer
  */
 async function getUserIdFromEvent(
@@ -131,8 +187,41 @@ export const handler: Handlers = {
       switch (event.type) {
         case "checkout.session.completed": {
           const session = event.data.object as Stripe.Checkout.Session;
-          if (session.mode === "subscription") {
+          if (session.mode === "subscription" && session.subscription) {
             await updatePremiumStatus(userId, true);
+            
+            // Retrieve subscription to get details
+            const subscriptionId = typeof session.subscription === "string"
+              ? session.subscription
+              : session.subscription.id;
+            const subscription = await stripe.subscriptions.retrieve(
+              subscriptionId,
+            );
+            
+            const customerId = typeof subscription.customer === "string"
+              ? subscription.customer
+              : subscription.customer.id;
+            
+            // Get plan name from subscription items
+            const planName = subscription.items.data[0]?.price.nickname ||
+              subscription.items.data[0]?.price.id || null;
+            
+            await updateSubscriptionDetails(
+              userId,
+              customerId,
+              subscriptionId,
+              subscription.current_period_end,
+              planName,
+            );
+            
+            // Ensure customer metadata has userId for future lookups
+            const customerIdForMetadata = typeof subscription.customer === "string"
+              ? subscription.customer
+              : subscription.customer.id;
+            await stripe.customers.update(customerIdForMetadata, {
+              metadata: { userId },
+            });
+            
             console.log(`Premium activated for user ${userId}`);
           }
           break;
@@ -144,6 +233,24 @@ export const handler: Handlers = {
           const isActive = subscription.status === "active" ||
             subscription.status === "trialing";
           await updatePremiumStatus(userId, isActive);
+          
+          if (isActive) {
+            const customerId = typeof subscription.customer === "string"
+              ? subscription.customer
+              : subscription.customer.id;
+            
+            const planName = subscription.items.data[0]?.price.nickname ||
+              subscription.items.data[0]?.price.id || null;
+            
+            await updateSubscriptionDetails(
+              userId,
+              customerId,
+              subscription.id,
+              subscription.current_period_end,
+              planName,
+            );
+          }
+          
           console.log(
             `Premium status updated for user ${userId}: ${isActive}`,
           );
@@ -152,6 +259,7 @@ export const handler: Handlers = {
 
         case "customer.subscription.deleted": {
           await updatePremiumStatus(userId, false);
+          await clearSubscriptionDetails(userId);
           console.log(`Premium cancelled for user ${userId}`);
           break;
         }

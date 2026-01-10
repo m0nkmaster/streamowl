@@ -11,6 +11,12 @@ interface SettingsPageProps {
   userId: string;
   checkoutSuccess: boolean;
   checkoutCanceled: boolean;
+  isPremium: boolean;
+  subscriptionDetails: {
+    planName: string | null;
+    currentPeriodEnd: number | null;
+    customerId: string | null;
+  } | null;
 }
 
 export default function SettingsPage({
@@ -20,6 +26,8 @@ export default function SettingsPage({
   userId,
   checkoutSuccess,
   checkoutCanceled,
+  isPremium,
+  subscriptionDetails,
 }: SettingsPageProps) {
   const [selectedRegion, setSelectedRegion] = useState<SupportedRegion>(
     currentRegion as SupportedRegion,
@@ -29,6 +37,7 @@ export default function SettingsPage({
   const [success, setSuccess] = useState(false);
   const [publicProfile, setPublicProfile] = useState(publicProfileEnabled);
   const [profileLoading, setProfileLoading] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
 
   // Fetch current region preference on mount
   useEffect(() => {
@@ -80,6 +89,55 @@ export default function SettingsPage({
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleManageSubscription = async () => {
+    setPortalLoading(true);
+    try {
+      const response = await fetch("/api/premium/portal", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to open subscription portal");
+      }
+
+      const data = await response.json();
+      if (data.url) {
+        // Redirect to Stripe Customer Portal
+        globalThis.location.href = data.url;
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to open subscription portal",
+      );
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
+  const formatDate = (timestamp: number | null): string => {
+    if (!timestamp) return "N/A";
+    return new Date(timestamp * 1000).toLocaleDateString("en-GB", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const getPlanDisplayName = (planName: string | null): string => {
+    if (!planName) return "Premium";
+    // Format plan name (e.g., "price_xxx" -> "Premium" or use nickname)
+    if (planName.includes("monthly")) return "Premium Monthly";
+    if (planName.includes("yearly") || planName.includes("annual")) {
+      return "Premium Yearly";
+    }
+    return planName;
   };
 
   return (
@@ -157,6 +215,62 @@ export default function SettingsPage({
                       </p>
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {isPremium && subscriptionDetails && (
+              <div class="mb-6 pb-6 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900 mb-2">
+                  Subscription
+                </h2>
+                <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                  <div class="flex items-start justify-between">
+                    <div>
+                      <h3 class="text-sm font-medium text-indigo-900">
+                        {getPlanDisplayName(subscriptionDetails.planName)}
+                      </h3>
+                      <p class="mt-1 text-sm text-indigo-700">
+                        {subscriptionDetails.currentPeriodEnd
+                          ? `Renews on ${formatDate(subscriptionDetails.currentPeriodEnd)}`
+                          : "Active subscription"}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleManageSubscription}
+                      disabled={portalLoading}
+                      class={`ml-4 px-4 py-2 text-sm font-medium text-indigo-700 bg-white border border-indigo-300 rounded-md hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                        portalLoading ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                    >
+                      {portalLoading ? "Loading..." : "Manage Subscription"}
+                    </button>
+                  </div>
+                  <p class="mt-3 text-xs text-indigo-600">
+                    Manage your subscription, update payment methods, and view
+                    billing history through the Stripe Customer Portal.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {!isPremium && (
+              <div class="mb-6 pb-6 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900 mb-2">
+                  Subscription
+                </h2>
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <p class="text-sm text-gray-700 mb-4">
+                    Upgrade to Premium to unlock unlimited custom lists, more
+                    AI recommendations, and exclusive features.
+                  </p>
+                  <a
+                    href="/premium"
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    Upgrade to Premium
+                  </a>
                 </div>
               </div>
             )}
