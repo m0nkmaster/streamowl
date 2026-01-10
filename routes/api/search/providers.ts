@@ -4,7 +4,8 @@ import {
   getTvWatchProvidersByRegion,
   type SupportedRegion,
 } from "../../../lib/tmdb/client.ts";
-import { detectRegionFromRequest } from "../../../lib/region.ts";
+import { getUserRegion } from "../../../lib/region.ts";
+import { getSessionFromRequest } from "../../../lib/auth/middleware.ts";
 import {
   createBadRequestResponse,
   createInternalServerErrorResponse,
@@ -63,9 +64,11 @@ export const handler: Handlers = {
         );
       }
 
-      // Detect region from request or use provided region
+      // Get user region (checks preference first, then detects from headers)
+      // Or use provided region from request body
+      const session = await getSessionFromRequest(req);
       const region = body.region ||
-        detectRegionFromRequest(req) || "US";
+        (await getUserRegion(req, session)) || "US";
 
       // Fetch providers for all content items in parallel
       const providerPromises = body.content.map(async (item) => {

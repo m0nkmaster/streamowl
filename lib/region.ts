@@ -7,6 +7,8 @@
 
 import { SUPPORTED_REGIONS } from "./tmdb/client.ts";
 import type { SupportedRegion } from "./tmdb/client.ts";
+import type { SessionPayload } from "./auth/middleware.ts";
+import { query } from "./db.ts";
 
 /**
  * Map language codes to supported regions
@@ -84,6 +86,68 @@ export function detectRegionFromAcceptLanguage(
 export function detectRegionFromRequest(request: Request): SupportedRegion {
   const acceptLanguage = request.headers.get("Accept-Language");
   return detectRegionFromAcceptLanguage(acceptLanguage);
+}
+
+/**
+ * Get user region preference from database
+ *
+ * Checks user preferences for manually set region.
+ * Returns null if no preference is set.
+ *
+ * @param userId User ID
+ * @returns User's region preference or null
+ */
+export async function getUserRegionPreference(
+  userId: string,
+): Promise<SupportedRegion | null> {
+  try {
+    const result = await query<{ preferences: Record<string, unknown> }>(
+      "SELECT preferences FROM users WHERE id = $1",
+      [userId],
+    );
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    const preferences = result.rows[0].preferences || {};
+    const region = preferences.region as SupportedRegion | undefined;
+
+    if (region && isSupportedRegion(region)) {
+      return region;
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error fetching user region preference:", error);
+    return null;
+  }
+}
+
+/**
+ * Get user region with fallback to detection
+ *
+ * Checks user preference first (if authenticated), then falls back to
+ * detecting from request headers.
+ *
+ * @param request Request object
+ * @param session Optional session payload for authenticated users
+ * @returns Region code
+ */
+export async function getUserRegion(
+  request: Request,
+  session: SessionPayload | null = null,
+): Promise<SupportedRegion> {
+  // Check user preference first if authenticated
+  if (session) {
+    const userRegion = await getUserRegionPreference(session.userId);
+    if (userRegion) {
+      return userRegion;
+    }
+  }
+
+  // Fall back to header detection
+  return detectRegionFromRequest(request);
 }
 
 /**

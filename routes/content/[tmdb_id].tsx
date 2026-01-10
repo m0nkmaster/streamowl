@@ -16,7 +16,7 @@ import {
   type SupportedRegion,
   type TvDetails,
 } from "../../lib/tmdb/client.ts";
-import { detectRegionFromRequest, getRegionName } from "../../lib/region.ts";
+import { getUserRegion, getRegionName } from "../../lib/region.ts";
 import MarkAsWatchedButton from "../../islands/MarkAsWatchedButton.tsx";
 import AddToWatchlistButton from "../../islands/AddToWatchlistButton.tsx";
 import FavouriteButton from "../../islands/FavouriteButton.tsx";
@@ -60,8 +60,9 @@ export const handler: Handlers<ContentDetailPageProps> = {
       return new Response("Invalid content ID", { status: 400 });
     }
 
-    // Detect user region from request headers
-    const region = detectRegionFromRequest(_req);
+    // Get user region (checks preference first, then detects from headers)
+    const session = await getSessionFromRequest(_req);
+    const region = await getUserRegion(_req, session);
 
     // Try fetching as movie first, then as TV show
     let content: MovieDetails | TvDetails;
