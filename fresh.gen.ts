@@ -59,6 +59,7 @@ import * as $api_user_premium from "./routes/api/user/premium.ts";
 import * as $browse from "./routes/browse.tsx";
 import * as $content_tmdb_id_ from "./routes/content/[tmdb_id].tsx";
 import * as $dashboard from "./routes/dashboard.tsx";
+import * as $docs_api from "./routes/docs/api.tsx";
 import * as $forgot_password from "./routes/forgot-password.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $library from "./routes/library.tsx";
@@ -87,6 +88,7 @@ import * as $LoginForm from "./islands/LoginForm.tsx";
 import * as $MarkAsWatchedButton from "./islands/MarkAsWatchedButton.tsx";
 import * as $Navigation from "./islands/Navigation.tsx";
 import * as $NewReleases from "./islands/NewReleases.tsx";
+import * as $NotFoundSearch from "./islands/NotFoundSearch.tsx";
 import * as $NotesComponent from "./islands/NotesComponent.tsx";
 import * as $NotificationPrompt from "./islands/NotificationPrompt.tsx";
 import * as $PremiumPricingPage from "./islands/PremiumPricingPage.tsx";
@@ -170,6 +172,7 @@ const manifest = {
     "./routes/browse.tsx": $browse,
     "./routes/content/[tmdb_id].tsx": $content_tmdb_id_,
     "./routes/dashboard.tsx": $dashboard,
+    "./routes/docs/api.tsx": $docs_api,
     "./routes/forgot-password.tsx": $forgot_password,
     "./routes/index.tsx": $index,
     "./routes/library.tsx": $library,
@@ -200,6 +203,7 @@ const manifest = {
     "./islands/MarkAsWatchedButton.tsx": $MarkAsWatchedButton,
     "./islands/Navigation.tsx": $Navigation,
     "./islands/NewReleases.tsx": $NewReleases,
+    "./islands/NotFoundSearch.tsx": $NotFoundSearch,
     "./islands/NotesComponent.tsx": $NotesComponent,
     "./islands/NotificationPrompt.tsx": $NotificationPrompt,
     "./islands/PremiumPricingPage.tsx": $PremiumPricingPage,
