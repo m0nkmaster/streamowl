@@ -233,3 +233,21 @@
 - Error caching: Don't cache API errors (only cache successful responses) to allow retry of transient failures
 - Cache test script: Created `scripts/test-tmdb-cache.ts` to test cache hits, cache expiry, and graceful degradation, added `deno task test:tmdb-cache` to deno.json
 - Singleton pattern: Use singleton RedisCache instance for consistent cache access across the application
+
+## Search Page Implementation
+
+- Search API endpoint: Created `/api/search` endpoint that combines movie and TV search results from TMDB API, searches both in parallel using Promise.all for performance
+- Search route: Created `/routes/search.tsx` page route that renders search page with island component for client-side interactivity
+- Fresh islands: Created `/islands/SearchPage.tsx` island component for client-side search functionality with debouncing and instant results display
+- Island components: Fresh islands are client-side interactive components placed in `islands/` directory, automatically hydrated on the client side
+- Debounced search: Implemented 300ms debounce delay using setTimeout in useEffect hook to prevent excessive API calls while user types
+- Search state management: Use Preact hooks (useState, useEffect) for managing search query, results, loading, and error states
+- Result display: Display search results in responsive grid layout (2-5 columns based on viewport) with poster images, titles, content type badges, and release years
+- Poster image URLs: Construct TMDB poster image URLs using `https://image.tmdb.org/t/p/w300${poster_path}` format, fallback to placeholder if no poster
+- Content type badges: Display content type (movie/tv) as uppercase badge on result cards to distinguish between movies and TV shows
+- Loading states: Show "Searching..." message while API request is in progress, clear results when query is empty
+- Error handling: Display error messages if search fails, gracefully handle API errors without breaking the UI
+- Empty states: Show helpful messages when no query entered ("Start typing to search...") or no results found ("No results found for...")
+- Result links: Each result card links to `/content/{tmdb_id}` detail page (to be implemented in future story)
+- API response caching: Search API endpoint includes Cache-Control header (1 hour) for HTTP caching of search results
+- Type safety: Use TypeScript interfaces (SearchResponse, Content) for type-safe handling of search data throughout the component

@@ -57,11 +57,28 @@ export const handler: Handlers = {
         })),
       ]);
 
-      // Combine results (movies first, then TV shows)
+      // Combine results from both movies and TV shows
       const combinedResults: Content[] = [
         ...movieResults.results,
         ...tvResults.results,
       ];
+
+      // Sort combined results by relevance
+      // Sort by vote_average (descending), then by vote_count (descending) as tiebreaker
+      combinedResults.sort((a, b) => {
+        const aVoteAvg = (a.metadata.vote_average as number) || 0;
+        const bVoteAvg = (b.metadata.vote_average as number) || 0;
+        const aVoteCount = (a.metadata.vote_count as number) || 0;
+        const bVoteCount = (b.metadata.vote_count as number) || 0;
+
+        // Sort by vote_average first (higher = more relevant)
+        if (aVoteAvg !== bVoteAvg) {
+          return bVoteAvg - aVoteAvg;
+        }
+
+        // If vote_average is equal, sort by vote_count (more votes = more reliable)
+        return bVoteCount - aVoteCount;
+      });
 
       // Calculate combined totals
       const total_results = movieResults.total_results +
