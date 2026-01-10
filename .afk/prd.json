@@ -804,7 +804,7 @@
         "Step 3: Copy shareable URL",
         "Step 4: Access URL logged out and verify list displays"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "sharing-social-buttons",

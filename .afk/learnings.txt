@@ -352,6 +352,9 @@
 - Add content to list API: Created `/api/lists/[list_id]/items` endpoint with POST method to add content to a list, validates list ownership, creates content record if needed, prevents duplicates (idempotent), sets position to end of list
 - Add to list button: Created `islands/AddToListButton.tsx` island component with dropdown menu showing user's lists, fetches lists on mount, handles adding content to selected list with success/error feedback, shows loading states and empty state when no lists exist
 - List item position: When adding content to list, position is calculated as MAX(position) + 1 to append to end of list, ensuring proper ordering for future reorder functionality
+- Public list settings: Created `/api/lists/[list_id]` endpoint with PATCH method to update list settings (is_public), validates ownership, updates is_public boolean field and updated_at timestamp, returns updated list data
+- List settings UI: Created `islands/ListSettings.tsx` island component with toggle switch for public/private visibility, displays shareable URL when public with copy button, shows error messages and loading states, only visible to list owners
+- Shareable list URLs: Public lists accessible at `/lists/[list_id]` URL format, can be viewed by anyone (including logged-out users), private lists require authentication and ownership verification, shareable URL displayed in settings when list is public
 
 ## Browse Page - Trending Content Implementation
 
