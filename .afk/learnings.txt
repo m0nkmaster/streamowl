@@ -645,3 +645,15 @@
 - Content detail integration: Updated content detail page handler to fetch user notes alongside status and rating, added NotesComponent below RatingComponent in UI with border separator
 - Optimistic updates: Notes component uses optimistic UI updates (immediately update state on save), reverts on API failure to maintain consistency, shows loading states during save operations
 - Edit mode: Notes component has view mode (shows notes or placeholder) and edit mode (textarea with save/cancel buttons), toggles between modes with Edit/Add Note button
+
+## Custom Lists Reordering
+
+- Drag-and-drop API: Implemented using HTML5 Drag and Drop API (native browser API, no external dependencies), works well with Preact/Fresh islands for client-side interactivity
+- Reorder endpoint: Created PATCH `/api/lists/[list_id]/items` endpoint that accepts array of items with tmdb_id and position, updates all positions in a transaction for atomicity
+- Position management: List items have `position` INTEGER column in database, positions are sequential (0, 1, 2...), reordering updates all affected positions atomically
+- Island component: Created `islands/ReorderableList.tsx` island component for drag-and-drop functionality, only enabled for list owners (isOwner prop), shows "Drag items to reorder" hint when multiple items exist
+- Drag handlers: Implemented dragStart, dragEnd, dragOver, dragLeave, and drop handlers, prevents link navigation during drag operations using `pointer-events-none` CSS class
+- Optimistic updates: Component uses optimistic UI updates (immediately reorders items visually), reverts to original order on API failure, shows loading state during reorder operation
+- Visual feedback: Dragged item shows reduced opacity (50%), drop target shows scale-up effect and border highlight, cursor changes to grab/grabbing during drag operations
+- Link interaction: Prevents link clicks during drag by disabling pointer events on anchor tags, re-enables after drag ends, prevents navigation when dragging or reordering
+- Position persistence: Positions stored in database and persist across page refreshes, list page query orders by position ASC, position field included in list items API response
