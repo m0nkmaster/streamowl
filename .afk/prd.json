@@ -89,7 +89,7 @@
         "Step 3: Add unique constraint on user_id + tag name",
         "Step 4: Test applying multiple tags to content"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "database-schema-streaming-services",

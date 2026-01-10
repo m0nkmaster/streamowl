@@ -53,3 +53,10 @@
 - List ordering: Use integer position column with index on (list_id, position) for efficient ordered queries
 - Composite unique constraint: Use UNIQUE(list_id, content_id) to prevent duplicate content in the same list
 - Test script pattern: Follow consistent structure - verify table structure, test inserts, test ordering, test constraints, test cascade deletes
+- Tags tables: Created tags table for user-defined tags and content_tags junction table for many-to-many relationship with content
+- Tags table structure: Includes user_id (FK to users), name, colour (VARCHAR(7) for hex colour codes), and timestamps with cascade delete from users
+- Tags unique constraint: Use UNIQUE(user_id, name) to prevent duplicate tag names per user (allows same tag name for different users)
+- Content_tags table structure: Includes tag_id (FK to tags), content_id (FK to content), with cascade delete from both parent tables
+- Content_tags unique constraint: Use UNIQUE(tag_id, content_id) to prevent duplicate tag applications to the same content
+- Tag colour default: Use VARCHAR(7) for hex colour codes (e.g., #3B82F6) with default value for consistent styling
+- Multiple tags on content: Test applying multiple tags to a single content item to verify many-to-many relationship works correctly
