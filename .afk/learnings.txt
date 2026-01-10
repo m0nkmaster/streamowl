@@ -340,3 +340,14 @@
 - Add content to list API: Created `/api/lists/[list_id]/items` endpoint with POST method to add content to a list, validates list ownership, creates content record if needed, prevents duplicates (idempotent), sets position to end of list
 - Add to list button: Created `islands/AddToListButton.tsx` island component with dropdown menu showing user's lists, fetches lists on mount, handles adding content to selected list with success/error feedback, shows loading states and empty state when no lists exist
 - List item position: When adding content to list, position is calculated as MAX(position) + 1 to append to end of list, ensuring proper ordering for future reorder functionality
+
+## Browse Page - Trending Content Implementation
+
+- Trending API endpoint: Created `/api/trending` endpoint that fetches trending content from TMDB API using `/trending/all/{time_window}` endpoint, supports "day" and "week" time windows, returns paginated results
+- Trending TMDB client function: Created `getTrending()` function in TMDB client that accepts timeWindow ("day" or "week") and page number, uses shorter cache TTL (1 hour) since trending content updates daily
+- Trending response mapping: TMDB trending/all endpoint returns mixed results (movies and TV shows), need to check for 'name' field (TV) vs 'title' field (movie) to correctly map to internal Content model with appropriate type
+- Browse page route: Created `/routes/browse.tsx` page route that renders browse page with island component for client-side interactivity
+- Browse page island: Created `islands/BrowsePage.tsx` island component that fetches trending content on mount, displays in responsive grid layout matching search results pattern
+- Trending section display: Display trending content in "Trending" section with section heading, loading states, error handling, and empty states following consistent UI patterns
+- Content freshness: Trending content uses 1-hour cache TTL (shorter than default 24 hours) to ensure content updates periodically and doesn't become stale, matching TMDB's daily update cycle
+- Time window parameter: Trending API supports time_window query parameter ("day" or "week") for flexibility, defaults to "day" for most recent trending content

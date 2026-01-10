@@ -570,7 +570,7 @@
         "Step 3: Verify content updates periodically (not stale)",
         "Step 4: Click trending item and verify navigation to detail page"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "browse-new-releases",
