@@ -294,3 +294,14 @@
 - Date formatting: Format watched_at timestamps using `toLocaleDateString()` with "en-GB" locale for British English date formatting (e.g., "15 January 2024")
 - Empty states: Display helpful messages when no watched content exists, guide users to mark content as watched to populate their library
 - Content grid layout: Use responsive grid (2-5 columns based on viewport) for displaying library content, consistent with search results page layout
+
+## Library - To Watch List Implementation
+
+- Watchlist API endpoint: Created `/api/content/[tmdb_id]/watchlist` endpoint with POST (add to watchlist) and DELETE (remove from watchlist) methods, follows same pattern as watched endpoint but uses 'to_watch' status
+- Watchlist status: Use 'to_watch' status in user_content table to track watchlist items, no watched_at timestamp needed for watchlist items
+- Add to watchlist button: Created `islands/AddToWatchlistButton.tsx` island component with optimistic UI updates, similar to MarkAsWatchedButton but with different styling (indigo colour scheme)
+- Watchlist content API: Created `/api/library/watchlist` endpoint to fetch all watchlist content for authenticated user, includes content details and created_at timestamp (when added to watchlist)
+- Library tabs watchlist: Updated `islands/LibraryTabs.tsx` to fetch and display watchlist content when "To Watch" tab is active, uses same grid layout and date formatting as watched tab
+- Tab-based data fetching: Use useEffect hook with activeTab dependency to fetch data only when specific tab is active, prevents unnecessary API calls
+- Multiple content states: Content can have different statuses (watched, to_watch, favourite) - buttons check initialStatus prop to determine current state and update accordingly
+- Button grouping: Display multiple action buttons (Mark as Watched, Add to Watchlist) side-by-side on content detail page using flex layout with gap spacing

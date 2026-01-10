@@ -427,7 +427,7 @@
         "Step 3: Navigate to /library and select 'To Watch' tab",
         "Step 4: Verify content appears in watchlist"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "library-favourites-list",
