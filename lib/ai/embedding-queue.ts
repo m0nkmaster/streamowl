@@ -200,9 +200,7 @@ export async function processEmbeddingJob(
 
     return true;
   } catch (error) {
-    const errorMessage = error instanceof Error
-      ? error.message
-      : String(error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     await markJobFailed(job.id, errorMessage);
     return false;
   }

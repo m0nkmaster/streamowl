@@ -1,6 +1,6 @@
 import { type Handlers, type PageProps } from "$fresh/server.ts";
 import { getSessionFromRequest } from "../lib/auth/middleware.ts";
-import { getUserRegion, getRegionName } from "../lib/region.ts";
+import { getUserRegion } from "../lib/region.ts";
 import SettingsPage from "../islands/SettingsPage.tsx";
 
 interface SettingsPageProps {
@@ -30,7 +30,7 @@ export const handler: Handlers<SettingsPageProps> = {
 
     // Get current user region (preference or detected)
     const currentRegion = await getUserRegion(req, session);
-    
+
     // Get detected region (without preference)
     const detectedRegion = await getUserRegion(req, null);
 

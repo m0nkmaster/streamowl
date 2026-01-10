@@ -1,4 +1,4 @@
-import { useState, useEffect } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { SUPPORTED_REGIONS } from "../lib/tmdb/client.ts";
 import type { SupportedRegion } from "../lib/tmdb/client.ts";
 import { getRegionName } from "../lib/region.ts";
@@ -91,7 +91,9 @@ export default function SettingsPage({
               <p class="text-sm text-gray-500 mb-4">
                 Set your preferred region to see streaming availability for that
                 location. Your detected region is{" "}
-                <span class="font-medium">{getRegionName(detectedRegion as SupportedRegion)}</span>.
+                <span class="font-medium">
+                  {getRegionName(detectedRegion as SupportedRegion)}
+                </span>.
               </p>
 
               {success && (

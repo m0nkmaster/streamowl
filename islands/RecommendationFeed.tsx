@@ -1,4 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
+import { IS_BROWSER } from "$fresh/runtime.ts";
 import type { RecommendationCandidate } from "../lib/ai/recommendations.ts";
 
 interface RecommendationsResponse {
@@ -15,6 +16,12 @@ export default function RecommendationFeed() {
   >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [watchlistStatuses, setWatchlistStatuses] = useState<
+    Record<number, boolean>
+  >({});
+  const [loadingWatchlist, setLoadingWatchlist] = useState<
+    Record<number, boolean>
+  >({});
 
   // Fetch recommendations on mount
   useEffect(() => {
@@ -35,6 +42,11 @@ export default function RecommendationFeed() {
 
         const data: RecommendationsResponse = await response.json();
         setRecommendations(data.recommendations || []);
+
+        // Fetch watchlist statuses for all recommendations
+        if (data.recommendations && data.recommendations.length > 0) {
+          fetchWatchlistStatuses(data.recommendations);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
         console.error("Error fetching recommendations:", err);
@@ -45,6 +57,41 @@ export default function RecommendationFeed() {
 
     fetchRecommendations();
   }, []);
+
+  // Fetch watchlist statuses for recommendations
+  const fetchWatchlistStatuses = async (
+    recs: RecommendationCandidate[],
+  ) => {
+    if (!IS_BROWSER) return;
+
+    // Fetch statuses in parallel
+    const statusPromises = recs.map(async (rec) => {
+      try {
+        const response = await fetch(`/api/content/${rec.tmdb_id}/status`);
+        if (response.ok) {
+          const data = await response.json();
+          return {
+            tmdbId: rec.tmdb_id,
+            isInWatchlist: data.status === "to_watch",
+          };
+        }
+      } catch (error) {
+        // Silently fail - user might not be authenticated
+        console.error(
+          `Failed to fetch status for ${rec.tmdb_id}:`,
+          error,
+        );
+      }
+      return { tmdbId: rec.tmdb_id, isInWatchlist: false };
+    });
+
+    const statuses = await Promise.all(statusPromises);
+    const statusMap: Record<number, boolean> = {};
+    statuses.forEach(({ tmdbId, isInWatchlist }) => {
+      statusMap[tmdbId] = isInWatchlist;
+    });
+    setWatchlistStatuses(statusMap);
+  };
 
   // Helper function to get poster image URL
   const getPosterUrl = (posterPath: string | null): string => {
@@ -64,9 +111,7 @@ export default function RecommendationFeed() {
 
     // Optimistic update - remove from UI immediately
     const originalRecommendations = [...recommendations];
-    setRecommendations((prev) =>
-      prev.filter((rec) => rec.tmdb_id !== tmdbId)
-    );
+    setRecommendations((prev) => prev.filter((rec) => rec.tmdb_id !== tmdbId));
 
     try {
       const response = await fetch(`/api/recommendations/${tmdbId}/dismiss`, {
@@ -83,6 +128,69 @@ export default function RecommendationFeed() {
       setRecommendations(originalRecommendations);
       console.error("Error dismissing recommendation:", err);
       alert("Failed to dismiss recommendation. Please try again.");
+    }
+  };
+
+  // Handle adding/removing from watchlist
+  const handleWatchlistToggle = async (
+    e: Event,
+    tmdbId: number,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!IS_BROWSER || loadingWatchlist[tmdbId]) return;
+
+    const currentStatus = watchlistStatuses[tmdbId] || false;
+    const newStatus = !currentStatus;
+
+    // Optimistic update
+    setWatchlistStatuses((prev) => ({
+      ...prev,
+      [tmdbId]: newStatus,
+    }));
+    setLoadingWatchlist((prev) => ({
+      ...prev,
+      [tmdbId]: true,
+    }));
+
+    try {
+      const method = newStatus ? "POST" : "DELETE";
+      const response = await fetch(`/api/content/${tmdbId}/watchlist`, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        // Revert on error
+        setWatchlistStatuses((prev) => ({
+          ...prev,
+          [tmdbId]: currentStatus,
+        }));
+        const error = await response.json();
+        console.error("Failed to update watchlist:", error);
+        alert(
+          response.status === 401
+            ? "Please log in to add items to your watchlist"
+            : "Failed to update watchlist. Please try again.",
+        );
+      }
+    } catch (err) {
+      // Revert on error
+      setWatchlistStatuses((prev) => ({
+        ...prev,
+        [tmdbId]: currentStatus,
+      }));
+      console.error("Error updating watchlist:", err);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setLoadingWatchlist((prev) => {
+        const updated = { ...prev };
+        delete updated[tmdbId];
+        return updated;
+      });
     }
   };
 
@@ -165,6 +273,7 @@ export default function RecommendationFeed() {
                   </div>
                 </div>
               </a>
+              {/* Dismiss button */}
               <button
                 type="button"
                 onClick={(e) => handleDismiss(e, rec.tmdb_id)}
@@ -186,6 +295,33 @@ export default function RecommendationFeed() {
                     d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
+              </button>
+              {/* Add to Watchlist button */}
+              <button
+                type="button"
+                onClick={(e) => handleWatchlistToggle(e, rec.tmdb_id)}
+                disabled={loadingWatchlist[rec.tmdb_id]}
+                class={`absolute bottom-4 right-4 px-3 py-1.5 rounded-lg text-sm font-medium transition-all opacity-0 group-hover:opacity-100 ${
+                  watchlistStatuses[rec.tmdb_id]
+                    ? "bg-indigo-600 text-white hover:bg-indigo-700"
+                    : "bg-white text-gray-800 hover:bg-gray-100 shadow-md"
+                } ${
+                  loadingWatchlist[rec.tmdb_id]
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+                aria-label={watchlistStatuses[rec.tmdb_id]
+                  ? "Remove from watchlist"
+                  : "Add to watchlist"}
+                title={watchlistStatuses[rec.tmdb_id]
+                  ? "Remove from watchlist"
+                  : "Add to watchlist"}
+              >
+                {loadingWatchlist[rec.tmdb_id]
+                  ? "Loading..."
+                  : watchlistStatuses[rec.tmdb_id]
+                  ? "✓ In Watchlist"
+                  : "Add to Watchlist"}
               </button>
             </div>
           ))}

@@ -13,10 +13,17 @@
 
 import { processEmbeddingQueue } from "../lib/ai/embedding-queue.ts";
 
-const maxJobs = parseInt(Deno.args.find((arg) => arg.startsWith("--max-jobs="))?.split("=")[1] || "10");
-const delayMs = parseInt(Deno.args.find((arg) => arg.startsWith("--delay-ms="))?.split("=")[1] || "100");
+const maxJobs = parseInt(
+  Deno.args.find((arg) => arg.startsWith("--max-jobs="))?.split("=")[1] || "10",
+);
+const delayMs = parseInt(
+  Deno.args.find((arg) => arg.startsWith("--delay-ms="))?.split("=")[1] ||
+    "100",
+);
 
-console.log(`Processing embedding queue (max: ${maxJobs}, delay: ${delayMs}ms)...`);
+console.log(
+  `Processing embedding queue (max: ${maxJobs}, delay: ${delayMs}ms)...`,
+);
 
 const startTime = Date.now();
 const successCount = await processEmbeddingQueue(maxJobs, delayMs);

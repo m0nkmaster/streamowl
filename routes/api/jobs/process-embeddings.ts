@@ -63,7 +63,7 @@ export const handler: Handlers = {
       );
     }
   },
-  async GET(req, ctx) {
+  GET(req, ctx) {
     // Allow GET for simple cron triggers
     return handler.POST!(req, ctx);
   },

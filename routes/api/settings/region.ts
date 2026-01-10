@@ -1,7 +1,10 @@
 import { type Handlers } from "$fresh/server.ts";
 import { requireAuthForApi } from "../../../lib/auth/middleware.ts";
 import { query } from "../../../lib/db.ts";
-import { createBadRequestResponse, createInternalServerErrorResponse } from "../../../lib/api/errors.ts";
+import {
+  createBadRequestResponse,
+  createInternalServerErrorResponse,
+} from "../../../lib/api/errors.ts";
 import { type SupportedRegion } from "../../../lib/tmdb/client.ts";
 import { isSupportedRegion } from "../../../lib/region.ts";
 
@@ -41,7 +44,9 @@ export const handler: Handlers = {
         return error;
       }
       console.error("Error fetching region preference:", error);
-      return createInternalServerErrorResponse("Failed to fetch region preference");
+      return createInternalServerErrorResponse(
+        "Failed to fetch region preference",
+      );
     }
   },
 
@@ -95,7 +100,9 @@ export const handler: Handlers = {
         return error;
       }
       console.error("Error updating region preference:", error);
-      return createInternalServerErrorResponse("Failed to update region preference");
+      return createInternalServerErrorResponse(
+        "Failed to update region preference",
+      );
     }
   },
 };

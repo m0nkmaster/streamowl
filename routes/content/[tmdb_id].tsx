@@ -16,7 +16,7 @@ import {
   type SupportedRegion,
   type TvDetails,
 } from "../../lib/tmdb/client.ts";
-import { getUserRegion, getRegionName } from "../../lib/region.ts";
+import { getRegionName, getUserRegion } from "../../lib/region.ts";
 import MarkAsWatchedButton from "../../islands/MarkAsWatchedButton.tsx";
 import AddToWatchlistButton from "../../islands/AddToWatchlistButton.tsx";
 import FavouriteButton from "../../islands/FavouriteButton.tsx";
