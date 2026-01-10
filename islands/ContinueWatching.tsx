@@ -1,4 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
+import SkeletonCard from "../components/SkeletonCard.tsx";
 
 interface WatchedContent {
   tmdb_id: number;
@@ -77,10 +78,10 @@ export default function ContinueWatching() {
         </div>
       </div>
 
-      {/* Loading State */}
+      {/* Loading State - Skeleton Cards */}
       {loading && (
-        <div class="text-center py-8">
-          <p class="text-gray-600">Loading...</p>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       )}
 

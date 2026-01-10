@@ -2,6 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import CreateListModal from "./CreateListModal.tsx";
 import ContentGrid from "../components/ContentGrid.tsx";
+import SkeletonCard from "../components/SkeletonCard.tsx";
 
 interface WatchedContent {
   tmdb_id: number;
@@ -448,9 +449,11 @@ export default function LibraryTabs(
           {activeTab === "watched" && (
             <div>
               {loading && (
-                <div class="text-center py-8">
-                  <p class="text-gray-600">Loading...</p>
-                </div>
+                <ContentGrid>
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <SkeletonCard key={i} />
+                  ))}
+                </ContentGrid>
               )}
 
               {error && (
@@ -527,9 +530,11 @@ export default function LibraryTabs(
           {activeTab === "to_watch" && (
             <div>
               {loading && (
-                <div class="text-center py-8">
-                  <p class="text-gray-600">Loading...</p>
-                </div>
+                <ContentGrid>
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <SkeletonCard key={i} />
+                  ))}
+                </ContentGrid>
               )}
 
               {error && (
@@ -606,9 +611,11 @@ export default function LibraryTabs(
           {activeTab === "favourites" && (
             <div>
               {loading && (
-                <div class="text-center py-8">
-                  <p class="text-gray-600">Loading...</p>
-                </div>
+                <ContentGrid>
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <SkeletonCard key={i} />
+                  ))}
+                </ContentGrid>
               )}
 
               {error && (

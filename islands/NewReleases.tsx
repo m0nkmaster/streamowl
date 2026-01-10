@@ -3,6 +3,7 @@ import type { Content } from "../lib/tmdb/client.ts";
 import ContentGrid from "../components/ContentGrid.tsx";
 import QuickActions from "./QuickActions.tsx";
 import { useToast } from "./Toast.tsx";
+import SkeletonCard from "../components/SkeletonCard.tsx";
 
 interface NewReleasesResponse {
   results: Content[];
@@ -211,11 +212,11 @@ export default function NewReleases() {
         </div>
       </div>
 
-      {/* Loading State */}
+      {/* Loading State - Skeleton Cards */}
       {loading && (
-        <div class="text-center py-8">
-          <p class="text-gray-600">Loading new releases...</p>
-        </div>
+        <ContentGrid>
+          {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
+        </ContentGrid>
       )}
 
       {/* Error State */}

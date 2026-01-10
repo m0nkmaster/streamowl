@@ -4,6 +4,7 @@ import ContentGrid from "../components/ContentGrid.tsx";
 import QuickActions from "./QuickActions.tsx";
 import { useToast } from "./Toast.tsx";
 import NewReleases from "./NewReleases.tsx";
+import SkeletonCard from "../components/SkeletonCard.tsx";
 
 interface TrendingResponse {
   results: Content[];
@@ -132,11 +133,11 @@ export default function BrowsePage() {
       <section class="mb-12">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Trending</h2>
 
-        {/* Loading State */}
+        {/* Loading State - Skeleton Cards */}
         {loading && (
-          <div class="text-center py-8">
-            <p class="text-gray-600">Loading trending content...</p>
-          </div>
+          <ContentGrid>
+            {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
+          </ContentGrid>
         )}
 
         {/* Error State */}

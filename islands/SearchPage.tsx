@@ -3,6 +3,7 @@ import type { Content } from "../lib/tmdb/client.ts";
 import ContentGrid from "../components/ContentGrid.tsx";
 import QuickActions from "./QuickActions.tsx";
 import { useToast } from "./Toast.tsx";
+import SkeletonCard from "../components/SkeletonCard.tsx";
 
 interface SearchResponse {
   results: Content[];
@@ -581,6 +582,13 @@ export default function SearchPage() {
             </div>
           )}
         </div>
+      )}
+
+      {/* Loading State - Skeleton Cards */}
+      {loading && (
+        <ContentGrid>
+          {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
+        </ContentGrid>
       )}
 
       {/* Results */}

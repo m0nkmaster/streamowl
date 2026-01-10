@@ -283,10 +283,27 @@ export default function RecommendationFeed() {
         )}
       </div>
 
-      {/* Loading State */}
+      {/* Loading State - Skeleton Cards */}
       {loading && (
-        <div class="text-center py-8">
-          <p class="text-gray-600">Loading recommendations...</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              class="bg-white rounded-lg shadow-md overflow-hidden animate-pulse"
+            >
+              <div class="w-full aspect-[2/3] bg-gray-300" />
+              <div class="p-4">
+                <div class="h-6 bg-gray-300 rounded mb-2" />
+                <div class="h-4 bg-gray-200 rounded mb-3 w-1/3" />
+                <div class="space-y-2 mb-3">
+                  <div class="h-3 bg-gray-200 rounded w-full" />
+                  <div class="h-3 bg-gray-200 rounded w-5/6" />
+                  <div class="h-3 bg-gray-200 rounded w-4/6" />
+                </div>
+                <div class="h-4 bg-gray-200 rounded w-1/2" />
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
