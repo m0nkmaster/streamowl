@@ -375,7 +375,7 @@
         "Step 3: Click play and verify video plays",
         "Step 4: Verify no trailer section for content without trailers"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "content-detail-similar-titles",

@@ -602,3 +602,13 @@
 - Empty state handling: Updated empty state message to include streaming service information when filter is active, provides "Show all services" button to clear streaming service filter
 - Batch API efficiency: Batch endpoint processes up to 50 content items per request, fetches providers in parallel using Promise.all for performance, handles individual item failures gracefully without breaking entire batch
 - Region detection: Batch API endpoint detects user region from request headers (Accept-Language) or accepts region parameter, uses detected region when fetching watch providers from TMDB API
+
+## Content Detail - Trailer Implementation
+
+- TMDB videos API endpoints: Use `/movie/{movie_id}/videos` and `/tv/{tv_id}/videos` endpoints to fetch video data including trailers, teasers, and clips
+- Video response structure: TMDB videos API returns `VideosResponse` with `id` and `results[]` array containing video objects with `id`, `key` (YouTube video key), `name`, `site` (e.g., "YouTube"), `type` (e.g., "Trailer", "Teaser"), `official` (boolean), and `published_at` fields
+- Trailer extraction: Created `extractTrailerKey()` helper function that filters videos for YouTube trailers/teasers, prefers official trailers over unofficial ones, falls back to first trailer if no official one found, returns null if no trailer available
+- Video fetching functions: Created `getMovieVideos()` and `getTvVideos()` functions in TMDB client following same pattern as other API functions, use default cache TTL (24 hours) for video data
+- Trailer display: Display trailer section only when `trailerKey` is available, use responsive YouTube embed iframe with 16:9 aspect ratio (padding-bottom: 56.25%), include proper iframe attributes (title, allow, allowFullScreen) for accessibility and security
+- Error handling: Video fetching errors are logged but don't fail the page (graceful degradation), ensures content detail page loads even if videos API is unavailable
+- Trailer placement: Trailer section displayed after synopsis and before cast section, provides visual break between text content and cast grid
