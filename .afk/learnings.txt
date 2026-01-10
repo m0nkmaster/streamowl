@@ -694,3 +694,14 @@
 - Empty state handling: Added empty state messages when filtered results are empty but original content exists, includes "Clear filters" button to reset tag selection, provides helpful guidance to users
 - Tag fetching: Fetch user's tags on component mount using /api/tags endpoint, displays tags in sidebar sorted alphabetically, shows empty state when no tags exist
 - Tag filter UI: Tag buttons show colour indicator (coloured circle), selected tags have indigo background with checkmark, hover states provide visual feedback, "Clear" button appears when tags are selected
+
+## Browse Page - New Releases Implementation
+
+- New releases API: Created `/api/new-releases` endpoint that combines TMDB's "now playing" movies (`/movie/now_playing`) and "on the air" TV shows (`/tv/on_the_air`) endpoints, filters results to only include content with release dates within the last 90 days
+- TMDB client functions: Added `getNowPlayingMovies()` and `getOnTheAirTv()` functions to `lib/tmdb/client.ts` following the same pattern as `getTrending()`, use 2-hour cache TTL since these update frequently
+- Date filtering: New releases API filters combined results by release date (within last 90 days) to ensure only genuinely new content is shown, sorts by release date descending (newest first)
+- Streaming availability: NewReleases component fetches streaming availability for all releases using batch POST request to `/api/search/providers` endpoint, displays "Streaming" badge on content cards when available
+- Release date formatting: Component formats release dates to show relative time (e.g., "2 days ago", "Coming in 3 days") for better UX, falls back to formatted date for older releases
+- Component integration: Added NewReleases component to BrowsePage above Trending section, component uses ContentGrid for consistent layout with other browse sections
+- Quick actions: NewReleases component includes QuickActions overlay for watchlist/favourite/watched actions, consistent with other content grids throughout the app
+- Streaming badge: Displays green "Streaming" badge in top-left corner of content cards when streaming availability is detected, provides visual indicator without cluttering the UI

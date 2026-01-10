@@ -583,7 +583,7 @@
         "Step 3: Verify content has recent release dates",
         "Step 4: Verify streaming availability shows for new releases"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "browse-leaving-soon",
