@@ -1142,7 +1142,7 @@
         "Step 3: Verify request is rejected",
         "Step 4: Verify legitimate requests succeed with token"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "security-rate-limiting",

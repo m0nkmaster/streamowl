@@ -1,7 +1,31 @@
-import { type PageProps } from "$fresh/server.ts";
+import { type Handlers, type PageProps } from "$fresh/server.ts";
+import {
+  generateCsrfToken,
+  setCsrfCookie,
+  CSRF_FIELD_NAME,
+} from "../lib/security/csrf.ts";
 
-export default function LoginPage(props: PageProps) {
-  const returnTo = props.url.searchParams.get("returnTo") || "/dashboard";
+interface LoginPageProps {
+  csrfToken: string;
+  returnTo: string;
+}
+
+export const handler: Handlers<LoginPageProps> = {
+  GET(req, ctx) {
+    // Generate CSRF token and set cookie
+    const csrfToken = generateCsrfToken();
+    const headers = new Headers();
+    setCsrfCookie(headers, csrfToken);
+
+    const url = new URL(req.url);
+    const returnTo = url.searchParams.get("returnTo") || "/dashboard";
+
+    return ctx.render({ csrfToken, returnTo }, { headers });
+  },
+};
+
+export default function LoginPage(props: PageProps<LoginPageProps>) {
+  const { csrfToken, returnTo } = props.data;
 
   return (
     <div class="min-h-screen flex items-center justify-center bg-gray-50">
@@ -13,6 +37,7 @@ export default function LoginPage(props: PageProps) {
         </div>
         <form class="mt-8 space-y-6" method="POST" action="/api/login">
           <input type="hidden" name="returnTo" value={returnTo} />
+          <input type="hidden" name={CSRF_FIELD_NAME} value={csrfToken} />
           <div class="rounded-md shadow-sm -space-y-px">
             <div>
               <label for="email" class="sr-only">Email address</label>

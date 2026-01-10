@@ -1,4 +1,28 @@
-export default function SignupPage() {
+import { type Handlers, type PageProps } from "$fresh/server.ts";
+import {
+  generateCsrfToken,
+  setCsrfCookie,
+  CSRF_FIELD_NAME,
+} from "../lib/security/csrf.ts";
+
+interface SignupPageProps {
+  csrfToken: string;
+}
+
+export const handler: Handlers<SignupPageProps> = {
+  GET(_req, ctx) {
+    // Generate CSRF token and set cookie
+    const csrfToken = generateCsrfToken();
+    const headers = new Headers();
+    setCsrfCookie(headers, csrfToken);
+
+    return ctx.render({ csrfToken }, { headers });
+  },
+};
+
+export default function SignupPage(props: PageProps<SignupPageProps>) {
+  const { csrfToken } = props.data;
+
   return (
     <div class="min-h-screen flex items-center justify-center bg-gray-50">
       <div class="max-w-md w-full space-y-8 p-8">
@@ -8,6 +32,7 @@ export default function SignupPage() {
           </h2>
         </div>
         <form class="mt-8 space-y-6" method="POST" action="/api/signup">
+          <input type="hidden" name={CSRF_FIELD_NAME} value={csrfToken} />
           <div class="rounded-md shadow-sm -space-y-px">
             <div>
               <label for="email" class="sr-only">Email address</label>

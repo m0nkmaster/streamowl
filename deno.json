@@ -28,6 +28,7 @@
     "test:password-hashing": "deno run -A scripts/test-password-hashing.ts",
     "test:sql-injection": "deno run -A scripts/test-sql-injection-protection.ts",
     "test:xss": "deno run -A scripts/test-xss-prevention.ts",
+    "test:csrf": "deno run -A scripts/test-csrf-protection.ts",
     "test:migration-runner": "deno run -A scripts/test-migration-runner.ts",
     "test:content-embeddings": "deno run -A scripts/test-content-embeddings.ts",
     "test:taste-profile": "deno run -A scripts/test-taste-profile.ts",

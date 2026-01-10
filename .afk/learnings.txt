@@ -465,3 +465,16 @@
 - Component composition: ContentGrid accepts children and optional className prop, allowing flexible content cards while maintaining consistent grid layout
 - Grid consistency: Updated all content display pages (LibraryTabs, SearchPage, BrowsePage, ListPage) to use ContentGrid component, ensuring consistent responsive behaviour across the application
 - Component location: Created `components/` directory for shared Preact components that can be used in both islands and routes, separate from `islands/` directory which contains client-side interactive components
+
+## Security - CSRF Protection Implementation
+
+- CSRF token utilities: Created `lib/security/csrf.ts` module with functions for generating, storing, and validating CSRF tokens using double-submit cookie pattern
+- Double-submit cookie pattern: CSRF token stored in HttpOnly cookie (server-side only) and same token included in forms as hidden field, validated by comparing both tokens on submission
+- Token generation: Use cryptographically secure random token generation (32 bytes, base64 encoded) for CSRF tokens, expires after 1 hour
+- Cookie security: CSRF cookie uses HttpOnly, SameSite=Lax, and Secure (in production) flags for maximum security
+- Constant-time comparison: Use constant-time string comparison function to prevent timing attacks when validating CSRF tokens
+- Form integration: Updated login, signup, and logout forms to include CSRF tokens as hidden fields, generated on GET request and set in cookie
+- Route handler pattern: GET handlers generate CSRF token and set cookie, POST handlers validate token before processing request
+- API route validation: Updated login, signup, and logout API endpoints to validate CSRF tokens, return 403 Forbidden with error message if invalid
+- Test script: Created `scripts/test-csrf-protection.ts` to verify CSRF protection works correctly (missing token rejected, invalid token rejected, valid token accepted)
+- JSON API endpoints: JSON API endpoints (called from JavaScript) need additional CSRF token endpoint (`/api/csrf-token`) to expose token for JavaScript clients, as HttpOnly cookies cannot be read by JavaScript

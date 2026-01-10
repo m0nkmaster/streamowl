@@ -3,6 +3,10 @@ import { query } from "../../lib/db.ts";
 import { verifyPassword } from "../../lib/auth/password.ts";
 import { createSessionToken } from "../../lib/auth/jwt.ts";
 import { setSessionCookie } from "../../lib/auth/cookies.ts";
+import {
+  validateCsrfToken,
+  createCsrfErrorResponse,
+} from "../../lib/security/csrf.ts";
 
 interface LoginRequest {
   email: string;
@@ -17,6 +21,12 @@ export const handler: Handlers = {
   async POST(req) {
     try {
       const formData = await req.formData();
+
+      // Validate CSRF token
+      const isValidCsrf = await validateCsrfToken(req, formData);
+      if (!isValidCsrf) {
+        return createCsrfErrorResponse();
+      }
       const email = formData.get("email")?.toString();
       const password = formData.get("password")?.toString();
 
