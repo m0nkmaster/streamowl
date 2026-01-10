@@ -154,7 +154,7 @@
         "Step 3: Verify redirect back to app with user logged in",
         "Step 4: Verify user record created with Google profile data"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-logout",
