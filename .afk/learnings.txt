@@ -478,3 +478,17 @@
 - API route validation: Updated login, signup, and logout API endpoints to validate CSRF tokens, return 403 Forbidden with error message if invalid
 - Test script: Created `scripts/test-csrf-protection.ts` to verify CSRF protection works correctly (missing token rejected, invalid token rejected, valid token accepted)
 - JSON API endpoints: JSON API endpoints (called from JavaScript) need additional CSRF token endpoint (`/api/csrf-token`) to expose token for JavaScript clients, as HttpOnly cookies cannot be read by JavaScript
+
+## Security - Rate Limiting Implementation
+
+- Rate limiting module: Created `lib/security/rate-limit.ts` module with functions for tracking failed authentication attempts and enforcing rate limits using sliding window approach
+- Sliding window rate limiting: Track failed attempts per identifier (IP address) with timestamps, clean up old attempts outside the window (15 minutes), block after 10 failed attempts
+- IP address extraction: Extract client IP from X-Forwarded-For or X-Real-IP headers (for proxies/load balancers), fallback to "unknown" if headers not available
+- Rate limit configuration: 10 failed attempts per 15 minutes (configurable MAX_FAILED_ATTEMPTS and RATE_LIMIT_WINDOW_MS constants)
+- Memory management: Periodic cleanup (every 5 minutes) removes old entries from in-memory store to prevent memory leaks, cleans up attempts outside window and removes entries that are no longer blocked
+- Rate limit checking: Check rate limit before processing authentication requests, return 429 Too Many Requests with error message and remaining seconds if blocked
+- Failed attempt tracking: Record failed attempts (invalid email, invalid password, duplicate email on signup) to track abuse patterns
+- Successful authentication clearing: Clear failed attempts on successful login/signup to reset rate limit counter for legitimate users
+- Error response format: Rate limit errors return 429 status with JSON body containing error message, rateLimitExceeded flag, and remainingSeconds countdown
+- Authentication endpoint integration: Integrated rate limiting into login and signup endpoints, checks rate limit before processing, records failures, clears on success
+- Test script: Created `scripts/test-rate-limiting.ts` to verify rate limiting works correctly (10 failed attempts trigger limit, error message indicates rate limiting, cooldown restores access)

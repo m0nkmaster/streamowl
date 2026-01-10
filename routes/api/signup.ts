@@ -7,6 +7,12 @@ import {
   validateCsrfToken,
   createCsrfErrorResponse,
 } from "../../lib/security/csrf.ts";
+import {
+  checkRateLimit,
+  recordFailedAttempt,
+  clearFailedAttempts,
+  getClientIp,
+} from "../../lib/security/rate-limit.ts";
 
 interface SignupRequest {
   email: string;
@@ -29,6 +35,23 @@ export const handler: Handlers = {
       }
       const email = formData.get("email")?.toString();
       const password = formData.get("password")?.toString();
+
+      // Check rate limit before processing signup
+      const clientIp = getClientIp(req);
+      const rateLimitCheck = checkRateLimit(clientIp);
+      if (rateLimitCheck.isBlocked) {
+        return new Response(
+          JSON.stringify({
+            error: "Too many signup attempts. Please try again later.",
+            rateLimitExceeded: true,
+            remainingSeconds: rateLimitCheck.remainingSeconds,
+          }),
+          {
+            status: 429,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
 
       // Validate input
       if (!email || !password) {
@@ -73,6 +96,8 @@ export const handler: Handlers = {
       );
 
       if (existingUsers.length > 0) {
+        // Record failed attempt for duplicate email (potential abuse)
+        recordFailedAttempt(clientIp);
         return new Response(
           JSON.stringify({ error: "Email already registered" }),
           {
@@ -100,6 +125,9 @@ export const handler: Handlers = {
 
       // Create session token
       const token = await createSessionToken(newUser.id, newUser.email);
+
+      // Clear failed attempts on successful signup
+      clearFailedAttempts(clientIp);
 
       // Set session cookie and redirect to dashboard
       const headers = new Headers();

@@ -7,6 +7,12 @@ import {
   validateCsrfToken,
   createCsrfErrorResponse,
 } from "../../lib/security/csrf.ts";
+import {
+  checkRateLimit,
+  recordFailedAttempt,
+  clearFailedAttempts,
+  getClientIp,
+} from "../../lib/security/rate-limit.ts";
 
 interface LoginRequest {
   email: string;
@@ -29,6 +35,23 @@ export const handler: Handlers = {
       }
       const email = formData.get("email")?.toString();
       const password = formData.get("password")?.toString();
+
+      // Check rate limit before processing authentication
+      const clientIp = getClientIp(req);
+      const rateLimitCheck = checkRateLimit(clientIp);
+      if (rateLimitCheck.isBlocked) {
+        return new Response(
+          JSON.stringify({
+            error: "Too many failed login attempts. Please try again later.",
+            rateLimitExceeded: true,
+            remainingSeconds: rateLimitCheck.remainingSeconds,
+          }),
+          {
+            status: 429,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
 
       // Validate input
       if (!email || !password) {
@@ -64,6 +87,8 @@ export const handler: Handlers = {
       );
 
       if (users.length === 0) {
+        // Record failed attempt for invalid email
+        recordFailedAttempt(clientIp);
         return new Response(
           JSON.stringify({ error: "Invalid email or password" }),
           {
@@ -82,6 +107,8 @@ export const handler: Handlers = {
       );
 
       if (!isValidPassword) {
+        // Record failed attempt for invalid password
+        recordFailedAttempt(clientIp);
         return new Response(
           JSON.stringify({ error: "Invalid email or password" }),
           {
@@ -90,6 +117,9 @@ export const handler: Handlers = {
           },
         );
       }
+
+      // Clear failed attempts on successful login
+      clearFailedAttempts(clientIp);
 
       // Create session token
       const token = await createSessionToken(user.id, user.email);

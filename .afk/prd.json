@@ -1155,7 +1155,7 @@
         "Step 3: Verify error message indicates rate limiting",
         "Step 4: Wait and verify access restored after cooldown"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "error-handling-api",
