@@ -128,3 +128,9 @@
 - Request function: Generic `request<T>()` function handles rate limiting, API key injection, parameter encoding, and error parsing
 - Test script pattern: Created `scripts/test-tmdb-client.ts` following same pattern as other test scripts - verify functionality, test error cases, test rate limiting
 - Environment variable documentation: Added TMDB_API_KEY to `.env.example` with instructions to get API key from TMDB settings
+- Movie search function: Created `searchMovies()` function in TMDB client that accepts query string and page number, returns paginated results
+- TMDB search endpoint: Use `/search/movie` endpoint with `query` and `page` parameters for movie search
+- Search response mapping: TMDB search returns `{ page, results[], total_pages, total_results }` structure, map results to internal Content model with type 'movie'
+- Content model mapping: Map TMDB movie search results to internal Content interface with tmdb_id, type: 'movie', title, overview, release_date, poster_path, backdrop_path, and metadata object
+- Pagination validation: Validate page number is positive integer, validate query is non-empty string before making API request
+- Search test script: Created `scripts/test-tmdb-search.ts` to test search functionality, pagination, and error handling, added `deno task test:tmdb-search` to deno.json

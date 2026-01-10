@@ -206,7 +206,7 @@
         "Step 3: Test searching for 'Inception' returns correct results",
         "Step 4: Verify pagination returns different results for page 2"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "tmdb-search-tv",
