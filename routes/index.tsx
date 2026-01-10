@@ -1,6 +1,8 @@
 import { type Handlers } from "$fresh/server.ts";
 import { getSessionFromRequest } from "../lib/auth/middleware.ts";
 import RecommendationFeed from "../islands/RecommendationFeed.tsx";
+import ContinueWatching from "../islands/ContinueWatching.tsx";
+import NewReleases from "../islands/NewReleases.tsx";
 
 /**
  * Home page handler
@@ -25,7 +27,14 @@ export default function Home({ data }: { data: HomePageProps }) {
     return (
       <div class="min-h-screen bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Recommendations section - prominently displayed */}
           <RecommendationFeed />
+          
+          {/* Continue Watching section - shows recent activity */}
+          <ContinueWatching />
+          
+          {/* New Releases section - shows fresh content */}
+          <NewReleases />
         </div>
       </div>
     );
