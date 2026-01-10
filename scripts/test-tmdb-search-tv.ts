@@ -18,7 +18,7 @@ async function testSearchBreakingBad() {
 
   try {
     const results = await searchTv("Breaking Bad");
-    
+
     console.log("✓ Search completed successfully!");
     console.log(`  Total results: ${results.total_results}`);
     console.log(`  Total pages: ${results.total_pages}`);
@@ -32,14 +32,16 @@ async function testSearchBreakingBad() {
 
     // Check if Breaking Bad is in the results (should be first or near the top)
     const breakingBad = results.results.find(
-      (tv) => tv.title.toLowerCase().includes("breaking bad")
+      (tv) => tv.title.toLowerCase().includes("breaking bad"),
     );
 
     if (!breakingBad) {
       console.warn("  ⚠ 'Breaking Bad' not found in first page results");
       console.log("  First few results:");
       results.results.slice(0, 3).forEach((tv, idx) => {
-        console.log(`    ${idx + 1}. ${tv.title} (${tv.release_date || "N/A"})`);
+        console.log(
+          `    ${idx + 1}. ${tv.title} (${tv.release_date || "N/A"})`,
+        );
       });
     } else {
       console.log("\n  ✓ Found 'Breaking Bad' in results:");
@@ -47,7 +49,9 @@ async function testSearchBreakingBad() {
       console.log(`    TMDB ID: ${breakingBad.tmdb_id}`);
       console.log(`    Type: ${breakingBad.type}`);
       console.log(`    First Air Date: ${breakingBad.release_date || "N/A"}`);
-      console.log(`    Overview: ${breakingBad.overview?.substring(0, 80) || "N/A"}...`);
+      console.log(
+        `    Overview: ${breakingBad.overview?.substring(0, 80) || "N/A"}...`,
+      );
       console.log(`    Poster: ${breakingBad.poster_path || "N/A"}`);
     }
 
@@ -67,9 +71,10 @@ async function testSearchBreakingBad() {
     console.log("\n  ✓ Result structure is valid");
     return true;
   } catch (error) {
-    console.error("✗ Search failed:", error instanceof Error
-      ? error.message
-      : String(error));
+    console.error(
+      "✗ Search failed:",
+      error instanceof Error ? error.message : String(error),
+    );
     return false;
   }
 }
@@ -92,7 +97,9 @@ async function testContentType() {
     const invalidTypes = results.results.filter((tv) => tv.type !== "tv");
 
     if (invalidTypes.length > 0) {
-      console.error(`✗ Found ${invalidTypes.length} results with incorrect type`);
+      console.error(
+        `✗ Found ${invalidTypes.length} results with incorrect type`,
+      );
       invalidTypes.forEach((tv) => {
         console.error(`  - ${tv.title}: type is '${tv.type}', expected 'tv'`);
       });
@@ -102,9 +109,10 @@ async function testContentType() {
     console.log(`✓ All ${results.results.length} results have type 'tv'`);
     return true;
   } catch (error) {
-    console.error("✗ Test failed:", error instanceof Error
-      ? error.message
-      : String(error));
+    console.error(
+      "✗ Test failed:",
+      error instanceof Error ? error.message : String(error),
+    );
     return false;
   }
 }
@@ -113,7 +121,9 @@ async function testContentType() {
  * Test pagination returns different results for page 2
  */
 async function testPagination() {
-  console.log("\nTest 3: Pagination - verifying page 2 returns different results");
+  console.log(
+    "\nTest 3: Pagination - verifying page 2 returns different results",
+  );
   console.log("Fetching page 1 and page 2...\n");
 
   try {
@@ -144,7 +154,9 @@ async function testPagination() {
       console.warn(
         `  ⚠ Found ${overlap.length} overlapping results between pages`,
       );
-      console.log("  This might be acceptable if TMDB results changed between requests");
+      console.log(
+        "  This might be acceptable if TMDB results changed between requests",
+      );
     } else {
       console.log("  ✓ No overlapping results between pages");
     }
@@ -155,20 +167,35 @@ async function testPagination() {
       page1.total_results !== page2.total_results
     ) {
       console.error("✗ Pagination metadata differs between pages");
-      console.error(`  Page 1: ${page1.total_pages} pages, ${page1.total_results} total`);
-      console.error(`  Page 2: ${page2.total_pages} pages, ${page2.total_results} total`);
+      console.error(
+        `  Page 1: ${page1.total_pages} pages, ${page1.total_results} total`,
+      );
+      console.error(
+        `  Page 2: ${page2.total_pages} pages, ${page2.total_results} total`,
+      );
       return false;
     }
 
-    console.log(`  ✓ Pagination metadata consistent: ${page1.total_pages} pages, ${page1.total_results} total results`);
-    console.log(`  ✓ Page 1 results: ${page1.results.map((tv) => tv.title).slice(0, 3).join(", ")}...`);
-    console.log(`  ✓ Page 2 results: ${page2.results.map((tv) => tv.title).slice(0, 3).join(", ")}...`);
+    console.log(
+      `  ✓ Pagination metadata consistent: ${page1.total_pages} pages, ${page1.total_results} total results`,
+    );
+    console.log(
+      `  ✓ Page 1 results: ${
+        page1.results.map((tv) => tv.title).slice(0, 3).join(", ")
+      }...`,
+    );
+    console.log(
+      `  ✓ Page 2 results: ${
+        page2.results.map((tv) => tv.title).slice(0, 3).join(", ")
+      }...`,
+    );
 
     return true;
   } catch (error) {
-    console.error("✗ Pagination test failed:", error instanceof Error
-      ? error.message
-      : String(error));
+    console.error(
+      "✗ Pagination test failed:",
+      error instanceof Error ? error.message : String(error),
+    );
     return false;
   }
 }
@@ -206,7 +233,9 @@ async function testInvalidPage() {
 
   try {
     await searchTv("test", 0);
-    console.error("✗ Expected error for invalid page number, but request succeeded");
+    console.error(
+      "✗ Expected error for invalid page number, but request succeeded",
+    );
     return false;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

@@ -86,7 +86,7 @@ export const handler: Handlers = {
 
       // Get return URL from form data or default to dashboard
       const returnTo = formData.get("returnTo")?.toString() || "/dashboard";
-      
+
       // Validate returnTo to prevent open redirects (must be relative path)
       const returnUrl = returnTo.startsWith("/") ? returnTo : "/dashboard";
 

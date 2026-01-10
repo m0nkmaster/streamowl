@@ -17,7 +17,7 @@ async function testSearchInception() {
 
   try {
     const results = await searchMovies("Inception");
-    
+
     console.log("✓ Search completed successfully!");
     console.log(`  Total results: ${results.total_results}`);
     console.log(`  Total pages: ${results.total_pages}`);
@@ -31,21 +31,25 @@ async function testSearchInception() {
 
     // Check if Inception is in the results (should be first or near the top)
     const inception = results.results.find(
-      (movie) => movie.title.toLowerCase().includes("inception")
+      (movie) => movie.title.toLowerCase().includes("inception"),
     );
 
     if (!inception) {
       console.warn("  ⚠ 'Inception' not found in first page results");
       console.log("  First few results:");
       results.results.slice(0, 3).forEach((movie, idx) => {
-        console.log(`    ${idx + 1}. ${movie.title} (${movie.release_date || "N/A"})`);
+        console.log(
+          `    ${idx + 1}. ${movie.title} (${movie.release_date || "N/A"})`,
+        );
       });
     } else {
       console.log("\n  ✓ Found 'Inception' in results:");
       console.log(`    Title: ${inception.title}`);
       console.log(`    TMDB ID: ${inception.tmdb_id}`);
       console.log(`    Release Date: ${inception.release_date || "N/A"}`);
-      console.log(`    Overview: ${inception.overview?.substring(0, 80) || "N/A"}...`);
+      console.log(
+        `    Overview: ${inception.overview?.substring(0, 80) || "N/A"}...`,
+      );
       console.log(`    Poster: ${inception.poster_path || "N/A"}`);
     }
 
@@ -65,9 +69,10 @@ async function testSearchInception() {
     console.log("\n  ✓ Result structure is valid");
     return true;
   } catch (error) {
-    console.error("✗ Search failed:", error instanceof Error
-      ? error.message
-      : String(error));
+    console.error(
+      "✗ Search failed:",
+      error instanceof Error ? error.message : String(error),
+    );
     return false;
   }
 }
@@ -76,7 +81,9 @@ async function testSearchInception() {
  * Test pagination returns different results for page 2
  */
 async function testPagination() {
-  console.log("\nTest 2: Pagination - verifying page 2 returns different results");
+  console.log(
+    "\nTest 2: Pagination - verifying page 2 returns different results",
+  );
   console.log("Fetching page 1 and page 2...\n");
 
   try {
@@ -107,7 +114,9 @@ async function testPagination() {
       console.warn(
         `  ⚠ Found ${overlap.length} overlapping results between pages`,
       );
-      console.log("  This might be acceptable if TMDB results changed between requests");
+      console.log(
+        "  This might be acceptable if TMDB results changed between requests",
+      );
     } else {
       console.log("  ✓ No overlapping results between pages");
     }
@@ -118,20 +127,35 @@ async function testPagination() {
       page1.total_results !== page2.total_results
     ) {
       console.error("✗ Pagination metadata differs between pages");
-      console.error(`  Page 1: ${page1.total_pages} pages, ${page1.total_results} total`);
-      console.error(`  Page 2: ${page2.total_pages} pages, ${page2.total_results} total`);
+      console.error(
+        `  Page 1: ${page1.total_pages} pages, ${page1.total_results} total`,
+      );
+      console.error(
+        `  Page 2: ${page2.total_pages} pages, ${page2.total_results} total`,
+      );
       return false;
     }
 
-    console.log(`  ✓ Pagination metadata consistent: ${page1.total_pages} pages, ${page1.total_results} total results`);
-    console.log(`  ✓ Page 1 results: ${page1.results.map((m) => m.title).slice(0, 3).join(", ")}...`);
-    console.log(`  ✓ Page 2 results: ${page2.results.map((m) => m.title).slice(0, 3).join(", ")}...`);
+    console.log(
+      `  ✓ Pagination metadata consistent: ${page1.total_pages} pages, ${page1.total_results} total results`,
+    );
+    console.log(
+      `  ✓ Page 1 results: ${
+        page1.results.map((m) => m.title).slice(0, 3).join(", ")
+      }...`,
+    );
+    console.log(
+      `  ✓ Page 2 results: ${
+        page2.results.map((m) => m.title).slice(0, 3).join(", ")
+      }...`,
+    );
 
     return true;
   } catch (error) {
-    console.error("✗ Pagination test failed:", error instanceof Error
-      ? error.message
-      : String(error));
+    console.error(
+      "✗ Pagination test failed:",
+      error instanceof Error ? error.message : String(error),
+    );
     return false;
   }
 }
@@ -169,7 +193,9 @@ async function testInvalidPage() {
 
   try {
     await searchMovies("test", 0);
-    console.error("✗ Expected error for invalid page number, but request succeeded");
+    console.error(
+      "✗ Expected error for invalid page number, but request succeeded",
+    );
     return false;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

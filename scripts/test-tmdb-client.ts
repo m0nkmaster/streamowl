@@ -22,15 +22,18 @@ async function testFetchMovie() {
     console.log(`  Title: ${movie.title}`);
     console.log(`  Release Date: ${movie.release_date}`);
     console.log(`  Overview: ${movie.overview.substring(0, 100)}...`);
-    console.log(`  Rating: ${movie.vote_average}/10 (${movie.vote_count} votes)`);
+    console.log(
+      `  Rating: ${movie.vote_average}/10 (${movie.vote_count} votes)`,
+    );
     console.log(`  Poster: ${movie.poster_path || "N/A"}`);
     console.log(`  Runtime: ${movie.runtime || "N/A"} minutes`);
     console.log(`  Genres: ${movie.genres.map((g) => g.name).join(", ")}`);
     return true;
   } catch (error) {
-    console.error("✗ Failed to fetch movie:", error instanceof Error
-      ? error.message
-      : String(error));
+    console.error(
+      "✗ Failed to fetch movie:",
+      error instanceof Error ? error.message : String(error),
+    );
     return false;
   }
 }
@@ -44,7 +47,9 @@ async function testInvalidMovieId() {
 
   try {
     await getMovieById(999999999);
-    console.error("✗ Expected error for invalid movie ID, but request succeeded");
+    console.error(
+      "✗ Expected error for invalid movie ID, but request succeeded",
+    );
     return false;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -72,7 +77,9 @@ async function testInvalidIdFormat() {
 
   try {
     await getMovieById(-1);
-    console.error("✗ Expected error for invalid ID format, but request succeeded");
+    console.error(
+      "✗ Expected error for invalid ID format, but request succeeded",
+    );
     return false;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -95,11 +102,13 @@ async function testRateLimiting() {
   console.log("Making 10 rapid requests to test rate limiting...\n");
 
   const startTime = Date.now();
-  const requests = Array.from({ length: 10 }, (_, i) =>
-    getMovieById(603 + i).catch((_err) => {
-      // Ignore errors for this test, we're just checking rate limiting
-      return null;
-    })
+  const requests = Array.from(
+    { length: 10 },
+    (_, i) =>
+      getMovieById(603 + i).catch((_err) => {
+        // Ignore errors for this test, we're just checking rate limiting
+        return null;
+      }),
   );
 
   try {
@@ -107,13 +116,16 @@ async function testRateLimiting() {
     const duration = Date.now() - startTime;
     console.log(`✓ Completed 10 requests in ${duration}ms`);
     console.log(
-      `  Average: ${(duration / 10).toFixed(2)}ms per request (rate limiting working)`,
+      `  Average: ${
+        (duration / 10).toFixed(2)
+      }ms per request (rate limiting working)`,
     );
     return true;
   } catch (error) {
-    console.error("✗ Rate limiting test failed:", error instanceof Error
-      ? error.message
-      : String(error));
+    console.error(
+      "✗ Rate limiting test failed:",
+      error instanceof Error ? error.message : String(error),
+    );
     return false;
   }
 }

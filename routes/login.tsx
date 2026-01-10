@@ -2,7 +2,7 @@ import { type PageProps } from "$fresh/server.ts";
 
 export default function LoginPage(props: PageProps) {
   const returnTo = props.url.searchParams.get("returnTo") || "/dashboard";
-  
+
   return (
     <div class="min-h-screen flex items-center justify-center bg-gray-50">
       <div class="max-w-md w-full space-y-8 p-8">

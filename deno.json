@@ -21,7 +21,8 @@
     "test:tmdb": "deno run -A scripts/test-tmdb-client.ts",
     "test:tmdb-search": "deno run -A scripts/test-tmdb-search.ts",
     "test:tmdb-search-tv": "deno run -A scripts/test-tmdb-search-tv.ts",
-    "test:tmdb-content-details": "deno run -A scripts/test-tmdb-content-details.ts"
+    "test:tmdb-content-details": "deno run -A scripts/test-tmdb-content-details.ts",
+    "test:password-hashing": "deno run -A scripts/test-password-hashing.ts"
   },
   "lint": {
     "rules": {
