@@ -374,3 +374,16 @@
 - Index parameters: HNSW indexes use `m` (number of connections per layer, default 16) and `ef_construction` (size of candidate set during construction, default 64) parameters for tuning index performance
 - Index naming: Use descriptive index names like `idx_users_taste_embedding_cosine` and `idx_content_content_embedding_cosine` to clearly identify vector similarity indexes
 - Migration pattern: Follow standard migration pattern with numbered prefix (010_) and descriptive filename, enable extension before adding columns, create indexes after columns are added
+
+## AI - Content Embeddings Generation
+
+- OpenAI embeddings API: Use OpenAI text-embedding-3-small model for generating 1536-dimensional embeddings, accessed via REST API at https://api.openai.com/v1/embeddings
+- API key configuration: Store OPENAI_API_KEY in environment variables, accessed via Deno.env.get() for secure API key management
+- Embedding generation: Create OpenAI client module with generateEmbedding() function that accepts text and returns 1536-dimensional vector array
+- Content text generation: Combine title, synopsis, and genres into structured text format ("Title: ...\n\nSynopsis: ...\n\nGenres: ...") for embedding generation to capture semantic meaning
+- Vector storage format: Store embeddings in pgvector as string representation '[0.1,0.2,...]' with explicit cast to vector(1536) type, postgres library handles type conversion automatically
+- Embedding dimension verification: Always verify embedding dimension matches expected (1536 for text-embedding-3-small) before storing to prevent dimension mismatches
+- Database update pattern: Use UPDATE query with content_embedding column and vector cast to store embeddings, can be called after content creation or asynchronously
+- Convenience functions: Create helper functions like generateEmbeddingFromTmdbDetails() that extract title, overview, and genres from TMDB details and generate/store embeddings in one call
+- Error handling: Handle OpenAI API errors (network failures, rate limits, invalid responses) with clear error messages, verify embedding dimension matches expected before storage
+- Test script pattern: Create test scripts that verify embedding generation, dimension matching, database storage, and retrieval following consistent test patterns used in other modules

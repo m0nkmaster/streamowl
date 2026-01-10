@@ -648,7 +648,7 @@
         "Step 3: Store embedding in content table",
         "Step 4: Verify embedding dimension matches pgvector column"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "ai-content-embedding-pipeline",
