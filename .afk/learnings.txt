@@ -549,3 +549,14 @@
 - Attribution text: Includes required attribution text "This product uses the TMDB API but is not endorsed or certified by TMDB" as per TMDB API terms
 - Link functionality: Footer includes functional link to TMDB website (`https://www.themoviedb.org/`) with `target="_blank"` and `rel="noopener noreferrer"` for security
 - Responsive design: Footer uses responsive flex layout (stacked on mobile, side-by-side on desktop) with proper spacing and styling
+
+## Search - Filter by Content Type Implementation
+
+- Client-side filtering: Implemented content type filtering on search page using client-side state management (useState hook) to filter results without additional API calls
+- Filter state management: Added `typeFilter` state with type `ContentTypeFilter` ("all" | "movie" | "tv") to track selected filter, defaults to "all" to show all results
+- Filter buttons UI: Created filter button group with three buttons (All, Movies, TV Shows) that appear when search results are available, uses active state styling (indigo background for active, gray for inactive)
+- Result filtering: Filter results using `filteredResults` computed value that filters `results` array based on `typeFilter` state, filters by `content.type` field matching filter value
+- Filter button accessibility: All filter buttons include `type="button"` attribute to satisfy linting rules (jsx-button-has-type), prevents accidental form submission
+- Result count display: Display filtered result count with total count shown in parentheses when filter is active (e.g., "Found 5 results (12 total)"), provides context about filtered vs total results
+- Empty state handling: Show appropriate empty state message when filtered results are empty but total results exist, includes "Show all results" button to reset filter
+- Filter persistence: Filter state persists during search (doesn't reset when new search is performed), allowing users to maintain filter preference while searching
