@@ -1,4 +1,9 @@
 import { useEffect, useState } from "preact/hooks";
+import {
+  getGridPosterSize,
+  getPosterSrcSet,
+  getPosterUrl,
+} from "../lib/images.ts";
 import SkeletonCard from "../components/SkeletonCard.tsx";
 
 interface WatchedContent {
@@ -54,14 +59,6 @@ export default function ContinueWatching() {
     fetchWatched();
   }, []);
 
-  // Helper function to get poster image URL
-  const getPosterUrl = (posterPath: string | null): string => {
-    if (!posterPath) {
-      return "https://via.placeholder.com/300x450?text=No+Poster";
-    }
-    return `https://image.tmdb.org/t/p/w300${posterPath}`;
-  };
-
   // Don't render if no content
   if (!loading && !error && content.length === 0) {
     return null;
@@ -104,7 +101,9 @@ export default function ContinueWatching() {
               <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                 <div class="relative">
                   <img
-                    src={getPosterUrl(item.poster_path)}
+                    src={getPosterUrl(item.poster_path, getGridPosterSize())}
+                    srcSet={getPosterSrcSet(item.poster_path)}
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                     alt={item.title}
                     class="w-full aspect-[2/3] object-cover"
                     loading="lazy"

@@ -1,6 +1,11 @@
 import { useEffect, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import type { RecommendationCandidate } from "../lib/ai/recommendations.ts";
+import {
+  getGridPosterSize,
+  getPosterSrcSet,
+  getPosterUrl,
+} from "../lib/images.ts";
 import RecommendationChat from "./RecommendationChat.tsx";
 import { useToast } from "./Toast.tsx";
 
@@ -143,14 +148,6 @@ export default function RecommendationFeed() {
       statusMap[tmdbId] = isInWatchlist;
     });
     setWatchlistStatuses(statusMap);
-  };
-
-  // Helper function to get poster image URL
-  const getPosterUrl = (posterPath: string | null): string => {
-    if (!posterPath) {
-      return "https://via.placeholder.com/300x450?text=No+Poster";
-    }
-    return `https://image.tmdb.org/t/p/w300${posterPath}`;
   };
 
   // Handle dismissing a recommendation
@@ -417,7 +414,9 @@ export default function RecommendationFeed() {
                 <a href={`/content/${rec.tmdb_id}`} class="block">
                   <div class="relative">
                     <img
-                      src={getPosterUrl(rec.poster_path)}
+                      src={getPosterUrl(rec.poster_path, getGridPosterSize())}
+                      srcSet={getPosterSrcSet(rec.poster_path)}
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                       alt={rec.title}
                       class="w-full aspect-[2/3] object-cover"
                       loading="lazy"

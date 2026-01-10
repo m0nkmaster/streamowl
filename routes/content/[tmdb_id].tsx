@@ -17,6 +17,13 @@ import {
   type TvDetails,
 } from "../../lib/tmdb/client.ts";
 import { getRegionName, getUserRegion } from "../../lib/region.ts";
+import {
+  getBackdropSrcSet,
+  getBackdropUrl,
+  getDetailPosterSize,
+  getPosterSrcSet,
+  getPosterUrl,
+} from "../../lib/images.ts";
 import MarkAsWatchedButton from "../../islands/MarkAsWatchedButton.tsx";
 import AddToWatchlistButton from "../../islands/AddToWatchlistButton.tsx";
 import FavouriteButton from "../../islands/FavouriteButton.tsx";
@@ -139,7 +146,6 @@ export const handler: Handlers<ContentDetailPageProps> = {
     let userRating: number | null = null;
     let userNotes: string | null = null;
     let userTags: Tag[] = [];
-    const session = await getSessionFromRequest(_req);
     if (session) {
       try {
         const { query } = await import("../../lib/db.ts");
@@ -202,26 +208,6 @@ export const handler: Handlers<ContentDetailPageProps> = {
     });
   },
 };
-
-/**
- * Helper function to get poster image URL
- */
-function getPosterUrl(posterPath: string | null): string {
-  if (!posterPath) {
-    return "https://via.placeholder.com/300x450?text=No+Poster";
-  }
-  return `https://image.tmdb.org/t/p/w500${posterPath}`;
-}
-
-/**
- * Helper function to get backdrop image URL
- */
-function getBackdropUrl(backdropPath: string | null): string {
-  if (!backdropPath) {
-    return "";
-  }
-  return `https://image.tmdb.org/t/p/w1280${backdropPath}`;
-}
 
 /**
  * Helper function to get profile image URL
@@ -318,17 +304,24 @@ export default function ContentDetailPage(
     ? (content as MovieDetails).runtime
     : (content as TvDetails).episode_run_time;
   const cast = content.credits?.cast || [];
-  const backdropUrl = getBackdropUrl(content.backdrop_path);
   const tmdbId = content.id;
+
+  const backdropSrcSet = getBackdropSrcSet(content.backdrop_path);
+  const backdropSrc = getBackdropUrl(content.backdrop_path, "w1280");
 
   return (
     <div class="min-h-screen bg-gray-50">
       {/* Backdrop Image */}
-      {backdropUrl && (
-        <div
-          class="relative h-96 bg-cover bg-center"
-          style={`background-image: url(${backdropUrl})`}
-        >
+      {backdropSrc && (
+        <div class="relative h-96 overflow-hidden">
+          <img
+            src={backdropSrc}
+            srcSet={backdropSrcSet}
+            sizes="100vw"
+            alt={`${title} backdrop`}
+            class="absolute inset-0 w-full h-full object-cover"
+            loading="eager"
+          />
           <div class="absolute inset-0 bg-black bg-opacity-50" />
         </div>
       )}
@@ -338,7 +331,9 @@ export default function ContentDetailPage(
           {/* Poster */}
           <div class="flex-shrink-0">
             <img
-              src={getPosterUrl(content.poster_path)}
+              src={getPosterUrl(content.poster_path, getDetailPosterSize())}
+              srcSet={getPosterSrcSet(content.poster_path)}
+              sizes="(max-width: 768px) 256px, 320px"
               alt={title}
               class="w-64 md:w-80 rounded-lg shadow-lg"
             />
@@ -504,7 +499,9 @@ export default function ContentDetailPage(
                     >
                       <div class="relative w-full aspect-[2/3] bg-gray-200">
                         <img
-                          src={getPosterUrl(item.poster_path)}
+                          src={getPosterUrl(item.poster_path, "w300")}
+                          srcSet={getPosterSrcSet(item.poster_path)}
+                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                           alt={item.title}
                           class="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
                           loading="lazy"

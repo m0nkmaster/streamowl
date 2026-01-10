@@ -1,5 +1,10 @@
 import { useEffect, useState } from "preact/hooks";
 import type { Content } from "../lib/tmdb/client.ts";
+import {
+  getGridPosterSize,
+  getPosterSrcSet,
+  getPosterUrl,
+} from "../lib/images.ts";
 import ContentGrid from "../components/ContentGrid.tsx";
 import QuickActions from "./QuickActions.tsx";
 import { useToast } from "./Toast.tsx";
@@ -288,14 +293,6 @@ export default function SearchPage() {
 
     return true;
   });
-
-  // Helper function to get poster image URL
-  const getPosterUrl = (posterPath: string | null): string => {
-    if (!posterPath) {
-      return "https://via.placeholder.com/300x450?text=No+Poster";
-    }
-    return `https://image.tmdb.org/t/p/w300${posterPath}`;
-  };
 
   // Fetch content status when hovering over a card
   const fetchContentStatus = async (tmdbId: number) => {
@@ -648,7 +645,9 @@ export default function SearchPage() {
               >
                 <div class="bg-white rounded-lg shadow-md overflow-hidden relative">
                   <img
-                    src={getPosterUrl(content.poster_path)}
+                    src={getPosterUrl(content.poster_path, getGridPosterSize())}
+                    srcSet={getPosterSrcSet(content.poster_path)}
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                     alt={content.title}
                     class="w-full aspect-[2/3] object-cover"
                     loading="lazy"

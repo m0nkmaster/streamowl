@@ -1,3 +1,8 @@
+import {
+  getGridPosterSize,
+  getPosterSrcSet,
+  getPosterUrl,
+} from "../lib/images.ts";
 import ContentGrid from "../components/ContentGrid.tsx";
 
 interface PublicProfilePageProps {
@@ -17,16 +22,6 @@ interface PublicProfilePageProps {
     poster_path: string | null;
     release_date: string | null;
   }>;
-}
-
-/**
- * Helper function to get poster image URL
- */
-function getPosterUrl(posterPath: string | null): string {
-  if (!posterPath) {
-    return "https://via.placeholder.com/300x450?text=No+Poster";
-  }
-  return `https://image.tmdb.org/t/p/w500${posterPath}`;
 }
 
 export default function PublicProfilePage({
@@ -126,7 +121,12 @@ export default function PublicProfilePage({
                   >
                     <div class="bg-white rounded-lg shadow-md overflow-hidden relative">
                       <img
-                        src={getPosterUrl(item.poster_path)}
+                        src={getPosterUrl(
+                          item.poster_path,
+                          getGridPosterSize(),
+                        )}
+                        srcSet={getPosterSrcSet(item.poster_path)}
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                         alt={item.title}
                         class="w-full aspect-[2/3] object-cover"
                         loading="lazy"

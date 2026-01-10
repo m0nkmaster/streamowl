@@ -1,5 +1,10 @@
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { useEffect, useState } from "preact/hooks";
+import {
+  getGridPosterSize,
+  getPosterSrcSet,
+  getPosterUrl,
+} from "../lib/images.ts";
 import ContentGrid from "../components/ContentGrid.tsx";
 
 interface ListItem {
@@ -34,13 +39,6 @@ export default function ReorderableList({
   useEffect(() => {
     setItems(initialItems);
   }, [initialItems]);
-
-  const getPosterUrl = (posterPath: string | null): string => {
-    if (!posterPath) {
-      return "https://via.placeholder.com/300x450?text=No+Poster";
-    }
-    return `https://image.tmdb.org/t/p/w300${posterPath}`;
-  };
 
   const handleDragStart = (e: DragEvent, index: number) => {
     if (!IS_BROWSER || !isOwner) return;
@@ -196,7 +194,9 @@ export default function ReorderableList({
                     <div class="absolute inset-0 border-2 border-indigo-500 rounded-lg z-10 pointer-events-none" />
                   )}
                   <img
-                    src={getPosterUrl(item.poster_path)}
+                    src={getPosterUrl(item.poster_path, getGridPosterSize())}
+                    srcSet={getPosterSrcSet(item.poster_path)}
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
                     alt={item.title}
                     class="w-full aspect-[2/3] object-cover"
                     loading="lazy"
