@@ -6,6 +6,8 @@ import * as $_app from "./routes/_app.tsx";
 import * as $api_path_ from "./routes/api/[...path].ts";
 import * as $api_auth_google from "./routes/api/auth/google.ts";
 import * as $api_auth_google_callback from "./routes/api/auth/google/callback.ts";
+import * as $api_auth_resend_verification from "./routes/api/auth/resend-verification.ts";
+import * as $api_auth_verify_email from "./routes/api/auth/verify-email.ts";
 import * as $api_content_tmdb_id_favourite from "./routes/api/content/[tmdb_id]/favourite.ts";
 import * as $api_content_tmdb_id_notes from "./routes/api/content/[tmdb_id]/notes.ts";
 import * as $api_content_tmdb_id_rating from "./routes/api/content/[tmdb_id]/rating.ts";
@@ -17,6 +19,7 @@ import * as $api_content_tmdb_id_watchlist from "./routes/api/content/[tmdb_id]/
 import * as $api_forgot_password from "./routes/api/forgot-password.ts";
 import * as $api_jobs_process_embeddings from "./routes/api/jobs/process-embeddings.ts";
 import * as $api_jobs_sync_streaming from "./routes/api/jobs/sync-streaming.ts";
+import * as $api_leaving_soon from "./routes/api/leaving-soon.ts";
 import * as $api_library_favourites from "./routes/api/library/favourites.ts";
 import * as $api_library_lists from "./routes/api/library/lists.ts";
 import * as $api_library_watched from "./routes/api/library/watched.ts";
@@ -65,6 +68,7 @@ import * as $BrowsePage from "./islands/BrowsePage.tsx";
 import * as $ContinueWatching from "./islands/ContinueWatching.tsx";
 import * as $CreateListModal from "./islands/CreateListModal.tsx";
 import * as $FavouriteButton from "./islands/FavouriteButton.tsx";
+import * as $LeavingSoon from "./islands/LeavingSoon.tsx";
 import * as $LibraryTabs from "./islands/LibraryTabs.tsx";
 import * as $ListSettings from "./islands/ListSettings.tsx";
 import * as $LoginForm from "./islands/LoginForm.tsx";
@@ -93,6 +97,8 @@ const manifest = {
     "./routes/api/[...path].ts": $api_path_,
     "./routes/api/auth/google.ts": $api_auth_google,
     "./routes/api/auth/google/callback.ts": $api_auth_google_callback,
+    "./routes/api/auth/resend-verification.ts": $api_auth_resend_verification,
+    "./routes/api/auth/verify-email.ts": $api_auth_verify_email,
     "./routes/api/content/[tmdb_id]/favourite.ts":
       $api_content_tmdb_id_favourite,
     "./routes/api/content/[tmdb_id]/notes.ts": $api_content_tmdb_id_notes,
@@ -107,6 +113,7 @@ const manifest = {
     "./routes/api/forgot-password.ts": $api_forgot_password,
     "./routes/api/jobs/process-embeddings.ts": $api_jobs_process_embeddings,
     "./routes/api/jobs/sync-streaming.ts": $api_jobs_sync_streaming,
+    "./routes/api/leaving-soon.ts": $api_leaving_soon,
     "./routes/api/library/favourites.ts": $api_library_favourites,
     "./routes/api/library/lists.ts": $api_library_lists,
     "./routes/api/library/watched.ts": $api_library_watched,
@@ -159,6 +166,7 @@ const manifest = {
     "./islands/ContinueWatching.tsx": $ContinueWatching,
     "./islands/CreateListModal.tsx": $CreateListModal,
     "./islands/FavouriteButton.tsx": $FavouriteButton,
+    "./islands/LeavingSoon.tsx": $LeavingSoon,
     "./islands/LibraryTabs.tsx": $LibraryTabs,
     "./islands/ListSettings.tsx": $ListSettings,
     "./islands/LoginForm.tsx": $LoginForm,

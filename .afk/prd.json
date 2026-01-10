@@ -596,7 +596,7 @@
         "Step 3: Verify departure dates display on content cards",
         "Step 4: Filter by streaming service and verify results update"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "region-detection",

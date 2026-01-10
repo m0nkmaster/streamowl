@@ -9,6 +9,7 @@ import ContentGrid from "../components/ContentGrid.tsx";
 import QuickActions from "./QuickActions.tsx";
 import { useToast } from "./Toast.tsx";
 import NewReleases from "./NewReleases.tsx";
+import LeavingSoon from "./LeavingSoon.tsx";
 import SkeletonCard from "../components/SkeletonCard.tsx";
 
 interface TrendingResponse {
@@ -126,6 +127,8 @@ export default function BrowsePage() {
       <ToastContainer />
       {/* New Releases Section */}
       <NewReleases />
+      {/* Leaving Soon Section */}
+      <LeavingSoon />
       {/* Trending Section */}
       <section class="mb-12">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Trending</h2>

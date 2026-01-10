@@ -1082,3 +1082,12 @@
 - The Fresh tailwind plugin handles CSS compilation automatically during development
 - Content paths in tailwind.config.ts should include: `"{routes,islands,components}/**/*.{ts,tsx}"`
 - Dark mode can be set to "class" for manual theme toggling
+
+## Leaving Soon Feature
+
+- Leaving Soon section displays content with available_until dates approaching (within 30 days by default)
+- API endpoint /api/leaving-soon queries content_streaming table joined with content and streaming_services tables
+- LeavingSoon island component includes streaming service filter dropdown for filtering by specific service
+- Departure date badges use colour-coded urgency: red (≤3 days), orange (≤7 days), yellow (>7 days)
+- formatDepartureDate() shows relative time: "Leaving today!", "Leaving tomorrow", "Leaving in X days"
+- Empty states handled gracefully when no content is leaving soon
