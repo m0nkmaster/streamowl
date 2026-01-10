@@ -327,3 +327,13 @@
 - Library API ratings: Updated all library API endpoints (/api/library/watched, /api/library/watchlist, /api/library/favourites) to include rating field in response for displaying ratings in library views
 - Rating upsert logic: When setting a rating, if user_content record exists, update rating field; if not, create new record with 'watched' status and rating (ensures rating can be set even if content not yet marked as watched)
 - Optimistic UI updates: Rating component uses optimistic updates - immediately updates UI when rating changed, reverts if API call fails to maintain consistency
+
+## Library - Custom Lists Implementation
+
+- Lists API endpoint: Created `/api/lists` endpoint with POST method for creating custom lists, validates name (required, max 255 chars) and description (optional), returns created list with id, name, description, is_public, and created_at
+- Lists fetching API: Created `/api/library/lists` endpoint with GET method to fetch all user's custom lists with item counts using LEFT JOIN and GROUP BY to count list_items per list
+- Create list modal: Created `islands/CreateListModal.tsx` island component with form for name and description, handles form submission, loading states, and error display, closes modal and refreshes lists on success
+- Library sidebar: Updated `islands/LibraryTabs.tsx` to include sidebar displaying custom lists with "Create List" button, fetches lists on mount, refreshes after list creation, shows item counts and links to list detail pages
+- List detail route: Created `/routes/lists/[list_id].tsx` route for viewing individual lists, handles public/private list access control (public lists viewable by anyone, private lists only by owner), displays list items in responsive grid layout
+- Shareable URLs: Lists have unique shareable URLs at `/lists/[list_id]` format using UUID from database, accessible to anyone for public lists, requires authentication and ownership for private lists
+- List sidebar integration: Sidebar displays lists with name and item count, links to list detail pages, shows empty state when no lists exist, "Create List" button opens modal for creating new lists

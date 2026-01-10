@@ -492,7 +492,7 @@
         "Step 3: Click create and verify list appears in sidebar",
         "Step 4: Verify list has unique shareable URL"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "custom-lists-add-content",
