@@ -128,7 +128,7 @@
         "Step 3: Submit form and verify redirect to dashboard",
         "Step 4: Verify user record created in database with hashed password"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-email-password-login",

@@ -81,3 +81,16 @@
 - Session middleware: Extract token from cookies, verify JWT, attach session to handler context state
 - Token verification: Verify token signature and expiration, reject invalid or expired tokens with clear error messages
 - Type safety: Use interface for SessionPayload, validate payload structure after verification to ensure type safety
+
+## User Authentication - Email/Password Signup
+
+- Password hashing: Use `deno.land/x/bcrypt@v0.4.1` for password hashing in Deno
+- Password storage: Store bcrypt hash in `password_hash` column (VARCHAR(255)) in users table
+- Password validation: Enforce minimum 8 characters on both client (HTML minLength) and server side
+- Email validation: Validate email format using regex pattern on server side, normalise to lowercase before storage
+- User creation: Use database transaction to ensure atomic user creation with password hash
+- Duplicate email check: Query existing users before attempting insert to prevent duplicate email registration
+- API routes in Fresh: Create API handlers by exporting a `handler` object with HTTP method handlers (GET, POST, etc.) from routes in `routes/api/` directory
+- Form handling: Use FormData API to extract form values from POST requests in Fresh handlers
+- Redirect after POST: Use 303 See Other status code with Location header for redirect after successful POST (prevents resubmission on refresh)
+- Session creation: Create JWT session token immediately after user creation and set secure cookie before redirecting
