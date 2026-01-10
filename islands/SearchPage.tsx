@@ -44,6 +44,20 @@ const GENRE_MAP: Record<number, string> = {
 };
 
 /**
+ * Streaming service options for filter dropdown
+ */
+const STREAMING_SERVICES = [
+  { id: 8, name: "Netflix" },
+  { id: 9, name: "Amazon Prime Video" },
+  { id: 15, name: "Hulu" },
+  { id: 337, name: "Disney+" },
+  { id: 350, name: "Apple TV+" },
+  { id: 384, name: "HBO Max" },
+  { id: 386, name: "Peacock" },
+  { id: 531, name: "Paramount+" },
+].sort((a, b) => a.name.localeCompare(b.name));
+
+/**
  * Search page island component
  * Handles search input with debouncing and displays results
  */
@@ -58,6 +72,13 @@ export default function SearchPage() {
   const [genreFilter, setGenreFilter] = useState<number | null>(null);
   const [minYear, setMinYear] = useState<number | null>(null);
   const [maxYear, setMaxYear] = useState<number | null>(null);
+  const [streamingServiceFilter, setStreamingServiceFilter] = useState<
+    number | null
+  >(null);
+  const [providerAvailability, setProviderAvailability] = useState<
+    Record<number, number[]>
+  >({});
+  const [loadingProviders, setLoadingProviders] = useState(false);
   const [debounceTimer, setDebounceTimer] = useState<
     ReturnType<typeof setTimeout> | null
   >(null);
@@ -74,6 +95,7 @@ export default function SearchPage() {
       setResults([]);
       setLoading(false);
       setError(null);
+      setProviderAvailability({}); // Clear provider availability on new search
       return;
     }
 
@@ -95,9 +117,12 @@ export default function SearchPage() {
         const data: SearchResponse = await response.json();
         setResults(data.results);
         setError(null);
+        // Clear provider availability when new search results arrive
+        setProviderAvailability({});
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
         setResults([]);
+        setProviderAvailability({});
       } finally {
         setLoading(false);
       }
@@ -144,7 +169,69 @@ export default function SearchPage() {
     ? sortedYears[sortedYears.length - 1]
     : null;
 
-  // Filter results by content type, genre, and year range
+  // Helper function to fetch provider availability
+  const fetchProviderAvailability = async (
+    contentList: Content[],
+  ): Promise<Record<number, number[]>> => {
+    const response = await fetch("/api/search/providers", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content: contentList.map((c) => ({
+          tmdb_id: c.tmdb_id,
+          type: c.type,
+        })),
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch provider availability");
+    }
+
+    const data = await response.json();
+    const availability: Record<number, number[]> = {};
+
+    Object.entries(data.availability).forEach(([tmdbId, info]) => {
+      const availabilityInfo = info as {
+        provider_ids: number[];
+        providers: unknown[];
+      };
+      availability[parseInt(tmdbId, 10)] = availabilityInfo.provider_ids;
+    });
+
+    return availability;
+  };
+
+  // Fetch provider availability when streaming service filter is selected
+  useEffect(() => {
+    if (
+      streamingServiceFilter !== null && results.length > 0 && !loadingProviders
+    ) {
+      // Check if we already have provider data for all results
+      const resultIds = results.map((c) => c.tmdb_id);
+      const needsFetch = resultIds.some(
+        (tmdbId) => !providerAvailability[tmdbId],
+      );
+
+      if (needsFetch) {
+        setLoadingProviders(true);
+        fetchProviderAvailability(results)
+          .then((availability) => {
+            setProviderAvailability(availability);
+          })
+          .catch((error) => {
+            console.error("Failed to fetch provider availability:", error);
+          })
+          .finally(() => {
+            setLoadingProviders(false);
+          });
+      }
+    }
+  }, [streamingServiceFilter, results.length]);
+
+  // Filter results by content type, genre, year range, and streaming service
   const filteredResults = results.filter((content) => {
     // Apply type filter
     if (typeFilter !== "all" && content.type !== typeFilter) {
@@ -178,6 +265,14 @@ export default function SearchPage() {
     } else {
       // If no release date and year filter is set, exclude
       if (minYear !== null || maxYear !== null) {
+        return false;
+      }
+    }
+
+    // Apply streaming service filter
+    if (streamingServiceFilter !== null) {
+      const providerIds = providerAvailability[content.tmdb_id] || [];
+      if (!providerIds.includes(streamingServiceFilter)) {
         return false;
       }
     }
@@ -358,6 +453,59 @@ export default function SearchPage() {
               )}
             </div>
           )}
+
+          {/* Streaming Service Filter */}
+          {results.length > 0 && (
+            <div class="flex items-center gap-2">
+              <label
+                for="streaming-service-filter"
+                class="text-sm font-medium text-gray-700"
+              >
+                Streaming Service:
+              </label>
+              <select
+                id="streaming-service-filter"
+                value={streamingServiceFilter?.toString() || ""}
+                onChange={(e) => {
+                  const value = (e.target as HTMLSelectElement).value;
+                  setStreamingServiceFilter(
+                    value === "" ? null : parseInt(value, 10),
+                  );
+                  // Clear provider availability when filter changes
+                  if (value === "") {
+                    setProviderAvailability({});
+                  }
+                }}
+                disabled={loadingProviders}
+                class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <option value="">All Services</option>
+                {STREAMING_SERVICES.map((service) => (
+                  <option key={service.id} value={service.id.toString()}>
+                    {service.name}
+                  </option>
+                ))}
+              </select>
+              {streamingServiceFilter !== null && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStreamingServiceFilter(null);
+                    setProviderAvailability({});
+                  }}
+                  disabled={loadingProviders}
+                  class="px-3 py-2 text-sm text-indigo-600 hover:text-indigo-700 underline disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Clear
+                </button>
+              )}
+              {loadingProviders && (
+                <span class="text-sm text-gray-500">
+                  Loading availability...
+                </span>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -368,7 +516,8 @@ export default function SearchPage() {
             Found {filteredResults.length}{" "}
             result{filteredResults.length !== 1 ? "s" : ""}
             {(typeFilter !== "all" || genreFilter !== null ||
-              minYear !== null || maxYear !== null) &&
+              minYear !== null || maxYear !== null ||
+              streamingServiceFilter !== null) &&
               ` (${results.length} total)`}
           </p>
           <ContentGrid>
@@ -429,11 +578,20 @@ export default function SearchPage() {
                       minYear !== null ? minYear : minAvailableYear
                     } to ${maxYear !== null ? maxYear : maxAvailableYear}`
                     : ""
+                }${
+                  streamingServiceFilter !== null
+                    ? ` on ${
+                      STREAMING_SERVICES.find(
+                        (s) => s.id === streamingServiceFilter,
+                      )?.name || "selected service"
+                    }`
+                    : ""
                 } found for "${query}"`}
             </p>
             {results.length > 0 &&
               (typeFilter !== "all" || genreFilter !== null ||
-                minYear !== null || maxYear !== null) &&
+                minYear !== null || maxYear !== null ||
+                streamingServiceFilter !== null) &&
               (
                 <div class="mt-4 flex gap-2 justify-center flex-wrap">
                   {typeFilter !== "all" && (
@@ -464,6 +622,18 @@ export default function SearchPage() {
                       class="text-indigo-600 hover:text-indigo-700 underline"
                     >
                       Show all years
+                    </button>
+                  )}
+                  {streamingServiceFilter !== null && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStreamingServiceFilter(null);
+                        setProviderAvailability({});
+                      }}
+                      class="text-indigo-600 hover:text-indigo-700 underline"
+                    >
+                      Show all services
                     </button>
                   )}
                 </div>

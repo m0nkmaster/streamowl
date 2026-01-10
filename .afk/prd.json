@@ -336,7 +336,7 @@
         "Step 3: Verify all displayed results are available on Netflix",
         "Step 4: Clear filter and verify full results return"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "content-detail-page",
