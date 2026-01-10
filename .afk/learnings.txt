@@ -94,3 +94,13 @@
 - Form handling: Use FormData API to extract form values from POST requests in Fresh handlers
 - Redirect after POST: Use 303 See Other status code with Location header for redirect after successful POST (prevents resubmission on refresh)
 - Session creation: Create JWT session token immediately after user creation and set secure cookie before redirecting
+
+## User Authentication - Email/Password Login
+
+- Login page: Create login page at `routes/login.tsx` with form matching signup page structure
+- Login API handler: Create handler at `routes/api/login.ts` following same pattern as signup handler
+- Password verification: Use `verifyPassword()` function from `lib/auth/password.ts` to compare submitted password with stored bcrypt hash
+- User lookup: Query users table by email (normalised to lowercase) to find existing user
+- Authentication errors: Return generic "Invalid email or password" message for both non-existent users and incorrect passwords (prevents user enumeration)
+- Error status codes: Use 401 Unauthorized for authentication failures, 400 for validation errors
+- Session creation on login: Create JWT session token and set cookie after successful password verification, same as signup flow

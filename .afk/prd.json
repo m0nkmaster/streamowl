@@ -141,7 +141,7 @@
         "Step 3: Submit form and verify redirect to dashboard",
         "Step 4: Verify session cookie is set correctly"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-google-oauth",
