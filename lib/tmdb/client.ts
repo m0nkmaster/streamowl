@@ -651,6 +651,71 @@ export async function getTvWatchProvidersByRegion(
 }
 
 /**
+ * Trending time window for TMDB trending API
+ */
+export type TrendingTimeWindow = "day" | "week";
+
+/**
+ * TMDB trending response structure (can contain movies or TV shows)
+ */
+export interface TMDBTrendingResponse {
+  page: number;
+  results: Array<TMDBMovieSearchResult | TMDBTVSearchResult>;
+  total_pages: number;
+  total_results: number;
+}
+
+/**
+ * Get trending content (movies and TV shows combined) from TMDB API
+ *
+ * @param timeWindow Time window for trending: "day" or "week" (default: "day")
+ * @param page Page number (default: 1)
+ * @returns Paginated trending results mapped to internal content model
+ * @throws Error if API request fails
+ */
+export async function getTrending(
+  timeWindow: TrendingTimeWindow = "day",
+  page: number = 1,
+): Promise<SearchResults> {
+  if (timeWindow !== "day" && timeWindow !== "week") {
+    throw new Error(
+      `Invalid time window: ${timeWindow}. Must be "day" or "week"`,
+    );
+  }
+
+  if (!Number.isInteger(page) || page < 1) {
+    throw new Error(`Page number must be a positive integer, got: ${page}`);
+  }
+
+  // Use shorter cache TTL for trending content (1 hour) since it updates daily
+  const response = await request<TMDBTrendingResponse>(
+    `/trending/all/${timeWindow}`,
+    { page },
+    3600, // 1 hour cache TTL
+  );
+
+  // Map results to internal content model
+  // TMDB trending/all returns mixed results, need to check which type each item is
+  const mappedResults = response.results.map((item) => {
+    // Check if it's a TV show (has 'name' field) or movie (has 'title' field)
+    if ("name" in item && "first_air_date" in item) {
+      // It's a TV show
+      return mapTMDBTVToContent(item as TMDBTVSearchResult);
+    } else {
+      // It's a movie
+      return mapTMDBMovieToContent(item as TMDBMovieSearchResult);
+    }
+  });
+
+  return {
+    page: response.page,
+    total_pages: response.total_pages,
+    total_results: response.total_results,
+    results: mappedResults,
+  };
+}
+
+/**
  * TMDB API client instance
  */
 export const tmdbClient = {
@@ -664,5 +729,6 @@ export const tmdbClient = {
   getMovieWatchProvidersByRegion,
   getTvWatchProvidersByRegion,
   filterWatchProvidersByRegion,
+  getTrending,
   request,
 };
