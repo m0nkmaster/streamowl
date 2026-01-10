@@ -1,4 +1,6 @@
 import { type Handlers } from "$fresh/server.ts";
+import { handleConditionalRequest } from "../../../lib/api/caching.ts";
+import { CachePresets } from "../../../lib/api/caching.ts";
 import { requireAuthForApi } from "../../../lib/auth/middleware.ts";
 import { query } from "../../../lib/db.ts";
 
@@ -42,23 +44,19 @@ export const handler: Handlers = {
         [userId],
       );
 
-      return new Response(
-        JSON.stringify({
-          lists: lists.map((list) => ({
-            id: list.id,
-            name: list.name,
-            description: list.description,
-            is_public: list.is_public,
-            created_at: list.created_at.toISOString(),
-            updated_at: list.updated_at.toISOString(),
-            item_count: list.item_count,
-          })),
-        }),
-        {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+      const response = {
+        lists: lists.map((list) => ({
+          id: list.id,
+          name: list.name,
+          description: list.description,
+          is_public: list.is_public,
+          created_at: list.created_at.toISOString(),
+          updated_at: list.updated_at.toISOString(),
+          item_count: list.item_count,
+        })),
+      };
+
+      return await handleConditionalRequest(req, response, CachePresets.PRIVATE_5M);
     } catch (error) {
       console.error("Error fetching lists:", error);
       return new Response(

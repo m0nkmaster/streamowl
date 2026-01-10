@@ -1,5 +1,16 @@
 {
-  "started_at": "2026-01-10T19:40:37.368254",
-  "iterations": 48,
-  "tasks": {}
+  "started_at": "2026-01-10T21:19:07.701349",
+  "iterations": 1,
+  "tasks": {
+    "performance-api-caching": {
+      "id": "performance-api-caching",
+      "source": "json:.afk/prd.json",
+      "status": "in_progress",
+      "started_at": "2026-01-10T21:19:07.701351",
+      "completed_at": null,
+      "failure_count": 0,
+      "commits": [],
+      "message": null
+    }
+  }
 }

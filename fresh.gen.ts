@@ -27,6 +27,7 @@ import * as $api_login from "./routes/api/login.ts";
 import * as $api_logout from "./routes/api/logout.ts";
 import * as $api_new_releases from "./routes/api/new-releases.ts";
 import * as $api_premium_checkout from "./routes/api/premium/checkout.ts";
+import * as $api_premium_portal from "./routes/api/premium/portal.ts";
 import * as $api_premium_webhook from "./routes/api/premium/webhook.ts";
 import * as $api_recommendations from "./routes/api/recommendations.ts";
 import * as $api_recommendations_tmdb_id_chat from "./routes/api/recommendations/[tmdb_id]/chat.ts";
@@ -50,6 +51,7 @@ import * as $index from "./routes/index.tsx";
 import * as $library from "./routes/library.tsx";
 import * as $lists_list_id_ from "./routes/lists/[list_id].tsx";
 import * as $login from "./routes/login.tsx";
+import * as $premium from "./routes/premium.tsx";
 import * as $profile_user_id_ from "./routes/profile/[user_id].tsx";
 import * as $reset_password from "./routes/reset-password.tsx";
 import * as $search from "./routes/search.tsx";
@@ -67,6 +69,7 @@ import * as $MarkAsWatchedButton from "./islands/MarkAsWatchedButton.tsx";
 import * as $Navigation from "./islands/Navigation.tsx";
 import * as $NewReleases from "./islands/NewReleases.tsx";
 import * as $NotesComponent from "./islands/NotesComponent.tsx";
+import * as $PremiumPricingPage from "./islands/PremiumPricingPage.tsx";
 import * as $PublicProfilePage from "./islands/PublicProfilePage.tsx";
 import * as $QuickActions from "./islands/QuickActions.tsx";
 import * as $RatingComponent from "./islands/RatingComponent.tsx";
@@ -76,6 +79,7 @@ import * as $ReorderableList from "./islands/ReorderableList.tsx";
 import * as $SearchPage from "./islands/SearchPage.tsx";
 import * as $SettingsPage from "./islands/SettingsPage.tsx";
 import * as $TagsComponent from "./islands/TagsComponent.tsx";
+import * as $ThemeToggle from "./islands/ThemeToggle.tsx";
 import * as $Toast from "./islands/Toast.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
@@ -109,6 +113,7 @@ const manifest = {
     "./routes/api/logout.ts": $api_logout,
     "./routes/api/new-releases.ts": $api_new_releases,
     "./routes/api/premium/checkout.ts": $api_premium_checkout,
+    "./routes/api/premium/portal.ts": $api_premium_portal,
     "./routes/api/premium/webhook.ts": $api_premium_webhook,
     "./routes/api/recommendations.ts": $api_recommendations,
     "./routes/api/recommendations/[tmdb_id]/chat.ts":
@@ -134,6 +139,7 @@ const manifest = {
     "./routes/library.tsx": $library,
     "./routes/lists/[list_id].tsx": $lists_list_id_,
     "./routes/login.tsx": $login,
+    "./routes/premium.tsx": $premium,
     "./routes/profile/[user_id].tsx": $profile_user_id_,
     "./routes/reset-password.tsx": $reset_password,
     "./routes/search.tsx": $search,
@@ -153,6 +159,7 @@ const manifest = {
     "./islands/Navigation.tsx": $Navigation,
     "./islands/NewReleases.tsx": $NewReleases,
     "./islands/NotesComponent.tsx": $NotesComponent,
+    "./islands/PremiumPricingPage.tsx": $PremiumPricingPage,
     "./islands/PublicProfilePage.tsx": $PublicProfilePage,
     "./islands/QuickActions.tsx": $QuickActions,
     "./islands/RatingComponent.tsx": $RatingComponent,
@@ -162,6 +169,7 @@ const manifest = {
     "./islands/SearchPage.tsx": $SearchPage,
     "./islands/SettingsPage.tsx": $SettingsPage,
     "./islands/TagsComponent.tsx": $TagsComponent,
+    "./islands/ThemeToggle.tsx": $ThemeToggle,
     "./islands/Toast.tsx": $Toast,
   },
   baseUrl: import.meta.url,

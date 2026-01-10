@@ -1,5 +1,7 @@
 import { type Handlers } from "$fresh/server.ts";
 import { requireAuthForApi } from "../../lib/auth/middleware.ts";
+import { handleConditionalRequest } from "../../lib/api/caching.ts";
+import { CachePresets } from "../../lib/api/caching.ts";
 import {
   generateRecommendationCandidates,
   generateRecommendationExplanation,
@@ -50,13 +52,7 @@ export const handler: Handlers = {
           recommendations: cached,
           remainingRecommendations: remaining,
         };
-        return new Response(JSON.stringify(response), {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json",
-            "Cache-Control": "private, max-age=3600", // Cache for 1 hour on client
-          },
-        });
+        return await handleConditionalRequest(req, response, CachePresets.PRIVATE_1H);
       }
 
       // Check if user has reached daily limit (for free tier users)
@@ -124,13 +120,7 @@ export const handler: Handlers = {
         remainingRecommendations: remaining,
       };
 
-      return new Response(JSON.stringify(response), {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "private, max-age=3600", // Cache for 1 hour on client
-        },
-      });
+      return handleConditionalRequest(req, response, CachePresets.PRIVATE_1H);
     } catch (error) {
       // Handle authentication errors
       if (error instanceof Response) {

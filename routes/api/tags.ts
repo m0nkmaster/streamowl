@@ -1,4 +1,6 @@
 import { type Handlers } from "$fresh/server.ts";
+import { handleConditionalRequest } from "../../lib/api/caching.ts";
+import { CachePresets } from "../../lib/api/caching.ts";
 import { requireAuthForApi } from "../../lib/auth/middleware.ts";
 import { query } from "../../lib/db.ts";
 import {
@@ -36,13 +38,8 @@ export const handler: Handlers = {
         [userId],
       );
 
-      return new Response(
-        JSON.stringify({ tags }),
-        {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+      const response = { tags };
+      return await handleConditionalRequest(req, response, CachePresets.PRIVATE_5M);
     } catch (error) {
       return createInternalServerErrorResponse(
         "Failed to fetch tags",

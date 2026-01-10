@@ -1,4 +1,6 @@
 import { type Handlers } from "$fresh/server.ts";
+import { handleConditionalRequest } from "../../../lib/api/caching.ts";
+import { CachePresets } from "../../../lib/api/caching.ts";
 import { requireAuthForApi } from "../../../lib/auth/middleware.ts";
 import { query } from "../../../lib/db.ts";
 
@@ -48,24 +50,20 @@ export const handler: Handlers = {
         [userId],
       );
 
-      return new Response(
-        JSON.stringify({
-          content: watchlistContent.map((item) => ({
-            tmdb_id: item.tmdb_id,
-            type: item.type,
-            title: item.title,
-            poster_path: item.poster_path,
-            release_date: item.release_date,
-            added_at: item.created_at.toISOString(),
-            rating: item.rating,
-            tag_ids: item.tag_ids || [],
-          })),
-        }),
-        {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+      const response = {
+        content: watchlistContent.map((item) => ({
+          tmdb_id: item.tmdb_id,
+          type: item.type,
+          title: item.title,
+          poster_path: item.poster_path,
+          release_date: item.release_date,
+          added_at: item.created_at.toISOString(),
+          rating: item.rating,
+          tag_ids: item.tag_ids || [],
+        })),
+      };
+
+      return await handleConditionalRequest(req, response, CachePresets.PRIVATE_5M);
     } catch (error) {
       console.error("Error fetching watchlist content:", error);
       return new Response(

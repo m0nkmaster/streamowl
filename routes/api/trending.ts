@@ -1,4 +1,6 @@
 import { type Handlers } from "$fresh/server.ts";
+import { handleConditionalRequest } from "../../lib/api/caching.ts";
+import { CachePresets } from "../../lib/api/caching.ts";
 import { type Content, getTrending } from "../../lib/tmdb/client.ts";
 import {
   createBadRequestResponse,
@@ -51,13 +53,7 @@ export const handler: Handlers = {
         total_pages: trendingResults.total_pages,
       };
 
-      return new Response(JSON.stringify(response), {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "public, max-age=3600", // Cache for 1 hour (trending updates daily)
-        },
-      });
+      return await handleConditionalRequest(req, response, CachePresets.PUBLIC_1H);
     } catch (error) {
       return createInternalServerErrorResponse(
         "Failed to fetch trending content",

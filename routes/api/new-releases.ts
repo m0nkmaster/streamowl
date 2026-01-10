@@ -1,4 +1,6 @@
 import { type Handlers } from "$fresh/server.ts";
+import { handleConditionalRequest } from "../../lib/api/caching.ts";
+import { CachePresets } from "../../lib/api/caching.ts";
 import {
   type Content,
   getNowPlayingMovies,
@@ -68,13 +70,7 @@ export const handler: Handlers = {
         total_pages: 1,
       };
 
-      return new Response(JSON.stringify(response), {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Cache-Control": "public, max-age=7200", // Cache for 2 hours
-        },
-      });
+      return await handleConditionalRequest(req, response, CachePresets.PUBLIC_2H);
     } catch (error) {
       return createInternalServerErrorResponse(
         "Failed to fetch new releases",

@@ -1,4 +1,6 @@
 import { type Handlers } from "$fresh/server.ts";
+import { handleConditionalRequest } from "../../../../lib/api/caching.ts";
+import { CachePresets } from "../../../../lib/api/caching.ts";
 import { requireAuthForApi } from "../../../../lib/auth/middleware.ts";
 import { query } from "../../../../lib/db.ts";
 
@@ -38,13 +40,8 @@ export const handler: Handlers = {
 
       if (content.length === 0) {
         // Content not in database yet, return null status
-        return new Response(
-          JSON.stringify({ status: null }),
-          {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        const response = { status: null };
+        return await handleConditionalRequest(req, response, CachePresets.PRIVATE_5M);
       }
 
       const contentId = content[0].id;
@@ -60,26 +57,17 @@ export const handler: Handlers = {
       );
 
       if (userContent.length === 0) {
-        return new Response(
-          JSON.stringify({ status: null, rating: null }),
-          {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        const response = { status: null, rating: null };
+        return await handleConditionalRequest(req, response, CachePresets.PRIVATE_5M);
       }
 
-      return new Response(
-        JSON.stringify({
-          status: userContent[0].status,
-          watched_at: userContent[0].watched_at?.toISOString() || null,
-          rating: userContent[0].rating,
-        }),
-        {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+      const response = {
+        status: userContent[0].status,
+        watched_at: userContent[0].watched_at?.toISOString() || null,
+        rating: userContent[0].rating,
+      };
+
+      return handleConditionalRequest(req, response, CachePresets.PRIVATE_5M);
     } catch (error) {
       console.error("Error fetching content status:", error);
       return new Response(
