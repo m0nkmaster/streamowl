@@ -16,6 +16,7 @@ import * as $api_content_tmdb_id_watched from "./routes/api/content/[tmdb_id]/wa
 import * as $api_content_tmdb_id_watchlist from "./routes/api/content/[tmdb_id]/watchlist.ts";
 import * as $api_forgot_password from "./routes/api/forgot-password.ts";
 import * as $api_jobs_process_embeddings from "./routes/api/jobs/process-embeddings.ts";
+import * as $api_jobs_sync_streaming from "./routes/api/jobs/sync-streaming.ts";
 import * as $api_library_favourites from "./routes/api/library/favourites.ts";
 import * as $api_library_lists from "./routes/api/library/lists.ts";
 import * as $api_library_watched from "./routes/api/library/watched.ts";
@@ -37,6 +38,7 @@ import * as $api_recommendations_mood from "./routes/api/recommendations/mood.ts
 import * as $api_reset_password from "./routes/api/reset-password.ts";
 import * as $api_search from "./routes/api/search.ts";
 import * as $api_search_providers from "./routes/api/search/providers.ts";
+import * as $api_settings_profile from "./routes/api/settings/profile.ts";
 import * as $api_settings_public_profile from "./routes/api/settings/public-profile.ts";
 import * as $api_settings_region from "./routes/api/settings/region.ts";
 import * as $api_signup from "./routes/api/signup.ts";
@@ -65,6 +67,7 @@ import * as $CreateListModal from "./islands/CreateListModal.tsx";
 import * as $FavouriteButton from "./islands/FavouriteButton.tsx";
 import * as $LibraryTabs from "./islands/LibraryTabs.tsx";
 import * as $ListSettings from "./islands/ListSettings.tsx";
+import * as $LoginForm from "./islands/LoginForm.tsx";
 import * as $MarkAsWatchedButton from "./islands/MarkAsWatchedButton.tsx";
 import * as $Navigation from "./islands/Navigation.tsx";
 import * as $NewReleases from "./islands/NewReleases.tsx";
@@ -78,6 +81,7 @@ import * as $RecommendationFeed from "./islands/RecommendationFeed.tsx";
 import * as $ReorderableList from "./islands/ReorderableList.tsx";
 import * as $SearchPage from "./islands/SearchPage.tsx";
 import * as $SettingsPage from "./islands/SettingsPage.tsx";
+import * as $SignupForm from "./islands/SignupForm.tsx";
 import * as $TagsComponent from "./islands/TagsComponent.tsx";
 import * as $ThemeToggle from "./islands/ThemeToggle.tsx";
 import * as $Toast from "./islands/Toast.tsx";
@@ -102,6 +106,7 @@ const manifest = {
       $api_content_tmdb_id_watchlist,
     "./routes/api/forgot-password.ts": $api_forgot_password,
     "./routes/api/jobs/process-embeddings.ts": $api_jobs_process_embeddings,
+    "./routes/api/jobs/sync-streaming.ts": $api_jobs_sync_streaming,
     "./routes/api/library/favourites.ts": $api_library_favourites,
     "./routes/api/library/lists.ts": $api_library_lists,
     "./routes/api/library/watched.ts": $api_library_watched,
@@ -125,6 +130,7 @@ const manifest = {
     "./routes/api/reset-password.ts": $api_reset_password,
     "./routes/api/search.ts": $api_search,
     "./routes/api/search/providers.ts": $api_search_providers,
+    "./routes/api/settings/profile.ts": $api_settings_profile,
     "./routes/api/settings/public-profile.ts": $api_settings_public_profile,
     "./routes/api/settings/region.ts": $api_settings_region,
     "./routes/api/signup.ts": $api_signup,
@@ -155,6 +161,7 @@ const manifest = {
     "./islands/FavouriteButton.tsx": $FavouriteButton,
     "./islands/LibraryTabs.tsx": $LibraryTabs,
     "./islands/ListSettings.tsx": $ListSettings,
+    "./islands/LoginForm.tsx": $LoginForm,
     "./islands/MarkAsWatchedButton.tsx": $MarkAsWatchedButton,
     "./islands/Navigation.tsx": $Navigation,
     "./islands/NewReleases.tsx": $NewReleases,
@@ -168,6 +175,7 @@ const manifest = {
     "./islands/ReorderableList.tsx": $ReorderableList,
     "./islands/SearchPage.tsx": $SearchPage,
     "./islands/SettingsPage.tsx": $SettingsPage,
+    "./islands/SignupForm.tsx": $SignupForm,
     "./islands/TagsComponent.tsx": $TagsComponent,
     "./islands/ThemeToggle.tsx": $ThemeToggle,
     "./islands/Toast.tsx": $Toast,
