@@ -63,7 +63,7 @@
         "Step 3: Add unique constraint on user_id + content_id",
         "Step 4: Verify cascade delete behaviour works correctly"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "database-schema-lists",

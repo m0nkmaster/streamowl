@@ -40,3 +40,10 @@
 - Content table structure: Includes tmdb_id (unique integer), type (enum), title, overview, release_date, poster_path, backdrop_path, metadata (JSONB), and timestamps
 - Enum types: Created using `CREATE TYPE` syntax before table creation, referenced in column definition as `content_type NOT NULL`
 - Test scripts: Follow consistent pattern - verify structure, test inserts, test retrievals, test queries. Created `scripts/test-content-table.ts` and added `deno task test:content`
+- User_content table: Junction table for many-to-many relationship between users and content with status tracking
+- User_content status enum: Created `user_content_status` enum with values: watched, to_watch, favourite
+- Foreign key constraints: Use `REFERENCES table(column) ON DELETE CASCADE` for automatic cleanup when parent records are deleted
+- Unique constraints: Use `UNIQUE(column1, column2)` syntax for composite unique constraints on junction tables
+- Rating column: Use `NUMERIC(3, 1)` for ratings with CHECK constraint to enforce 0-10 range
+- Cascade delete testing: Test cascade behaviour by deleting parent records and verifying child records are automatically deleted
+- Junction table indexes: Create indexes on foreign key columns and commonly queried columns (status, watched_at) for performance
