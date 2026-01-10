@@ -22,6 +22,7 @@ import AddToWatchlistButton from "../../islands/AddToWatchlistButton.tsx";
 import FavouriteButton from "../../islands/FavouriteButton.tsx";
 import AddToListButton from "../../islands/AddToListButton.tsx";
 import RatingComponent from "../../islands/RatingComponent.tsx";
+import NotesComponent from "../../islands/NotesComponent.tsx";
 import ContentGrid from "../../components/ContentGrid.tsx";
 
 interface ContentDetailPageProps {
@@ -32,6 +33,7 @@ interface ContentDetailPageProps {
   similarTitles: SearchResults | null;
   userStatus: "watched" | "to_watch" | "favourite" | null;
   userRating: number | null;
+  userNotes: string | null;
   isAuthenticated: boolean;
   region: SupportedRegion;
 }
@@ -123,9 +125,10 @@ export const handler: Handlers<ContentDetailPageProps> = {
       console.error("Failed to fetch similar titles:", error);
     }
 
-    // Fetch user status and rating if authenticated
+    // Fetch user status, rating, and notes if authenticated
     let userStatus: "watched" | "to_watch" | "favourite" | null = null;
     let userRating: number | null = null;
+    let userNotes: string | null = null;
     const session = await getSessionFromRequest(_req);
     if (session) {
       try {
@@ -137,13 +140,15 @@ export const handler: Handlers<ContentDetailPageProps> = {
           const userContent = await query<{
             status: "watched" | "to_watch" | "favourite";
             rating: number | null;
+            notes: string | null;
           }>(
-            "SELECT status, rating FROM user_content WHERE user_id = $1 AND content_id = $2",
+            "SELECT status, rating, notes FROM user_content WHERE user_id = $1 AND content_id = $2",
             [session.userId, contentRecord.id],
           );
           if (userContent.length > 0) {
             userStatus = userContent[0].status;
             userRating = userContent[0].rating;
+            userNotes = userContent[0].notes;
           }
         }
       } catch (error) {
@@ -160,6 +165,7 @@ export const handler: Handlers<ContentDetailPageProps> = {
       similarTitles,
       userStatus,
       userRating,
+      userNotes,
       isAuthenticated: session !== null,
       region,
     });
@@ -265,6 +271,7 @@ export default function ContentDetailPage(
     similarTitles,
     userStatus,
     userRating,
+    userNotes,
     isAuthenticated,
     region,
   } = data;
@@ -369,6 +376,13 @@ export default function ContentDetailPage(
                   <RatingComponent
                     tmdbId={tmdbId}
                     initialRating={userRating}
+                  />
+                </div>
+                {/* Notes Component */}
+                <div class="border-t pt-4">
+                  <NotesComponent
+                    tmdbId={tmdbId}
+                    initialNotes={userNotes}
                   />
                 </div>
               </div>
