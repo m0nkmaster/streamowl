@@ -8,6 +8,7 @@ import {
 interface LoginPageProps {
   csrfToken: string;
   returnTo: string;
+  resetSuccess?: boolean;
 }
 
 export const handler: Handlers<LoginPageProps> = {
@@ -19,13 +20,14 @@ export const handler: Handlers<LoginPageProps> = {
 
     const url = new URL(req.url);
     const returnTo = url.searchParams.get("returnTo") || "/dashboard";
+    const resetSuccess = url.searchParams.get("reset") === "success";
 
-    return ctx.render({ csrfToken, returnTo }, { headers });
+    return ctx.render({ csrfToken, returnTo, resetSuccess }, { headers });
   },
 };
 
 export default function LoginPage(props: PageProps<LoginPageProps>) {
-  const { csrfToken, returnTo } = props.data;
+  const { csrfToken, returnTo, resetSuccess } = props.data;
 
   return (
     <div class="min-h-screen flex items-center justify-center bg-gray-50">
@@ -35,6 +37,35 @@ export default function LoginPage(props: PageProps<LoginPageProps>) {
             Sign in to your account
           </h2>
         </div>
+
+        {resetSuccess && (
+          <div class="rounded-md bg-green-50 p-4">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg
+                  class="h-5 w-5 text-green-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium text-green-800">
+                  Password reset successful
+                </p>
+                <p class="mt-1 text-sm text-green-700">
+                  You can now sign in with your new password.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <form class="mt-8 space-y-6" method="POST" action="/api/login">
           <input type="hidden" name="returnTo" value={returnTo} />
           <input type="hidden" name={CSRF_FIELD_NAME} value={csrfToken} />
@@ -72,6 +103,15 @@ export default function LoginPage(props: PageProps<LoginPageProps>) {
             >
               Sign in
             </button>
+          </div>
+
+          <div class="text-center">
+            <a
+              href="/forgot-password"
+              class="font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              Forgot your password?
+            </a>
           </div>
         </form>
 

@@ -1428,7 +1428,7 @@
         "Step 3: Receive email with reset link",
         "Step 4: Set new password and verify login works"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "seo-meta-tags",

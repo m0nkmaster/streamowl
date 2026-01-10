@@ -5,17 +5,21 @@ interface NavigationProps {
   isAuthenticated: boolean;
 }
 
-export default function Navigation({ currentPath, isAuthenticated }: NavigationProps) {
+export default function Navigation(
+  { currentPath, isAuthenticated }: NavigationProps,
+) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navLinks = [
     { href: "/", label: "Home", icon: "🏠" },
     { href: "/browse", label: "Browse", icon: "🔍" },
     { href: "/search", label: "Search", icon: "🔎" },
-    ...(isAuthenticated ? [
-      { href: "/library", label: "Library", icon: "📚" },
-      { href: "/dashboard", label: "Dashboard", icon: "⚙️" },
-    ] : []),
+    ...(isAuthenticated
+      ? [
+        { href: "/library", label: "Library", icon: "📚" },
+        { href: "/dashboard", label: "Dashboard", icon: "⚙️" },
+      ]
+      : []),
   ];
 
   const isActive = (href: string) => {
@@ -65,35 +69,37 @@ export default function Navigation({ currentPath, isAuthenticated }: NavigationP
               aria-label="Toggle navigation menu"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              {isMobileMenuOpen ? (
-                <svg
-                  class="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  class="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              )}
+              {isMobileMenuOpen
+                ? (
+                  <svg
+                    class="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                )
+                : (
+                  <svg
+                    class="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M4 6h16M4 12h16M4 18h16"
+                    />
+                  </svg>
+                )}
             </button>
           </div>
 

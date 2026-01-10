@@ -20,7 +20,7 @@ export const handler: Handlers<AppProps> = {
 
 export default function App({ Component, data }: PageProps<AppProps>) {
   const { currentPath, isAuthenticated } = data;
-  
+
   return (
     <html>
       <head>
@@ -29,7 +29,10 @@ export default function App({ Component, data }: PageProps<AppProps>) {
         <title>Stream Owl</title>
       </head>
       <body>
-        <Navigation currentPath={currentPath} isAuthenticated={isAuthenticated} />
+        <Navigation
+          currentPath={currentPath}
+          isAuthenticated={isAuthenticated}
+        />
         <Component />
       </body>
     </html>
