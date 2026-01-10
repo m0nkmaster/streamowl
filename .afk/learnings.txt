@@ -435,3 +435,25 @@
 - Error handling: Handle authentication errors (401), API failures, and empty states gracefully with helpful messages guiding users to watch content for recommendations
 - Cache key format: Use ISO date format (YYYY-MM-DD) in cache keys for consistent daily updates across timezones, ensures recommendations refresh at midnight local time
 - Client-side caching: Set Cache-Control header (private, max-age=3600) for 1-hour client-side caching to reduce API calls while maintaining freshness
+
+## UI - Home Feed Layout Implementation
+
+- Home feed structure: Personalised home feed includes three main sections: Recommendations (prominently displayed), Continue Watching (recent activity), and New Releases (fresh content) for authenticated users
+- Continue Watching component: Created `islands/ContinueWatching.tsx` island component that fetches recently watched content from `/api/library/watched` endpoint, displays most recent 6 items in responsive grid layout
+- New Releases component: Created `islands/NewReleases.tsx` island component that fetches trending content from `/api/trending` endpoint, displays first 6 items with "View All" link to browse page
+- Section ordering: Recommendations section displayed first (most prominent), followed by Continue Watching, then New Releases, creating logical flow from personalised content to recent activity to discovery
+- Conditional rendering: Continue Watching section only renders if user has watched content (returns null if empty), prevents empty sections from cluttering the home feed
+- Grid layout consistency: All home feed sections use consistent responsive grid layout (2-6 columns based on viewport) matching library and search page patterns for visual consistency
+- Section headers: Each section includes descriptive heading and subtitle explaining the content, with "View All" links where appropriate (New Releases links to browse page)
+- Component isolation: Each section is a separate island component that fetches its own data independently, allowing for independent loading states and error handling
+
+## UI - Library Tabs Implementation
+
+- Library tabs component: Created `islands/LibraryTabs.tsx` island component that implements tabbed library view with Watched, To Watch, and Favourites tabs, plus custom lists sidebar
+- Tab-based content switching: Use `useState` for activeTab and `useEffect` hook with activeTab dependency to fetch content when tab changes, ensuring efficient data loading only when needed
+- Custom lists sidebar: Display custom lists in sidebar (lg:w-64) with "Create List" button, list names, item counts, and links to list detail pages, providing easy access to custom collections
+- Tab navigation: Implement tab navigation using button elements with conditional styling (border-indigo-500 for active, border-transparent for inactive), providing clear visual feedback for active tab
+- Content fetching pattern: Fetch content only when specific tab is active using conditional checks in useEffect, preventing unnecessary API calls and improving performance
+- Responsive layout: Use flex layout (flex-col lg:flex-row) to stack sidebar above content on mobile, side-by-side on desktop, ensuring good UX across all viewport sizes
+- Empty states: Display helpful empty state messages for each tab when no content exists, guiding users on how to populate their library
+- Loading states: Show loading indicators while fetching content, providing feedback during data retrieval operations

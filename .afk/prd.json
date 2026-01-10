@@ -934,7 +934,7 @@
         "Step 3: Verify continue watching section shows recent activity",
         "Step 4: Verify new releases section shows fresh content"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "ui-library-tabs",
@@ -947,7 +947,7 @@
         "Step 3: Click between tabs and verify content switches",
         "Step 4: Verify custom lists appear in sidebar or dropdown"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "ui-content-grid",
