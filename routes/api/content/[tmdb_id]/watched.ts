@@ -1,5 +1,6 @@
 import { type Handlers } from "$fresh/server.ts";
 import { requireAuthForApi } from "../../../../lib/auth/middleware.ts";
+import { recalculateTasteProfile } from "../../../../lib/ai/taste-profile.ts";
 import { getOrCreateContent } from "../../../../lib/content.ts";
 import { query, transaction } from "../../../../lib/db.ts";
 import {
@@ -92,6 +93,14 @@ export const handler: Handlers = {
         }
       });
 
+      // Recalculate taste profile (non-blocking - log errors but don't fail request)
+      try {
+        await recalculateTasteProfile(userId);
+      } catch (error) {
+        console.error("Error recalculating taste profile:", error);
+        // Don't fail the request if taste profile calculation fails
+      }
+
       return new Response(
         JSON.stringify({ success: true, watched_at: new Date().toISOString() }),
         {
@@ -154,6 +163,14 @@ export const handler: Handlers = {
         "DELETE FROM user_content WHERE user_id = $1 AND content_id = $2",
         [userId, contentId],
       );
+
+      // Recalculate taste profile (non-blocking - log errors but don't fail request)
+      try {
+        await recalculateTasteProfile(userId);
+      } catch (error) {
+        console.error("Error recalculating taste profile:", error);
+        // Don't fail the request if taste profile calculation fails
+      }
 
       return new Response(
         JSON.stringify({ success: true }),
