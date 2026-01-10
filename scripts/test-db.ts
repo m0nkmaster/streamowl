@@ -33,7 +33,8 @@ async function testConcurrentRequests() {
   // Initialize pool
   getPool();
   const concurrentRequests = 5;
-  const promises: Promise<Array<{ request_id: number; timestamp: Date }>>[] = [];
+  const promises: Promise<Array<{ request_id: number; timestamp: Date }>>[] =
+    [];
 
   for (let i = 0; i < concurrentRequests; i++) {
     promises.push(

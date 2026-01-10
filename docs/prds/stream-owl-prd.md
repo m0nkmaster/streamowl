@@ -4,7 +4,12 @@
 
 ## 1. Executive Summary
 
-This document defines the requirements for a streaming content discovery platform - a web application (with PWA support) that solves the fragmented streaming landscape problem. Users can discover where movies, TV shows, and documentaries are available across streaming services, track their viewing history, and receive intelligent AI-powered recommendations that explain *why* content suits their taste.
+This document defines the requirements for a streaming content discovery
+platform - a web application (with PWA support) that solves the fragmented
+streaming landscape problem. Users can discover where movies, TV shows, and
+documentaries are available across streaming services, track their viewing
+history, and receive intelligent AI-powered recommendations that explain _why_
+content suits their taste.
 
 **Names:**
 
@@ -16,11 +21,16 @@ This document defines the requirements for a streaming content discovery platfor
 
 The modern viewer faces:
 
-- **Fragmentation**: Content spread across 10+ streaming services with no unified search
-- **Discovery paralysis**: Too much choice leads to endless scrolling and decision fatigue
-- **Lost context**: Forgetting what you wanted to watch, or what friends recommended
-- **Generic recommendations**: Platform algorithms optimise for engagement, not genuine taste matching
-- **Subscription blindness**: Paying for services without knowing what's available
+- **Fragmentation**: Content spread across 10+ streaming services with no
+  unified search
+- **Discovery paralysis**: Too much choice leads to endless scrolling and
+  decision fatigue
+- **Lost context**: Forgetting what you wanted to watch, or what friends
+  recommended
+- **Generic recommendations**: Platform algorithms optimise for engagement, not
+  genuine taste matching
+- **Subscription blindness**: Paying for services without knowing what's
+  available
 
 ---
 
@@ -28,9 +38,11 @@ The modern viewer faces:
 
 ### Primary Users
 
-- **Streaming subscribers** (25-45) juggling 2-6 services who want to maximise value
+- **Streaming subscribers** (25-45) juggling 2-6 services who want to maximise
+  value
 - **Film enthusiasts** who track what they watch and curate personal lists
-- **Busy professionals** with limited leisure time who want quality recommendations
+- **Busy professionals** with limited leisure time who want quality
+  recommendations
 
 ### Secondary Users
 
@@ -45,13 +57,15 @@ United Kingdom, United States, Canada, Australia, Germany, France
 
 ## 4. Product Vision
 
-> "The intelligent companion that knows your taste, finds your content, and explains why you'll love it."
+> "The intelligent companion that knows your taste, finds your content, and
+> explains why you'll love it."
 
 ### Core Value Propositions
 
 1. **Unified Search**: One place to search across all streaming services
 2. **Smart Tracking**: Effortless logging with rich metadata
-3. **Intelligent Recommendations**: AI that understands *why* you like what you like
+3. **Intelligent Recommendations**: AI that understands _why_ you like what you
+   like
 4. **Taste Profile**: A living document of your cinematic preferences
 
 ---
@@ -84,7 +98,8 @@ United Kingdom, United States, Canada, Australia, Germany, France
 
 | **Favourites** | Curated best-of collection |
 
-| **Custom Lists** | Unlimited user-created lists (e.g., "80s Horror", "Date Night") |
+| **Custom Lists** | Unlimited user-created lists (e.g., "80s Horror", "Date
+Night") |
 
 | **Tags** | User-defined tags for personal organisation |
 
@@ -94,7 +109,8 @@ United Kingdom, United States, Canada, Australia, Germany, France
 
 ### 5.3 AI Recommendation Engine
 
-The standout feature - an LLM-powered system that generates personalised recommendations with explanations:
+The standout feature - an LLM-powered system that generates personalised
+recommendations with explanations:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -152,7 +168,8 @@ The standout feature - an LLM-powered system that generates personalised recomme
 
 ### Authentication
 
-- As a user, I can sign up with email/password or social providers (Google, Apple, Facebook)
+- As a user, I can sign up with email/password or social providers (Google,
+  Apple, Facebook)
 - As a user, I can link multiple auth providers to one account
 - As a user, my data syncs across all devices
 
@@ -176,7 +193,7 @@ The standout feature - an LLM-powered system that generates personalised recomme
 
 - As a user, I receive daily personalised recommendations in my feed
 - As a user, I can ask for recommendations by mood or context
-- As a user, I understand *why* each recommendation was made
+- As a user, I understand _why_ each recommendation was made
 - As a user, I can dismiss recommendations to improve future suggestions
 - As a premium user, I get unlimited AI conversations about my taste
 
@@ -374,9 +391,11 @@ erDiagram
 
 | **TMDB Watch Providers** | Limited | Free | Basic availability only |
 
-| **Streaming Availability API** | Good | Pay-per-request | RapidAPI marketplace |
+| **Streaming Availability API** | Good | Pay-per-request | RapidAPI marketplace
+|
 
-**Recommendation**: Start with TMDB Watch Providers (free), upgrade to Watchmode for MVP launch.
+**Recommendation**: Start with TMDB Watch Providers (free), upgrade to Watchmode
+for MVP launch.
 
 ### Supplementary Data
 
@@ -428,17 +447,21 @@ flowchart LR
 
 ### Taste Profile Generation
 
-1. Each content item has a vector embedding (generated from synopsis, genres, themes)
-2. User's taste = weighted average of watched content embeddings, weighted by rating
+1. Each content item has a vector embedding (generated from synopsis, genres,
+   themes)
+2. User's taste = weighted average of watched content embeddings, weighted by
+   rating
 3. Profile updated on each watch/rate action
 4. Stored in pgvector for efficient similarity search
 
 ### Recommendation Flow
 
-1. **Candidate generation**: Vector similarity search for unwatched content similar to taste profile
+1. **Candidate generation**: Vector similarity search for unwatched content
+   similar to taste profile
 2. **Filtering**: Remove dismissed items, apply availability filters
 3. **Ranking**: Score by similarity + recency + diversity
-4. **Explanation generation**: LLM prompt with user history context + candidate details
+4. **Explanation generation**: LLM prompt with user history context + candidate
+   details
 5. **Response**: Structured recommendation with natural language reasoning
 
 ### Example Prompt Structure
@@ -584,15 +607,20 @@ Generate a 2-3 sentence explanation that:
 
 |------|------------|--------|------------|
 
-| **Streaming availability API costs** | Medium | High | Start with free TMDB providers, upgrade based on traction |
+| **Streaming availability API costs** | Medium | High | Start with free TMDB
+providers, upgrade based on traction |
 
-| **OpenAI API costs** | Medium | Medium | Rate limiting, caching common recommendations, batch processing |
+| **OpenAI API costs** | Medium | Medium | Rate limiting, caching common
+recommendations, batch processing |
 
-| **TMDB rate limits** | Low | Medium | Aggressive caching, background sync jobs |
+| **TMDB rate limits** | Low | Medium | Aggressive caching, background sync jobs
+|
 
-| **Competition (Letterboxd, JustWatch)** | High | Medium | Differentiate on AI explanations and UX |
+| **Competition (Letterboxd, JustWatch)** | High | Medium | Differentiate on AI
+explanations and UX |
 
-| **Streaming landscape changes** | Medium | Low | Modular provider architecture |
+| **Streaming landscape changes** | Medium | Low | Modular provider architecture
+|
 
 ---
 
@@ -616,6 +644,6 @@ Generate a 2-3 sentence explanation that:
 
 ---
 
-*Document Version: 1.0*
+_Document Version: 1.0_
 
-*Last Updated: January 2026*
+_Last Updated: January 2026_

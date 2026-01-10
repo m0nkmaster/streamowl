@@ -1,6 +1,5 @@
 {
-  "sources": [
-  ],
+  "sources": [],
   "feedback_loops": {
     "custom": {}
   },
@@ -14,7 +13,7 @@
     "file_path": ".afk/prompt.md"
   },
   "ai_cli": {
-    "command": "agent", 
+    "command": "agent",
     "args": ["--force", "-p"]
   },
   "prompt": {
