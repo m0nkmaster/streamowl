@@ -504,3 +504,14 @@
 - CSRF error integration: Updated CSRF error response function to use standardised error utilities for consistency with other API errors
 - Error logging: Internal server error responses log errors to console for debugging while returning user-friendly error messages to clients
 - Type safety: Error response functions use TypeScript interfaces (`ApiErrorResponse`, `ValidationErrorResponse`) for type-safe error response creation
+
+## Deployment - Deno Deploy Configuration
+
+- Deno Deploy entrypoint: Uses `main.ts` as the entrypoint file for production deployment, which imports Fresh server and starts the application
+- Deployment documentation: Created comprehensive deployment guide at `docs/DEPLOYMENT.md` covering repository linking, environment variable configuration, auto-deployment setup, and troubleshooting
+- Environment variables: All environment variables must be configured in Deno Deploy dashboard (DATABASE_URL, JWT_SECRET, TMDB_API_KEY, GOOGLE_OAUTH_CLIENT_ID, GOOGLE_OAUTH_CLIENT_SECRET, UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN, OPENAI_API_KEY)
+- Auto-deployment: Deno Deploy automatically deploys on push to configured branch (typically `main`), enabling continuous deployment workflow
+- Database setup: Production database must be set up separately (e.g., Supabase, Neon, Railway) and migrations must be run before deployment
+- Deployment verification: After deployment, verify production URL loads, environment variables are set correctly, and key functionality works (authentication, search, database connections)
+- Rollback capability: Deno Deploy allows promoting previous deployments to rollback if issues occur
+- Configuration files: `main.ts` and `fresh.config.ts` are sufficient for Deno Deploy - no additional deployment configuration files needed beyond standard Fresh setup
