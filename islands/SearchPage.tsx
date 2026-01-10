@@ -10,6 +10,40 @@ interface SearchResponse {
 }
 
 /**
+ * TMDB genre ID to name mapping
+ * Common genres for both movies and TV shows
+ */
+const GENRE_MAP: Record<number, string> = {
+  28: "Action",
+  12: "Adventure",
+  16: "Animation",
+  35: "Comedy",
+  80: "Crime",
+  99: "Documentary",
+  18: "Drama",
+  10751: "Family",
+  14: "Fantasy",
+  36: "History",
+  27: "Horror",
+  10402: "Music",
+  9648: "Mystery",
+  10749: "Romance",
+  878: "Science Fiction",
+  10770: "TV Movie",
+  53: "Thriller",
+  10752: "War",
+  37: "Western",
+  10759: "Action & Adventure",
+  10762: "Kids",
+  10763: "News",
+  10764: "Reality",
+  10765: "Sci-Fi & Fantasy",
+  10766: "Soap",
+  10767: "Talk",
+  10768: "War & Politics",
+};
+
+/**
  * Search page island component
  * Handles search input with debouncing and displays results
  */
@@ -21,6 +55,7 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<ContentTypeFilter>("all");
+  const [genreFilter, setGenreFilter] = useState<number | null>(null);
   const [debounceTimer, setDebounceTimer] = useState<
     ReturnType<typeof setTimeout> | null
   >(null);
@@ -76,12 +111,37 @@ export default function SearchPage() {
     };
   }, [query]);
 
-  // Filter results by content type
+  // Extract unique genres from results
+  const availableGenres = new Map<number, string>();
+  results.forEach((content) => {
+    const genreIds = (content.metadata.genre_ids as number[]) || [];
+    genreIds.forEach((genreId) => {
+      if (GENRE_MAP[genreId] && !availableGenres.has(genreId)) {
+        availableGenres.set(genreId, GENRE_MAP[genreId]);
+      }
+    });
+  });
+
+  // Sort genres by name
+  const sortedGenres = Array.from(availableGenres.entries())
+    .sort((a, b) => a[1].localeCompare(b[1]));
+
+  // Filter results by content type and genre
   const filteredResults = results.filter((content) => {
-    if (typeFilter === "all") {
-      return true;
+    // Apply type filter
+    if (typeFilter !== "all" && content.type !== typeFilter) {
+      return false;
     }
-    return content.type === typeFilter;
+
+    // Apply genre filter
+    if (genreFilter !== null) {
+      const genreIds = (content.metadata.genre_ids as number[]) || [];
+      if (!genreIds.includes(genreFilter)) {
+        return false;
+      }
+    }
+
+    return true;
   });
 
   // Helper function to get poster image URL
@@ -122,40 +182,80 @@ export default function SearchPage() {
 
       {/* Filter Buttons */}
       {!loading && !error && results.length > 0 && (
-        <div class="mb-6 flex gap-2 flex-wrap">
-          <button
-            type="button"
-            onClick={() => setTypeFilter("all")}
-            class={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              typeFilter === "all"
-                ? "bg-indigo-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
-          >
-            All
-          </button>
-          <button
-            type="button"
-            onClick={() => setTypeFilter("movie")}
-            class={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              typeFilter === "movie"
-                ? "bg-indigo-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
-          >
-            Movies
-          </button>
-          <button
-            type="button"
-            onClick={() => setTypeFilter("tv")}
-            class={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              typeFilter === "tv"
-                ? "bg-indigo-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
-          >
-            TV Shows
-          </button>
+        <div class="mb-6 space-y-4">
+          {/* Content Type Filters */}
+          <div class="flex gap-2 flex-wrap">
+            <button
+              type="button"
+              onClick={() => setTypeFilter("all")}
+              class={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                typeFilter === "all"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              All
+            </button>
+            <button
+              type="button"
+              onClick={() => setTypeFilter("movie")}
+              class={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                typeFilter === "movie"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              Movies
+            </button>
+            <button
+              type="button"
+              onClick={() => setTypeFilter("tv")}
+              class={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                typeFilter === "tv"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              }`}
+            >
+              TV Shows
+            </button>
+          </div>
+
+          {/* Genre Filter Dropdown */}
+          {sortedGenres.length > 0 && (
+            <div class="flex items-center gap-2">
+              <label
+                for="genre-filter"
+                class="text-sm font-medium text-gray-700"
+              >
+                Genre:
+              </label>
+              <select
+                id="genre-filter"
+                value={genreFilter?.toString() || ""}
+                onChange={(e) => {
+                  const value = (e.target as HTMLSelectElement).value;
+                  setGenreFilter(value === "" ? null : parseInt(value, 10));
+                }}
+                class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+              >
+                <option value="">All Genres</option>
+                {sortedGenres.map(([genreId, genreName]) => (
+                  <option key={genreId} value={genreId.toString()}>
+                    {genreName}
+                  </option>
+                ))}
+              </select>
+              {genreFilter !== null && (
+                <button
+                  type="button"
+                  onClick={() => setGenreFilter(null)}
+                  class="px-3 py-2 text-sm text-indigo-600 hover:text-indigo-700 underline"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -165,7 +265,8 @@ export default function SearchPage() {
           <p class="text-gray-600 mb-4">
             Found {filteredResults.length}{" "}
             result{filteredResults.length !== 1 ? "s" : ""}
-            {typeFilter !== "all" && ` (${results.length} total)`}
+            {(typeFilter !== "all" || genreFilter !== null) &&
+              ` (${results.length} total)`}
           </p>
           <ContentGrid>
             {filteredResults.map((content) => (
@@ -212,17 +313,37 @@ export default function SearchPage() {
               {results.length === 0
                 ? `No results found for "${query}"`
                 : `No ${
-                  typeFilter === "movie" ? "movies" : "TV shows"
+                  typeFilter === "movie"
+                    ? "movies"
+                    : typeFilter === "tv"
+                    ? "TV shows"
+                    : "content"
+                }${
+                  genreFilter !== null ? ` in ${GENRE_MAP[genreFilter]}` : ""
                 } found for "${query}"`}
             </p>
-            {results.length > 0 && typeFilter !== "all" && (
-              <button
-                type="button"
-                onClick={() => setTypeFilter("all")}
-                class="mt-4 text-indigo-600 hover:text-indigo-700 underline"
-              >
-                Show all results
-              </button>
+            {results.length > 0 &&
+              (typeFilter !== "all" || genreFilter !== null) && (
+              <div class="mt-4 flex gap-2 justify-center">
+                {typeFilter !== "all" && (
+                  <button
+                    type="button"
+                    onClick={() => setTypeFilter("all")}
+                    class="text-indigo-600 hover:text-indigo-700 underline"
+                  >
+                    Show all types
+                  </button>
+                )}
+                {genreFilter !== null && (
+                  <button
+                    type="button"
+                    onClick={() => setGenreFilter(null)}
+                    class="text-indigo-600 hover:text-indigo-700 underline"
+                  >
+                    Show all genres
+                  </button>
+                )}
+              </div>
             )}
           </div>
         )}

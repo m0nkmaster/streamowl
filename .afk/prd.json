@@ -310,7 +310,7 @@
         "Step 3: Select 'Action' genre",
         "Step 4: Verify only action content remains in results"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "search-filter-by-year",

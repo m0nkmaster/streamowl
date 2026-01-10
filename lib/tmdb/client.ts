@@ -275,6 +275,7 @@ export interface TMDBMovieSearchResult {
   backdrop_path: string | null;
   vote_average: number;
   vote_count: number;
+  genre_ids?: number[]; // Genre IDs from TMDB search results
   [key: string]: unknown; // Allow additional fields
 }
 
@@ -290,6 +291,7 @@ export interface TMDBTVSearchResult {
   backdrop_path: string | null;
   vote_average: number;
   vote_count: number;
+  genre_ids?: number[]; // Genre IDs from TMDB search results
   [key: string]: unknown; // Allow additional fields
 }
 
@@ -407,6 +409,7 @@ function mapTMDBMovieToContent(tmdbMovie: TMDBMovieSearchResult): Content {
     metadata: {
       vote_average: tmdbMovie.vote_average,
       vote_count: tmdbMovie.vote_count,
+      genre_ids: tmdbMovie.genre_ids || [],
     },
   };
 }
@@ -429,6 +432,7 @@ function mapTMDBTVToContent(tmdbTV: TMDBTVSearchResult): Content {
     metadata: {
       vote_average: tmdbTV.vote_average,
       vote_count: tmdbTV.vote_count,
+      genre_ids: tmdbTV.genre_ids || [],
     },
   };
 }
