@@ -1493,7 +1493,7 @@
         "Step 3: Verify attribution visible on content pages",
         "Step 4: Verify link to TMDB is functional"
       ],
-      "passes": false
+      "passes": true
     }
   ]
 }

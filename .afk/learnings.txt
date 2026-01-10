@@ -539,3 +539,13 @@
 - Password reset API: Created `/api/reset-password` endpoint that validates token, checks password match, updates user password, marks token as used, and invalidates all other tokens for the user
 - Login page integration: Added "Forgot your password?" link to login page, displays success message when redirected after password reset
 - Security considerations: Password reset flow prevents user enumeration (always returns success), validates tokens before use, marks tokens as used to prevent reuse, invalidates all tokens after successful reset, uses CSRF protection on all forms
+
+## TMDB Attribution Implementation
+
+- Footer component: Created `components/Footer.tsx` component with TMDB logo, attribution text, and link to TMDB website as required by TMDB API terms of service
+- App layout integration: Added Footer component to `routes/_app.tsx` layout wrapper so attribution appears on all pages including content detail pages
+- Flexbox layout: Used flexbox layout (`flex flex-col min-h-screen`) on body with `flex-1` on main content area to ensure footer stays at bottom of page
+- TMDB logo: Uses official TMDB logo SVG from TMDB CDN (`https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg`) with proper alt text and aria-label for accessibility
+- Attribution text: Includes required attribution text "This product uses the TMDB API but is not endorsed or certified by TMDB" as per TMDB API terms
+- Link functionality: Footer includes functional link to TMDB website (`https://www.themoviedb.org/`) with `target="_blank"` and `rel="noopener noreferrer"` for security
+- Responsive design: Footer uses responsive flex layout (stacked on mobile, side-by-side on desktop) with proper spacing and styling
