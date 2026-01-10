@@ -661,7 +661,7 @@
         "Step 3: Process queue with rate limiting for OpenAI API",
         "Step 4: Verify embeddings generated within reasonable timeframe"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "ai-taste-profile-calculation",

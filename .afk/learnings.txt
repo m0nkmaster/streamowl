@@ -717,3 +717,16 @@
 - Preference persistence: Region preference stored in database and persists across sessions, automatically used by all region-aware endpoints (content detail page, search providers API)
 - Region detection updates: Updated content detail page and search providers API to use `getUserRegion()` instead of `detectRegionFromRequest()`, ensures user preference is respected throughout the app
 - Preference fallback: If user has no preference set, system falls back to Accept-Language header detection, maintains backward compatibility for users who haven't set a preference
+
+## AI - Embedding Job Queue Implementation
+
+- Job queue table: Created `embedding_jobs` table with status tracking (pending, processing, completed, failed), error messages, retry count, and timestamps for background embedding generation
+- Unique constraint: Partial unique index prevents duplicate pending/processing jobs for same content using `CREATE UNIQUE INDEX ... WHERE status IN ('pending', 'processing')` syntax
+- Job locking: Uses `SELECT FOR UPDATE SKIP LOCKED` to prevent concurrent processing of same job, ensures only one worker processes each job at a time
+- Job queue module: Created `lib/ai/embedding-queue.ts` with functions to enqueue jobs, fetch next pending job, process jobs, and mark jobs as completed/failed
+- Auto-enqueue: Updated `getOrCreateContent()` to automatically enqueue embedding job when new content is created, uses fire-and-forget pattern (non-blocking)
+- Background processor: Created `scripts/process-embedding-queue.ts` script for manual/cron execution and `/api/jobs/process-embeddings` endpoint for scheduled triggers
+- Rate limiting: Processor includes configurable delay between jobs (default 100ms = 10 req/sec) to respect OpenAI API rate limits, processes up to 10 jobs per run by default
+- Stuck job recovery: `resetStuckJobs()` function resets jobs stuck in 'processing' status for more than 5 minutes back to 'pending', handles worker crashes gracefully
+- Error handling: Failed jobs are marked with error messages, allows debugging and monitoring of embedding generation failures
+- Task command: Added `deno task process:embeddings` command for easy manual queue processing
