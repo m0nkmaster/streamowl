@@ -102,7 +102,7 @@
         "Step 3: Seed common streaming services (Netflix, Disney+, Amazon, etc.)",
         "Step 4: Test querying availability for a title in a specific region"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-session-management",
