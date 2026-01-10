@@ -19,7 +19,8 @@
     "test:streaming": "deno run -A scripts/test-streaming-services-tables.ts",
     "test:auth": "deno run -A scripts/test-auth-session.ts",
     "test:tmdb": "deno run -A scripts/test-tmdb-client.ts",
-    "test:tmdb-search": "deno run -A scripts/test-tmdb-search.ts"
+    "test:tmdb-search": "deno run -A scripts/test-tmdb-search.ts",
+    "test:tmdb-search-tv": "deno run -A scripts/test-tmdb-search-tv.ts"
   },
   "lint": {
     "rules": {

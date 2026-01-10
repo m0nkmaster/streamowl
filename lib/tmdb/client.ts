@@ -185,11 +185,36 @@ export interface TMDBMovieSearchResult {
 }
 
 /**
- * TMDB search response structure
+ * TV show search result from TMDB API (simplified version from search endpoint)
+ */
+export interface TMDBTVSearchResult {
+  id: number;
+  name: string; // TV shows use 'name' instead of 'title'
+  overview: string;
+  first_air_date: string; // TV shows use 'first_air_date' instead of 'release_date'
+  poster_path: string | null;
+  backdrop_path: string | null;
+  vote_average: number;
+  vote_count: number;
+  [key: string]: unknown; // Allow additional fields
+}
+
+/**
+ * TMDB search response structure for movies
  */
 export interface TMDBSearchResponse {
   page: number;
   results: TMDBMovieSearchResult[];
+  total_pages: number;
+  total_results: number;
+}
+
+/**
+ * TMDB search response structure for TV shows
+ */
+export interface TMDBSearchTVResponse {
+  page: number;
+  results: TMDBTVSearchResult[];
   total_pages: number;
   total_results: number;
 }
@@ -257,6 +282,28 @@ function mapTMDBMovieToContent(tmdbMovie: TMDBMovieSearchResult): Content {
 }
 
 /**
+ * Map TMDB TV show search result to internal content model
+ *
+ * @param tmdbTV TMDB TV show search result
+ * @returns Internal content model
+ */
+function mapTMDBTVToContent(tmdbTV: TMDBTVSearchResult): Content {
+  return {
+    tmdb_id: tmdbTV.id,
+    type: "tv",
+    title: tmdbTV.name, // TV shows use 'name' field
+    overview: tmdbTV.overview || null,
+    release_date: tmdbTV.first_air_date || null, // TV shows use 'first_air_date'
+    poster_path: tmdbTV.poster_path || null,
+    backdrop_path: tmdbTV.backdrop_path || null,
+    metadata: {
+      vote_average: tmdbTV.vote_average,
+      vote_count: tmdbTV.vote_count,
+    },
+  };
+}
+
+/**
  * Search for movies using TMDB API with pagination
  *
  * @param query Search query string
@@ -290,10 +337,44 @@ export async function searchMovies(
 }
 
 /**
+ * Search for TV shows using TMDB API with pagination
+ *
+ * @param query Search query string
+ * @param page Page number (default: 1)
+ * @returns Paginated search results mapped to internal content model
+ * @throws Error if API request fails
+ */
+export async function searchTv(
+  query: string,
+  page: number = 1,
+): Promise<SearchResults> {
+  if (!query || typeof query !== "string" || query.trim().length === 0) {
+    throw new Error("Search query must be a non-empty string");
+  }
+
+  if (!Number.isInteger(page) || page < 1) {
+    throw new Error(`Page number must be a positive integer, got: ${page}`);
+  }
+
+  const response = await request<TMDBSearchTVResponse>("/search/tv", {
+    query: query.trim(),
+    page,
+  });
+
+  return {
+    page: response.page,
+    total_pages: response.total_pages,
+    total_results: response.total_results,
+    results: response.results.map(mapTMDBTVToContent),
+  };
+}
+
+/**
  * TMDB API client instance
  */
 export const tmdbClient = {
   getMovieById,
   searchMovies,
+  searchTv,
   request,
 };
