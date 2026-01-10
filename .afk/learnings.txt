@@ -412,3 +412,14 @@
 - Empty state handling: Return empty array if user has no taste profile (taste_embedding IS NULL), allows graceful handling of users without sufficient watched content for recommendations
 - Query optimisation: Fetch more candidates than needed (limit * 2) before diversity filtering to ensure sufficient variety after diversity scoring, then select top N diversified candidates
 - Test coverage: Test recommendation generation with various scenarios: user with taste profile, user without taste profile, exclusion of watched content, diversity scoring, similarity ranking
+
+## AI - Recommendation Explanations
+
+- GPT-4 chat completions: Use OpenAI chat completions API with gpt-4-turbo model for generating natural language explanations, requires structured prompt with system and user messages
+- Explanation prompt structure: Create system message defining assistant role and explanation style (brief, personalised, 2-3 sentences), user message includes watched content history and candidate details
+- User history context: Fetch top 10 most recent watched content with ratings to provide context for personalised explanations, format as bulleted list with titles, years, and ratings
+- Explanation generation: Call generateChatCompletion with structured messages array, parse response content to extract explanation text, handle API errors gracefully with fallback explanation
+- Candidate details: Include candidate title, type (movie/TV show), release year, and overview in prompt to help GPT-4 generate relevant explanations
+- History references: Prompt explicitly asks GPT-4 to reference specific titles from user history when relevant, improves personalisation and trust in recommendations
+- Fallback handling: Return generic fallback explanation if GPT-4 API call fails, ensures recommendations always have explanations even if API is unavailable
+- Interface extension: Add optional explanation field to RecommendationCandidate interface, allows explanations to be attached to candidates without breaking existing code
