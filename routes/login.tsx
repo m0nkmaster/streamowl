@@ -56,7 +56,9 @@ export default function LoginPage(props: PageProps) {
               <div class="w-full border-t border-gray-300"></div>
             </div>
             <div class="relative flex justify-center text-sm">
-              <span class="px-2 bg-gray-50 text-gray-500">Or continue with</span>
+              <span class="px-2 bg-gray-50 text-gray-500">
+                Or continue with
+              </span>
             </div>
           </div>
 

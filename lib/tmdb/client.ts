@@ -481,6 +481,157 @@ export async function searchTv(
 }
 
 /**
+ * Watch provider from TMDB API
+ */
+export interface WatchProvider {
+  display_priority: number;
+  logo_path: string;
+  provider_id: number;
+  provider_name: string;
+  [key: string]: unknown; // Allow additional fields
+}
+
+/**
+ * Watch providers for a specific region
+ */
+export interface RegionWatchProviders {
+  link: string;
+  flatrate?: WatchProvider[]; // Subscription services
+  rent?: WatchProvider[]; // Rent options
+  buy?: WatchProvider[]; // Buy options
+  ads?: WatchProvider[]; // Ad-supported services
+  free?: WatchProvider[]; // Free services
+  [key: string]: unknown; // Allow additional fields
+}
+
+/**
+ * Watch providers response from TMDB API
+ */
+export interface WatchProvidersResponse {
+  id: number;
+  results: Record<string, RegionWatchProviders>; // Key is ISO 3166-1 country code
+}
+
+/**
+ * Categorised watch providers for a specific region
+ */
+export interface CategorisedWatchProviders {
+  region: string;
+  link: string;
+  subscription: WatchProvider[];
+  rent: WatchProvider[];
+  buy: WatchProvider[];
+  ads: WatchProvider[];
+  free: WatchProvider[];
+}
+
+/**
+ * Supported regions for watch providers
+ */
+export const SUPPORTED_REGIONS = ["US", "GB", "CA", "AU", "DE", "FR"] as const;
+
+export type SupportedRegion = typeof SUPPORTED_REGIONS[number];
+
+/**
+ * Fetch watch providers for a movie by TMDB ID
+ *
+ * @param movieId TMDB movie ID
+ * @returns Watch providers response
+ * @throws Error if movie not found or API request fails
+ */
+export async function getMovieWatchProviders(
+  movieId: number,
+): Promise<WatchProvidersResponse> {
+  if (!Number.isInteger(movieId) || movieId <= 0) {
+    throw new Error(`Invalid movie ID: ${movieId}`);
+  }
+
+  const providers = await request<WatchProvidersResponse>(
+    `/movie/${movieId}/watch/providers`,
+  );
+  return providers;
+}
+
+/**
+ * Fetch watch providers for a TV show by TMDB ID
+ *
+ * @param tvId TMDB TV show ID
+ * @returns Watch providers response
+ * @throws Error if TV show not found or API request fails
+ */
+export async function getTvWatchProviders(
+  tvId: number,
+): Promise<WatchProvidersResponse> {
+  if (!Number.isInteger(tvId) || tvId <= 0) {
+    throw new Error(`Invalid TV show ID: ${tvId}`);
+  }
+
+  const providers = await request<WatchProvidersResponse>(
+    `/tv/${tvId}/watch/providers`,
+  );
+  return providers;
+}
+
+/**
+ * Filter watch providers by region and categorise by type
+ *
+ * @param providers Watch providers response from TMDB API
+ * @param region ISO 3166-1 country code (e.g., "US", "GB", "CA", "AU", "DE", "FR")
+ * @returns Categorised watch providers for the specified region, or null if region not available
+ */
+export function filterWatchProvidersByRegion(
+  providers: WatchProvidersResponse,
+  region: SupportedRegion,
+): CategorisedWatchProviders | null {
+  const regionData = providers.results[region];
+  if (!regionData) {
+    return null;
+  }
+
+  return {
+    region,
+    link: regionData.link || "",
+    subscription: regionData.flatrate || [],
+    rent: regionData.rent || [],
+    buy: regionData.buy || [],
+    ads: regionData.ads || [],
+    free: regionData.free || [],
+  };
+}
+
+/**
+ * Get watch providers for a movie filtered by region
+ *
+ * @param movieId TMDB movie ID
+ * @param region ISO 3166-1 country code (default: "US")
+ * @returns Categorised watch providers for the specified region, or null if not available
+ * @throws Error if movie not found or API request fails
+ */
+export async function getMovieWatchProvidersByRegion(
+  movieId: number,
+  region: SupportedRegion = "US",
+): Promise<CategorisedWatchProviders | null> {
+  const providers = await getMovieWatchProviders(movieId);
+  return filterWatchProvidersByRegion(providers, region);
+}
+
+/**
+ * Get watch providers for a TV show filtered by region
+ *
+ * @param tvId TMDB TV show ID
+ * @param region ISO 3166-1 country code (default: "US")
+ * @returns Categorised watch providers for the specified region, or null if not available
+ * @throws Error if TV show not found or API request fails
+ */
+export async function getTvWatchProvidersByRegion(
+  tvId: number,
+  region: SupportedRegion = "US",
+): Promise<CategorisedWatchProviders | null> {
+  const providers = await getTvWatchProviders(tvId);
+  return filterWatchProvidersByRegion(providers, region);
+}
+
+/**
  * TMDB API client instance
  */
 export const tmdbClient = {
@@ -489,5 +640,10 @@ export const tmdbClient = {
   getTvDetails,
   searchMovies,
   searchTv,
+  getMovieWatchProviders,
+  getTvWatchProviders,
+  getMovieWatchProvidersByRegion,
+  getTvWatchProvidersByRegion,
+  filterWatchProvidersByRegion,
   request,
 };

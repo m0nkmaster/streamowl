@@ -117,7 +117,9 @@ export const handler: Handlers = {
           if (updates.length > 0) {
             args.push(userId);
             await query(
-              `UPDATE users SET ${updates.join(", ")}, updated_at = CURRENT_TIMESTAMP WHERE id = $${argIndex}`,
+              `UPDATE users SET ${
+                updates.join(", ")
+              }, updated_at = CURRENT_TIMESTAMP WHERE id = $${argIndex}`,
               args,
             );
           }
@@ -129,7 +131,8 @@ export const handler: Handlers = {
             id: string;
             email: string;
           }>({
-            text: `INSERT INTO users (email, google_id, display_name, avatar_url)
+            text:
+              `INSERT INTO users (email, google_id, display_name, avatar_url)
                    VALUES ($1, $2, $3, $4)
                    RETURNING id, email`,
             args: [

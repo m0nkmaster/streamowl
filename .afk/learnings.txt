@@ -206,3 +206,15 @@
 - Logout UI: Add logout button to dashboard page with form POST to `/api/logout` endpoint
 - Redirect after logout: Redirect to homepage ("/") after clearing session cookie
 - Session validation: After logout, protected routes will redirect to login since session cookie is cleared
+
+## TMDB API - Watch Providers
+
+- Watch providers endpoints: Use `/movie/{movie_id}/watch/providers` and `/tv/{tv_id}/watch/providers` endpoints to fetch streaming availability data
+- Watch providers response structure: TMDB returns a `results` object where keys are ISO 3166-1 country codes (e.g., "US", "GB", "CA", "AU", "DE", "FR"), and each country has `flatrate` (subscription), `rent`, `buy`, `ads`, and `free` arrays
+- Provider structure: Each provider includes `provider_id`, `provider_name`, `logo_path`, `display_priority`, and other metadata fields
+- Region filtering: Created `filterWatchProvidersByRegion()` function to extract and categorise providers for a specific region from the full response
+- Supported regions: Defined `SUPPORTED_REGIONS` constant array with ["US", "GB", "CA", "AU", "DE", "FR"] for type-safe region handling
+- Categorisation: Providers are categorised into `subscription` (flatrate), `rent`, `buy`, `ads`, and `free` arrays for easy consumption
+- Convenience functions: Created `getMovieWatchProvidersByRegion()` and `getTvWatchProvidersByRegion()` functions that combine fetching and filtering in a single call
+- Null handling: Functions return `null` if no providers are available for the specified region (not an error condition)
+- Type safety: Created TypeScript interfaces (`WatchProvider`, `RegionWatchProviders`, `WatchProvidersResponse`, `CategorisedWatchProviders`) for type-safe handling of watch provider data
