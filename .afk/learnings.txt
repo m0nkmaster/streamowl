@@ -400,3 +400,15 @@
 - Error handling: Taste profile calculation errors are logged but don't fail the main operation (non-blocking), ensures user actions (rating/watching) succeed even if taste profile calculation fails
 - Content embedding requirement: Only include watched content that has content_embedding IS NOT NULL in taste profile calculation, filters out content without embeddings to prevent NULL errors
 - Test coverage: Test taste profile calculation with various scenarios: multiple watched items, rating weighting, unrated content, no watched content, content without embeddings
+
+## AI - Recommendation Candidates Generation
+
+- Vector similarity search: Use pgvector cosine distance operator (<=>) to find content similar to user taste profile, lower distance indicates higher similarity
+- Recommendation query: Query content table with taste embedding using `content_embedding <=> $1::vector(1536) AS distance` to calculate similarity, order by distance ascending for most similar first
+- Watched content exclusion: Exclude already watched content using NOT IN subquery on user_content table filtering by user_id and status='watched', ensures users don't see content they've already watched
+- Diversity scoring: Apply diversity penalty to avoid repetitive recommendations by limiting consecutive items of same type (max 2-3), penalising candidates too similar to recently selected items, and ensuring variety in content types
+- Similarity calculation: Convert cosine distance to similarity score using `1 - distance` formula, similarity ranges from 0 (dissimilar) to 1 (identical), higher similarity scores indicate better matches
+- Candidate ranking: Rank candidates by similarity score (descending), apply diversity penalties to similarity scores, select top candidates that balance similarity and diversity
+- Empty state handling: Return empty array if user has no taste profile (taste_embedding IS NULL), allows graceful handling of users without sufficient watched content for recommendations
+- Query optimisation: Fetch more candidates than needed (limit * 2) before diversity filtering to ensure sufficient variety after diversity scoring, then select top N diversified candidates
+- Test coverage: Test recommendation generation with various scenarios: user with taste profile, user without taste profile, exclusion of watched content, diversity scoring, similarity ranking

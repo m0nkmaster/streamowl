@@ -687,7 +687,7 @@
         "Step 3: Apply diversity scoring to avoid repetitive recommendations",
         "Step 4: Return top 20 candidates ranked by similarity"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "ai-recommendation-explanations",
