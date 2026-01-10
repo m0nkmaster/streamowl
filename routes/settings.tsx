@@ -17,6 +17,11 @@ interface SettingsPageProps {
     currentPeriodEnd: number | null;
     customerId: string | null;
   } | null;
+  userProfile: {
+    email: string;
+    displayName: string | null;
+    avatarUrl: string | null;
+  };
 }
 
 /**
@@ -44,16 +49,27 @@ export const handler: Handlers<SettingsPageProps> = {
     // Get detected region (without preference)
     const detectedRegion = await getUserRegion(req, null);
 
-    // Get user preferences to check public profile setting and subscription
+    // Get user profile and preferences
     const { query } = await import("../lib/db.ts");
     const userResult = await query<{
+      email: string;
+      display_name: string | null;
+      avatar_url: string | null;
       preferences: Record<string, unknown>;
     }>(
-      "SELECT preferences FROM users WHERE id = $1",
+      "SELECT email, display_name, avatar_url, preferences FROM users WHERE id = $1",
       [session.userId],
     );
 
-    const preferences = userResult[0]?.preferences || {};
+    const user = userResult[0];
+    const preferences = user?.preferences || {};
+
+    // Build user profile object
+    const userProfile = {
+      email: user?.email || "",
+      displayName: user?.display_name || null,
+      avatarUrl: user?.avatar_url || null,
+    };
     const publicProfileEnabled = preferences.public_profile_enabled === true;
     const isPremium = preferences.premium === true;
 
@@ -84,6 +100,7 @@ export const handler: Handlers<SettingsPageProps> = {
       checkoutCanceled,
       isPremium,
       subscriptionDetails,
+      userProfile,
     });
   },
 };

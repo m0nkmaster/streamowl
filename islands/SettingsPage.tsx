@@ -18,6 +18,11 @@ interface SettingsPageProps {
     currentPeriodEnd: number | null;
     customerId: string | null;
   } | null;
+  userProfile: {
+    email: string;
+    displayName: string | null;
+    avatarUrl: string | null;
+  };
 }
 
 export default function SettingsPage({
@@ -29,6 +34,7 @@ export default function SettingsPage({
   checkoutCanceled,
   isPremium,
   subscriptionDetails,
+  userProfile,
 }: SettingsPageProps) {
   const [selectedRegion, setSelectedRegion] = useState<SupportedRegion>(
     currentRegion as SupportedRegion,
@@ -39,6 +45,12 @@ export default function SettingsPage({
   const [publicProfile, setPublicProfile] = useState(publicProfileEnabled);
   const [profileLoading, setProfileLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
+
+  // Profile editing state
+  const [displayName, setDisplayName] = useState(userProfile.displayName || "");
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [nameLoading, setNameLoading] = useState(false);
+  const [nameSaved, setNameSaved] = useState(false);
 
   // Fetch current region preference on mount
   useEffect(() => {
@@ -143,6 +155,43 @@ export default function SettingsPage({
     return planName;
   };
 
+  const handleSaveDisplayName = async () => {
+    setNameLoading(true);
+    setError(null);
+    setNameSaved(false);
+
+    try {
+      const response = await fetch("/api/settings/profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ displayName: displayName.trim() || null }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to update display name");
+      }
+
+      setIsEditingName(false);
+      setNameSaved(true);
+      setTimeout(() => setNameSaved(false), 3000);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to update display name",
+      );
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setNameLoading(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setDisplayName(userProfile.displayName || "");
+    setIsEditingName(false);
+  };
+
   return (
     <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -157,6 +206,109 @@ export default function SettingsPage({
           </div>
 
           <div class="px-6 py-5">
+            {/* Profile Section */}
+            <div class="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+                Profile
+              </h2>
+
+              <div class="flex items-start gap-6">
+                {/* Avatar */}
+                <div class="flex-shrink-0">
+                  {userProfile.avatarUrl
+                    ? (
+                      <img
+                        src={userProfile.avatarUrl}
+                        alt="Profile avatar"
+                        class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
+                      />
+                    )
+                    : (
+                      <div class="w-20 h-20 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center border-2 border-gray-200 dark:border-gray-700">
+                        <span class="text-2xl font-medium text-indigo-600 dark:text-indigo-400">
+                          {(displayName || userProfile.email || "U").charAt(0)
+                            .toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                </div>
+
+                {/* Profile Details */}
+                <div class="flex-1 min-w-0">
+                  {/* Display Name */}
+                  <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Display Name
+                    </label>
+                    {isEditingName
+                      ? (
+                        <div class="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={displayName}
+                            onChange={(e) =>
+                              setDisplayName(e.currentTarget.value)}
+                            placeholder="Enter your display name"
+                            maxLength={255}
+                            class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 text-sm"
+                            disabled={nameLoading}
+                          />
+                          <button
+                            type="button"
+                            onClick={handleSaveDisplayName}
+                            disabled={nameLoading}
+                            class={`px-3 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                              nameLoading ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
+                          >
+                            {nameLoading ? "Saving..." : "Save"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleCancelEdit}
+                            disabled={nameLoading}
+                            class="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      )
+                      : (
+                        <div class="flex items-center gap-2">
+                          <span class="text-gray-900 dark:text-gray-100">
+                            {displayName || (
+                              <span class="text-gray-400 italic">Not set</span>
+                            )}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setIsEditingName(true)}
+                            class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+                          >
+                            Edit
+                          </button>
+                          {nameSaved && (
+                            <span class="text-sm text-green-600 dark:text-green-400">
+                              ✓ Saved
+                            </span>
+                          )}
+                        </div>
+                      )}
+                  </div>
+
+                  {/* Email (read-only) */}
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Email
+                    </label>
+                    <span class="text-gray-900 dark:text-gray-100">
+                      {userProfile.email}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <ThemeToggle />
 
             {checkoutSuccess && (
