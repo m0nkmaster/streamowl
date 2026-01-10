@@ -705,3 +705,15 @@
 - Component integration: Added NewReleases component to BrowsePage above Trending section, component uses ContentGrid for consistent layout with other browse sections
 - Quick actions: NewReleases component includes QuickActions overlay for watchlist/favourite/watched actions, consistent with other content grids throughout the app
 - Streaming badge: Displays green "Streaming" badge in top-left corner of content cards when streaming availability is detected, provides visual indicator without cluttering the UI
+
+## Region Manual Override Implementation
+
+- Region preference storage: User region preference stored in `users.preferences` JSONB column as `preferences.region` field, allows flexible preference storage without schema changes
+- Region preference API: Created `/api/settings/region` endpoint with GET (fetch preference) and POST (update preference) methods, requires authentication, validates region against supported regions list
+- Region detection priority: Updated `getUserRegion()` function to check user preference first (if authenticated), then fall back to Accept-Language header detection, ensures manual override takes precedence
+- Settings page: Created `/routes/settings.tsx` page with region selector component, displays all supported regions (US, GB, CA, AU, DE, FR) with visual selection state, shows detected region for comparison
+- Settings page authentication: Settings page requires authentication and redirects to login with return URL if not authenticated, follows same pattern as other protected routes
+- Region selector UI: Settings page displays region options as clickable cards with visual feedback (indigo border/background for selected), shows current selection and detected region comparison
+- Preference persistence: Region preference stored in database and persists across sessions, automatically used by all region-aware endpoints (content detail page, search providers API)
+- Region detection updates: Updated content detail page and search providers API to use `getUserRegion()` instead of `detectRegionFromRequest()`, ensures user preference is respected throughout the app
+- Preference fallback: If user has no preference set, system falls back to Accept-Language header detection, maintains backward compatibility for users who haven't set a preference
