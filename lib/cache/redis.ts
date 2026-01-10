@@ -94,7 +94,11 @@ class RedisCache {
       return entry.data;
     } catch (error) {
       // Graceful degradation: if Redis fails, continue without cache
-      console.warn(`Redis cache error: ${error instanceof Error ? error.message : String(error)}`);
+      console.warn(
+        `Redis cache error: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
       return null;
     }
   }
@@ -139,7 +143,11 @@ class RedisCache {
       }
     } catch (error) {
       // Graceful degradation: if Redis fails, continue without cache
-      console.warn(`Redis cache error: ${error instanceof Error ? error.message : String(error)}`);
+      console.warn(
+        `Redis cache error: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
     }
   }
 
@@ -163,7 +171,11 @@ class RedisCache {
       });
     } catch (error) {
       // Ignore errors on delete
-      console.warn(`Redis cache delete error: ${error instanceof Error ? error.message : String(error)}`);
+      console.warn(
+        `Redis cache delete error: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
     }
   }
 

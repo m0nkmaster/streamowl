@@ -271,7 +271,7 @@
         "Step 3: Verify results appear showing movie posters and titles",
         "Step 4: Verify results update as user types (debounced)"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "search-combined-results",

@@ -18,7 +18,11 @@ async function testCacheHit() {
   console.log("Fetching The Matrix (TMDB ID: 603) twice...\n");
 
   const cacheEnabled = redisCache.isEnabled();
-  console.log(`Cache status: ${cacheEnabled ? "ENABLED" : "DISABLED (Redis not configured)"}\n`);
+  console.log(
+    `Cache status: ${
+      cacheEnabled ? "ENABLED" : "DISABLED (Redis not configured)"
+    }\n`,
+  );
 
   try {
     // First request - should hit API
@@ -49,10 +53,16 @@ async function testCacheHit() {
     if (cacheEnabled) {
       // If cache is enabled, second request should be faster
       if (time2 < time1) {
-        console.log(`\n✓ Cache working: Second request was ${time1 - time2}ms faster`);
+        console.log(
+          `\n✓ Cache working: Second request was ${time1 - time2}ms faster`,
+        );
       } else {
-        console.log(`\n⚠ Cache may be working but second request wasn't faster (${time2}ms vs ${time1}ms)`);
-        console.log("  This could be due to network variability or cache write delay");
+        console.log(
+          `\n⚠ Cache may be working but second request wasn't faster (${time2}ms vs ${time1}ms)`,
+        );
+        console.log(
+          "  This could be due to network variability or cache write delay",
+        );
       }
     } else {
       console.log("\n✓ Test passed (cache disabled - both requests hit API)");
@@ -180,8 +190,14 @@ async function runTests() {
   console.log("Test Results Summary");
   console.log("=".repeat(60));
   console.log(`Cache Hit Test: ${results.cacheHit ? "✓ PASSED" : "✗ FAILED"}`);
-  console.log(`Cache Expiry Test: ${results.cacheExpiry ? "✓ PASSED" : "✗ FAILED"}`);
-  console.log(`Graceful Degradation: ${results.gracefulDegradation ? "✓ PASSED" : "✗ FAILED"}`);
+  console.log(
+    `Cache Expiry Test: ${results.cacheExpiry ? "✓ PASSED" : "✗ FAILED"}`,
+  );
+  console.log(
+    `Graceful Degradation: ${
+      results.gracefulDegradation ? "✓ PASSED" : "✗ FAILED"
+    }`,
+  );
   console.log();
 
   const allPassed = Object.values(results).every((result) => result);

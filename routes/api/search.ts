@@ -1,0 +1,100 @@
+import { type Handlers } from "$fresh/server.ts";
+import { type Content, searchMovies, searchTv } from "../../lib/tmdb/client.ts";
+
+interface SearchResponse {
+  results: Content[];
+  total_results: number;
+  page: number;
+  total_pages: number;
+}
+
+/**
+ * API handler for content search
+ * Searches both movies and TV shows, combining results
+ */
+export const handler: Handlers = {
+  async GET(req) {
+    try {
+      const url = new URL(req.url);
+      const query = url.searchParams.get("q");
+      const page = parseInt(url.searchParams.get("page") || "1", 10);
+
+      // Validate query
+      if (!query || query.trim().length === 0) {
+        return new Response(
+          JSON.stringify({ error: "Search query is required" }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      // Validate page number
+      if (!Number.isInteger(page) || page < 1) {
+        return new Response(
+          JSON.stringify({ error: "Page must be a positive integer" }),
+          {
+            status: 400,
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+      }
+
+      // Search both movies and TV shows in parallel
+      const [movieResults, tvResults] = await Promise.all([
+        searchMovies(query.trim(), page).catch(() => ({
+          page: 1,
+          total_pages: 0,
+          total_results: 0,
+          results: [] as Content[],
+        })),
+        searchTv(query.trim(), page).catch(() => ({
+          page: 1,
+          total_pages: 0,
+          total_results: 0,
+          results: [] as Content[],
+        })),
+      ]);
+
+      // Combine results (movies first, then TV shows)
+      const combinedResults: Content[] = [
+        ...movieResults.results,
+        ...tvResults.results,
+      ];
+
+      // Calculate combined totals
+      const total_results = movieResults.total_results +
+        tvResults.total_results;
+      const total_pages = Math.max(
+        movieResults.total_pages,
+        tvResults.total_pages,
+      );
+
+      const response: SearchResponse = {
+        results: combinedResults,
+        total_results,
+        page,
+        total_pages,
+      };
+
+      return new Response(JSON.stringify(response), {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "public, max-age=3600", // Cache for 1 hour
+        },
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error("Search error:", message);
+      return new Response(
+        JSON.stringify({ error: "Failed to search content" }),
+        {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+  },
+};
