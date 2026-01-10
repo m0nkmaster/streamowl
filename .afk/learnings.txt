@@ -623,3 +623,15 @@
 - Navigation: Each similar title card links to `/content/{tmdb_id}` detail page, allows users to explore related content easily, uses hover effects for better UX
 - Error handling: Similar titles fetching errors are logged but don't fail the page (graceful degradation), ensures content detail page loads even if similar API is unavailable
 - Similar titles placement: Similar titles section displayed after cast section and before "Where to Watch" section, provides logical flow from cast to recommendations to streaming availability
+
+## Library - Quick Actions Implementation
+
+- Toast notification system: Created reusable toast notification system (`islands/Toast.tsx`) with `useToast()` hook for managing toast state, supports success, error, and info types with auto-dismiss after configurable duration (default 3 seconds)
+- Toast container: ToastContainer component displays toasts at top-right of screen with slide-in animation, includes close button for manual dismissal, uses fixed positioning with z-index for overlay
+- Quick actions component: Created `islands/QuickActions.tsx` component that displays action buttons (watchlist, favourite, watched) on hover over content cards, uses CSS `group-hover:opacity-100` with `opacity-0` default state for smooth hover transitions
+- Hover overlay pattern: Quick actions overlay uses `absolute inset-0` positioning relative to card container, dark semi-transparent background (`bg-black bg-opacity-60`) with centred action buttons, prevents navigation when buttons clicked using `preventDefault()` and `stopPropagation()`
+- Status fetching: Fetch content status on hover (`onMouseEnter`) to initialise button states, cache statuses in component state to avoid redundant API calls, fetch updated status after successful actions to keep UI in sync
+- Optimistic updates: Quick actions use optimistic UI updates (immediately update button state), revert on API failure to maintain consistency, show loading states during API calls to prevent duplicate requests
+- Toast integration: Show success toast notifications when actions complete successfully, show error toast notifications when actions fail (including authentication errors), toast messages include content title for context
+- Search and browse integration: Updated `SearchPage` and `BrowsePage` islands to include QuickActions component on each content card, fetch statuses lazily on hover to reduce initial load time, handle authentication errors gracefully (show error toast for unauthenticated users)
+- CSS animations: Added slide-in animation for toast notifications using CSS keyframes in `_app.tsx` head section, animation uses `translateX(100%)` to `translateX(0)` for right-to-left slide effect
