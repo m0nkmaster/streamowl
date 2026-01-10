@@ -56,7 +56,8 @@
     "$std/": "https://deno.land/std@0.216.0/",
     "tailwindcss": "npm:tailwindcss@3.4.1",
     "tailwindcss/": "npm:/tailwindcss@3.4.1/",
-    "tailwindcss/plugin": "npm:/tailwindcss@3.4.1/plugin.js"
+    "tailwindcss/plugin": "npm:/tailwindcss@3.4.1/plugin.js",
+    "stripe": "https://esm.sh/stripe@17.3.1?target=deno"
   },
   "compilerOptions": {
     "jsx": "react-jsx",
