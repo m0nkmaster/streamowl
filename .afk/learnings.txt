@@ -25,3 +25,14 @@
 - Error handling: Always check if errors are instances of Error before accessing `.message` property
 - Connection pool: Singleton pattern used for pool instance to ensure single pool per application
 - Test script: Created `scripts/test-db.ts` for verifying database connectivity and pooling
+
+## Database Migrations
+
+- Migration directory: Created `migrations/` directory for SQL migration files
+- Migration naming: Use numbered prefix (001_, 002_, etc.) for execution order
+- Migration runner: Created `scripts/migrate.ts` for running migrations with tracking
+- Migration tracking: Uses `migrations` table to track executed migrations and prevent duplicates
+- Migration execution: Migrations run in transactions with rollback on failure
+- File operations: Use Deno built-in APIs (`Deno.readDir`, `Deno.readTextFile`) instead of std library for file operations
+- Migration tasks: Added `deno task migrate` for running migrations, `deno task test:users` for testing users table
+- Users table: Includes id (UUID), email (unique), display_name, avatar_url, preferences (JSONB), created_at, updated_at with automatic timestamp triggers

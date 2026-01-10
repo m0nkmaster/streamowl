@@ -11,7 +11,8 @@
     "typecheck": "deno check **/*.ts **/*.tsx",
     "test:db": "deno run -A scripts/test-db.ts",
     "migrate": "deno run -A scripts/migrate.ts",
-    "test:users": "deno run -A scripts/test-users-table.ts"
+    "test:users": "deno run -A scripts/test-users-table.ts",
+    "test:content": "deno run -A scripts/test-content-table.ts"
   },
   "lint": {
     "rules": {
