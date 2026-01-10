@@ -1,5 +1,10 @@
 # Agent Instructions
 
+## Stream Owl - Movie recommendations and finder
+
+
+## Beads - Task manager
+
 This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get
 started.
 

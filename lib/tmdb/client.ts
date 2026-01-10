@@ -1,13 +1,19 @@
 /**
  * TMDB (The Movie Database) API client
  *
- * Provides a client for interacting with the TMDB API with rate limiting
- * and error handling. Rate limit: 50 requests per second.
+ * Provides a client for interacting with the TMDB API with rate limiting,
+ * caching, and error handling. Rate limit: 50 requests per second.
  */
+
+import { redisCache } from "../cache/redis.ts";
 
 const TMDB_API_BASE_URL = "https://api.themoviedb.org/3";
 const RATE_LIMIT_REQUESTS_PER_SECOND = 50;
 const RATE_LIMIT_WINDOW_MS = 1000; // 1 second
+
+// Default cache TTL: 24 hours (86400 seconds)
+// TMDB data doesn't change frequently, so longer cache is beneficial
+const DEFAULT_CACHE_TTL_SECONDS = 86400;
 
 /**
  * Rate limiter implementation using a sliding window
@@ -85,16 +91,24 @@ export interface TMDBResponse<T> {
 }
 
 /**
- * Make a request to the TMDB API with rate limiting and error handling
+ * Make a request to the TMDB API with rate limiting, caching, and error handling
  *
  * @param endpoint API endpoint (e.g., "/movie/550")
  * @param params Optional query parameters
+ * @param ttlSeconds Optional cache TTL in seconds (default: 24 hours)
  * @returns Response data or throws error
  */
 async function request<T>(
   endpoint: string,
   params?: Record<string, string | number | boolean>,
+  ttlSeconds: number = DEFAULT_CACHE_TTL_SECONDS,
 ): Promise<T> {
+  // Check cache first
+  const cached = await redisCache.getCached<T>(endpoint, params);
+  if (cached !== null) {
+    return cached;
+  }
+
   // Wait for rate limit availability
   await rateLimiter.waitForAvailability();
 
@@ -143,7 +157,12 @@ async function request<T>(
       );
     }
 
-    return responseData as T;
+    const data = responseData as T;
+
+    // Cache successful responses (don't cache errors)
+    await redisCache.setCached(endpoint, params, data, ttlSeconds);
+
+    return data;
   } catch (error) {
     if (error instanceof Error) {
       // Re-throw our custom errors

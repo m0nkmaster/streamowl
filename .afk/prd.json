@@ -258,7 +258,7 @@
         "Step 3: Test that repeated requests return cached data",
         "Step 4: Verify cache expiry refreshes data from TMDB"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "search-page-ui",

@@ -218,3 +218,18 @@
 - Convenience functions: Created `getMovieWatchProvidersByRegion()` and `getTvWatchProvidersByRegion()` functions that combine fetching and filtering in a single call
 - Null handling: Functions return `null` if no providers are available for the specified region (not an error condition)
 - Type safety: Created TypeScript interfaces (`WatchProvider`, `RegionWatchProviders`, `WatchProvidersResponse`, `CategorisedWatchProviders`) for type-safe handling of watch provider data
+
+## TMDB API - Redis Caching Layer
+
+- Redis cache module: Created `lib/cache/redis.ts` for Redis/Upstash caching of TMDB API responses to reduce API calls and improve performance
+- Upstash REST API: Use Upstash Redis REST API with POST requests containing Redis command arrays (e.g., ["GET", key], ["SETEX", key, ttl, value], ["DEL", key])
+- Cache configuration: Store UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in environment variables, cache gracefully degrades if not configured
+- Cache key generation: Generate cache keys from endpoint and sorted parameters (e.g., "tmdb:/movie/550:append_to_response=credits,images") for consistent key generation
+- Cache entry structure: Store cache entries as JSON objects with `{ data: T, expiresAt: number }` to track expiration times
+- Cache TTL: Default cache TTL is 24 hours (86400 seconds) for TMDB API responses, configurable per request
+- Cache integration: Integrated cache wrapper into TMDB client `request()` function - checks cache first, falls back to API if cache miss, stores successful responses
+- Graceful degradation: Cache failures (Redis unavailable, network errors) are logged as warnings but don't break API functionality - app continues without cache
+- Cache expiry handling: Cache entries include expiration timestamp, expired entries are automatically deleted when accessed
+- Error caching: Don't cache API errors (only cache successful responses) to allow retry of transient failures
+- Cache test script: Created `scripts/test-tmdb-cache.ts` to test cache hits, cache expiry, and graceful degradation, added `deno task test:tmdb-cache` to deno.json
+- Singleton pattern: Use singleton RedisCache instance for consistent cache access across the application
