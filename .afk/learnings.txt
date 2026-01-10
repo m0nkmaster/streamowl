@@ -363,3 +363,14 @@
 - Trending section display: Display trending content in "Trending" section with section heading, loading states, error handling, and empty states following consistent UI patterns
 - Content freshness: Trending content uses 1-hour cache TTL (shorter than default 24 hours) to ensure content updates periodically and doesn't become stale, matching TMDB's daily update cycle
 - Time window parameter: Trending API supports time_window query parameter ("day" or "week") for flexibility, defaults to "day" for most recent trending content
+
+## Database - pgvector Extension Setup
+
+- pgvector extension: Enable pgvector extension using `CREATE EXTENSION IF NOT EXISTS vector;` in migration to add vector similarity search capabilities to PostgreSQL
+- Vector column type: Use `vector(dimension)` type for storing embeddings, dimension must match embedding model (1536 for OpenAI text-embedding-3-small)
+- Embedding columns: Add `taste_embedding vector(1536)` to users table for storing user taste profiles, and `content_embedding vector(1536)` to content table for storing content embeddings
+- HNSW indexes: Create HNSW (Hierarchical Navigable Small World) indexes using `USING hnsw` for fast approximate nearest neighbour search on vector columns
+- Cosine similarity: Use `vector_cosine_ops` operator class for cosine distance similarity search, which is standard for embedding similarity (1 - cosine similarity)
+- Index parameters: HNSW indexes use `m` (number of connections per layer, default 16) and `ef_construction` (size of candidate set during construction, default 64) parameters for tuning index performance
+- Index naming: Use descriptive index names like `idx_users_taste_embedding_cosine` and `idx_content_content_embedding_cosine` to clearly identify vector similarity indexes
+- Migration pattern: Follow standard migration pattern with numbered prefix (010_) and descriptive filename, enable extension before adding columns, create indexes after columns are added

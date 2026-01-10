@@ -635,7 +635,7 @@
         "Step 3: Add content_embedding column to content table",
         "Step 4: Create vector similarity index for efficient queries"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "ai-content-embeddings",
