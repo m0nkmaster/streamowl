@@ -1064,7 +1064,7 @@
         "Step 3: Verify appropriate image sizes load for viewport",
         "Step 4: Check network tab for image sizes"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "performance-lighthouse-score",
