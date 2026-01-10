@@ -42,12 +42,14 @@ export default function QuickActions({
     let endpoint: string;
     let method: "POST" | "DELETE";
     let newState: boolean;
+    let previousState: boolean;
     let stateSetter: (value: boolean) => void;
     let errorMessage: string;
 
     switch (action) {
       case "watchlist":
         endpoint = `/api/content/${tmdbId}/watchlist`;
+        previousState = isInWatchlist;
         newState = !isInWatchlist;
         method = newState ? "POST" : "DELETE";
         stateSetter = setIsInWatchlist;
@@ -55,6 +57,7 @@ export default function QuickActions({
         break;
       case "favourite":
         endpoint = `/api/content/${tmdbId}/favourite`;
+        previousState = isFavourite;
         newState = !isFavourite;
         method = newState ? "POST" : "DELETE";
         stateSetter = setIsFavourite;
@@ -62,6 +65,7 @@ export default function QuickActions({
         break;
       case "watched":
         endpoint = `/api/content/${tmdbId}/watched`;
+        previousState = isWatched;
         newState = !isWatched;
         method = newState ? "POST" : "DELETE";
         stateSetter = setIsWatched;
@@ -69,7 +73,7 @@ export default function QuickActions({
         break;
     }
 
-    // Optimistic update
+    // Optimistic update - update UI immediately
     stateSetter(newState);
 
     try {
@@ -81,8 +85,8 @@ export default function QuickActions({
       });
 
       if (!response.ok) {
-        // Revert on error
-        stateSetter(!newState);
+        // Revert on error - restore previous state
+        stateSetter(previousState);
         let finalErrorMessage = errorMessage;
         try {
           const error = await response.json();
@@ -100,8 +104,8 @@ export default function QuickActions({
         onAction?.(action, true);
       }
     } catch (error) {
-      // Revert on error
-      stateSetter(!newState);
+      // Revert on network error - restore previous state
+      stateSetter(previousState);
       console.error(`${errorMessage}:`, error);
       onAction?.(action, false);
     } finally {
