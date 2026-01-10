@@ -125,13 +125,14 @@ async function request<T>(
       responseData.success === false
     ) {
       const errorData = responseData as TMDBError;
-      const errorMessage = `TMDB API error (${errorData.status_code}): ${errorData.status_message}`;
-      
+      const errorMessage =
+        `TMDB API error (${errorData.status_code}): ${errorData.status_message}`;
+
       // Throw specific error for 404 (not found)
       if (errorData.status_code === 34) {
         throw new Error(`Movie not found: ${errorMessage}`);
       }
-      
+
       throw new Error(errorMessage);
     }
 
@@ -153,7 +154,60 @@ async function request<T>(
 }
 
 /**
- * Movie details from TMDB API
+ * Cast member from TMDB API
+ */
+export interface CastMember {
+  id: number;
+  name: string;
+  character: string;
+  order: number;
+  profile_path: string | null;
+  [key: string]: unknown; // Allow additional fields
+}
+
+/**
+ * Crew member from TMDB API
+ */
+export interface CrewMember {
+  id: number;
+  name: string;
+  job: string;
+  department: string;
+  profile_path: string | null;
+  [key: string]: unknown; // Allow additional fields
+}
+
+/**
+ * Credits from TMDB API
+ */
+export interface Credits {
+  cast: CastMember[];
+  crew: CrewMember[];
+}
+
+/**
+ * Image from TMDB API
+ */
+export interface Image {
+  file_path: string;
+  width: number;
+  height: number;
+  aspect_ratio: number;
+  vote_average: number;
+  vote_count: number;
+  [key: string]: unknown; // Allow additional fields
+}
+
+/**
+ * Images from TMDB API
+ */
+export interface Images {
+  posters: Image[];
+  backdrops: Image[];
+}
+
+/**
+ * Movie details from TMDB API (with credits and images)
  */
 export interface MovieDetails {
   id: number;
@@ -166,6 +220,27 @@ export interface MovieDetails {
   vote_count: number;
   runtime: number | null;
   genres: Array<{ id: number; name: string }>;
+  credits?: Credits;
+  images?: Images;
+  [key: string]: unknown; // Allow additional fields
+}
+
+/**
+ * TV details from TMDB API (with credits and images)
+ */
+export interface TvDetails {
+  id: number;
+  name: string;
+  overview: string;
+  first_air_date: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  vote_average: number;
+  vote_count: number;
+  episode_run_time: number[];
+  genres: Array<{ id: number; name: string }>;
+  credits?: Credits;
+  images?: Images;
   [key: string]: unknown; // Allow additional fields
 }
 
@@ -257,6 +332,42 @@ export async function getMovieById(movieId: number): Promise<MovieDetails> {
 
   const movie = await request<MovieDetails>(`/movie/${movieId}`);
   return movie;
+}
+
+/**
+ * Fetch full movie details including cast, crew, and images
+ *
+ * @param movieId TMDB movie ID
+ * @returns Movie details with credits and images
+ * @throws Error if movie not found or API request fails
+ */
+export async function getMovieDetails(movieId: number): Promise<MovieDetails> {
+  if (!Number.isInteger(movieId) || movieId <= 0) {
+    throw new Error(`Invalid movie ID: ${movieId}`);
+  }
+
+  const movie = await request<MovieDetails>(`/movie/${movieId}`, {
+    append_to_response: "credits,images",
+  });
+  return movie;
+}
+
+/**
+ * Fetch full TV show details including cast, crew, and images
+ *
+ * @param tvId TMDB TV show ID
+ * @returns TV show details with credits and images
+ * @throws Error if TV show not found or API request fails
+ */
+export async function getTvDetails(tvId: number): Promise<TvDetails> {
+  if (!Number.isInteger(tvId) || tvId <= 0) {
+    throw new Error(`Invalid TV show ID: ${tvId}`);
+  }
+
+  const tv = await request<TvDetails>(`/tv/${tvId}`, {
+    append_to_response: "credits,images",
+  });
+  return tv;
 }
 
 /**
@@ -374,6 +485,8 @@ export async function searchTv(
  */
 export const tmdbClient = {
   getMovieById,
+  getMovieDetails,
+  getTvDetails,
   searchMovies,
   searchTv,
   request,

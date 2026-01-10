@@ -232,7 +232,7 @@
         "Step 3: Test fetching details for a known movie ID",
         "Step 4: Verify cast, crew, poster, and backdrop data is returned"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "tmdb-watch-providers",

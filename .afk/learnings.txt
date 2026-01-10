@@ -139,3 +139,13 @@
 - TV show field mapping: TMDB TV shows use `name` field instead of `title`, and `first_air_date` instead of `release_date` - map these to internal Content model fields
 - TV search response mapping: TMDB TV search returns same structure as movie search but with TV-specific fields, map to Content model with type 'tv'
 - TV content type verification: Test script verifies all search results have type 'tv' to ensure correct mapping
+- Content details functions: Created `getMovieDetails()` and `getTvDetails()` functions that fetch full content details including cast, crew, and images
+- TMDB append_to_response parameter: Use `append_to_response=credits,images` query parameter to include credits and images in a single API request
+- Credits structure: TMDB credits include `cast[]` array with cast members (name, character, profile_path) and `crew[]` array with crew members (name, job, department, profile_path)
+- Images structure: TMDB images include `posters[]` array and `backdrops[]` array, each containing image objects with file_path, width, height, aspect_ratio, vote_average, vote_count
+- Cast member interface: Define CastMember interface with id, name, character, order, profile_path fields
+- Crew member interface: Define CrewMember interface with id, name, job, department, profile_path fields
+- Image interface: Define Image interface with file_path, width, height, aspect_ratio, vote_average, vote_count fields
+- MovieDetails interface: Extended MovieDetails interface to include optional `credits?: Credits` and `images?: Images` fields
+- TvDetails interface: Created TvDetails interface similar to MovieDetails but with TV-specific fields (name instead of title, first_air_date instead of release_date, episode_run_time instead of runtime)
+- Content details test script: Created `scripts/test-tmdb-content-details.ts` to test fetching movie and TV details, verify credits and images are included, test error handling, added `deno task test:tmdb-content-details` to deno.json
