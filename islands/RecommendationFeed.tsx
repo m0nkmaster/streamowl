@@ -2,6 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import type { RecommendationCandidate } from "../lib/ai/recommendations.ts";
 import RecommendationChat from "./RecommendationChat.tsx";
+import { useToast } from "./Toast.tsx";
 
 interface RecommendationsResponse {
   recommendations: RecommendationCandidate[];
@@ -40,6 +41,7 @@ export default function RecommendationFeed() {
       title: string;
     } | null
   >(null);
+  const { showToast, ToastContainer } = useToast();
 
   // Fetch premium status on mount
   useEffect(() => {
@@ -177,7 +179,7 @@ export default function RecommendationFeed() {
       // Revert on error
       setRecommendations(originalRecommendations);
       console.error("Error dismissing recommendation:", err);
-      alert("Failed to dismiss recommendation. Please try again.");
+      showToast("Failed to dismiss recommendation. Please try again.", "error");
     }
   };
 
@@ -221,10 +223,44 @@ export default function RecommendationFeed() {
         }));
         const error = await response.json();
         console.error("Failed to update watchlist:", error);
-        alert(
-          response.status === 401
-            ? "Please log in to add items to your watchlist"
-            : "Failed to update watchlist. Please try again.",
+        const errorMessage = response.status === 401
+          ? "Please log in to add items to your watchlist"
+          : "Failed to update watchlist. Please try again.";
+        showToast(errorMessage, "error");
+      } else {
+        // Show success toast with undo
+        const message = newStatus
+          ? "Added to watchlist"
+          : "Removed from watchlist";
+        showToast(
+          message,
+          "success",
+          3000,
+          newStatus
+            ? () => {
+              // Undo: remove from watchlist
+              fetch(`/api/content/${tmdbId}/watchlist`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+              }).then(() => {
+                setWatchlistStatuses((prev) => ({
+                  ...prev,
+                  [tmdbId]: false,
+                }));
+              });
+            }
+            : () => {
+              // Undo: add back to watchlist
+              fetch(`/api/content/${tmdbId}/watchlist`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+              }).then(() => {
+                setWatchlistStatuses((prev) => ({
+                  ...prev,
+                  [tmdbId]: true,
+                }));
+              });
+            },
         );
       }
     } catch (err) {
@@ -234,7 +270,7 @@ export default function RecommendationFeed() {
         [tmdbId]: currentStatus,
       }));
       console.error("Error updating watchlist:", err);
-      alert("An error occurred. Please try again.");
+      showToast("An error occurred. Please try again.", "error");
     } finally {
       setLoadingWatchlist((prev) => {
         const updated = { ...prev };
@@ -263,6 +299,7 @@ export default function RecommendationFeed() {
 
   return (
     <section class="mb-12">
+      <ToastContainer />
       <div class="flex items-center justify-between mb-6">
         <div>
           <h2 class="text-2xl font-bold text-gray-900">

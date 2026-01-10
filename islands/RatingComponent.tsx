@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
+import { useToast } from "./Toast.tsx";
 
 interface RatingComponentProps {
   tmdbId: number;
@@ -16,6 +17,7 @@ export default function RatingComponent(
   const [rating, setRating] = useState<number | null>(initialRating);
   const [tempRating, setTempRating] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const { showToast, ToastContainer } = useToast();
 
   // Update local state when initialRating prop changes
   useEffect(() => {
@@ -61,13 +63,37 @@ export default function RatingComponent(
         setRating(previousRating);
         const error = await response.json();
         console.error("Failed to set rating:", error);
-        alert("Failed to set rating. Please try again.");
+        const errorMessage = response.status === 401
+          ? "Please log in to rate content"
+          : "Failed to set rating. Please try again.";
+        showToast(errorMessage, "error");
+      } else {
+        // Show success toast with undo
+        showToast(
+          `Rated ${roundedValue.toFixed(1)}/10`,
+          "success",
+          3000,
+          () => {
+            // Undo: restore previous rating
+            if (previousRating !== null) {
+              fetch(`/api/content/${tmdbId}/rating`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ rating: previousRating }),
+              }).then(() => setRating(previousRating));
+            } else {
+              fetch(`/api/content/${tmdbId}/rating`, {
+                method: "DELETE",
+              }).then(() => setRating(null));
+            }
+          },
+        );
       }
     } catch (error) {
       // Revert on error
       setRating(previousRating);
       console.error("Error setting rating:", error);
-      alert("An error occurred. Please try again.");
+      showToast("An error occurred. Please try again.", "error");
     } finally {
       setIsLoading(false);
     }
@@ -92,13 +118,30 @@ export default function RatingComponent(
         setRating(previousRating);
         const error = await response.json();
         console.error("Failed to remove rating:", error);
-        alert("Failed to remove rating. Please try again.");
+        showToast("Failed to remove rating. Please try again.", "error");
+      } else {
+        // Show success toast with undo
+        showToast(
+          "Rating removed",
+          "success",
+          3000,
+          () => {
+            // Undo: restore previous rating
+            if (previousRating !== null) {
+              fetch(`/api/content/${tmdbId}/rating`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ rating: previousRating }),
+              }).then(() => setRating(previousRating));
+            }
+          },
+        );
       }
     } catch (error) {
       // Revert on error
       setRating(previousRating);
       console.error("Error removing rating:", error);
-      alert("An error occurred. Please try again.");
+      showToast("An error occurred. Please try again.", "error");
     } finally {
       setIsLoading(false);
     }
@@ -107,67 +150,70 @@ export default function RatingComponent(
   const displayRating = tempRating ?? rating ?? 0;
 
   return (
-    <div class="flex flex-col gap-3">
-      <div class="flex flex-col gap-2">
-        <label class="text-sm font-medium text-gray-700">
-          Your Rating
-        </label>
-        <div class="flex items-center gap-3">
-          <input
-            type="range"
-            min="1"
-            max="10"
-            step="0.5"
-            value={displayRating}
-            onChange={(e) =>
-              handleSliderChange(parseFloat(e.currentTarget.value))}
-            onMouseUp={(e) =>
-              handleSliderRelease(parseFloat(e.currentTarget.value))}
-            onTouchEnd={(e) =>
-              handleSliderRelease(parseFloat(e.currentTarget.value))}
-            disabled={isLoading}
-            class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed accent-indigo-600"
-            aria-label="Rating slider"
-          />
-          <div class="flex items-center gap-2 min-w-[80px]">
-            <span class="text-lg font-semibold text-gray-900">
-              {displayRating.toFixed(1)}
-            </span>
-            <span class="text-sm text-gray-500">/ 10</span>
+    <>
+      <ToastContainer />
+      <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-medium text-gray-700">
+            Your Rating
+          </label>
+          <div class="flex items-center gap-3">
+            <input
+              type="range"
+              min="1"
+              max="10"
+              step="0.5"
+              value={displayRating}
+              onChange={(e) =>
+                handleSliderChange(parseFloat(e.currentTarget.value))}
+              onMouseUp={(e) =>
+                handleSliderRelease(parseFloat(e.currentTarget.value))}
+              onTouchEnd={(e) =>
+                handleSliderRelease(parseFloat(e.currentTarget.value))}
+              disabled={isLoading}
+              class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed accent-indigo-600"
+              aria-label="Rating slider"
+            />
+            <div class="flex items-center gap-2 min-w-[80px]">
+              <span class="text-lg font-semibold text-gray-900">
+                {displayRating.toFixed(1)}
+              </span>
+              <span class="text-sm text-gray-500">/ 10</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Quick select buttons for common ratings */}
-      <div class="flex flex-wrap gap-2">
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
+        {/* Quick select buttons for common ratings */}
+        <div class="flex flex-wrap gap-2">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => handleSliderRelease(value)}
+              disabled={isLoading}
+              class={`px-3 py-1 text-sm rounded-md transition-colors ${
+                rating === value
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+              aria-label={`Rate ${value} out of 10`}
+            >
+              {value}
+            </button>
+          ))}
+        </div>
+
+        {rating !== null && (
           <button
-            key={value}
             type="button"
-            onClick={() => handleSliderRelease(value)}
+            onClick={handleRemoveRating}
             disabled={isLoading}
-            class={`px-3 py-1 text-sm rounded-md transition-colors ${
-              rating === value
-                ? "bg-indigo-600 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
-            aria-label={`Rate ${value} out of 10`}
+            class="text-sm text-gray-500 hover:text-gray-700 underline self-start disabled:opacity-50"
           >
-            {value}
+            Remove rating
           </button>
-        ))}
+        )}
       </div>
-
-      {rating !== null && (
-        <button
-          type="button"
-          onClick={handleRemoveRating}
-          disabled={isLoading}
-          class="text-sm text-gray-500 hover:text-gray-700 underline self-start disabled:opacity-50"
-        >
-          Remove rating
-        </button>
-      )}
-    </div>
+    </>
   );
 }

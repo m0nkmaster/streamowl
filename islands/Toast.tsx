@@ -6,6 +6,7 @@ export interface Toast {
   message: string;
   type: "success" | "error" | "info";
   duration?: number;
+  onUndo?: () => void;
 }
 
 interface ToastContainerProps {
@@ -36,26 +37,41 @@ function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
           <div class="flex-1">
             <p class="text-sm font-medium">{toast.message}</p>
           </div>
-          <button
-            type="button"
-            onClick={() => onRemove(toast.id)}
-            class="text-gray-500 hover:text-gray-700"
-            aria-label="Close notification"
-          >
-            <svg
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          <div class="flex items-center gap-2">
+            {toast.onUndo && (
+              <button
+                type="button"
+                onClick={() => {
+                  toast.onUndo?.();
+                  onRemove(toast.id);
+                }}
+                class="text-sm font-medium underline hover:no-underline"
+                aria-label="Undo action"
+              >
+                Undo
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => onRemove(toast.id)}
+              class="text-gray-500 hover:text-gray-700"
+              aria-label="Close notification"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
+              <svg
+                class="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
       ))}
     </div>
@@ -72,11 +88,12 @@ export function useToast() {
     message: string,
     type: "success" | "error" | "info" = "info",
     duration: number = 3000,
+    onUndo?: () => void,
   ) => {
     if (!IS_BROWSER) return;
 
     const id = `toast-${Date.now()}-${Math.random()}`;
-    const toast: Toast = { id, message, type, duration };
+    const toast: Toast = { id, message, type, duration, onUndo };
 
     setToasts((prev) => [...prev, toast]);
 
