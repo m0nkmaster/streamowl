@@ -6,19 +6,19 @@ import { createNotFoundResponse } from "../../lib/api/errors.ts";
  * Returns a JSON 404 response for any API endpoint that doesn't exist
  */
 export const handler: Handlers = {
-  async GET(_req) {
+  GET(_req) {
     return createNotFoundResponse("API endpoint not found");
   },
-  async POST(_req) {
+  POST(_req) {
     return createNotFoundResponse("API endpoint not found");
   },
-  async PUT(_req) {
+  PUT(_req) {
     return createNotFoundResponse("API endpoint not found");
   },
-  async PATCH(_req) {
+  PATCH(_req) {
     return createNotFoundResponse("API endpoint not found");
   },
-  async DELETE(_req) {
+  DELETE(_req) {
     return createNotFoundResponse("API endpoint not found");
   },
 };
