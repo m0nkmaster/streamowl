@@ -791,7 +791,7 @@
         "Step 3: View public profile URL",
         "Step 4: Access URL logged out and verify public data displays"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "sharing-public-lists",

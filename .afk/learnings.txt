@@ -778,3 +778,14 @@
 - Remaining recommendations display: UI shows remaining recommendation count when user has less than 3 remaining, providing clear feedback on usage
 - Cache integration: Rate limiting works alongside existing recommendation caching - cached recommendations don't count against limit, only new generations increment the counter
 - TTL calculation: Usage counter TTL is calculated as seconds until midnight to ensure daily reset, using `getSecondsUntilMidnight()` helper function
+
+## Public Profile Feature
+
+- Public profile toggle: Added public profile toggle to settings page (`/settings`) allowing users to enable/disable public profile visibility, stored in `users.preferences.public_profile_enabled` JSONB field
+- Settings API endpoint: Created `/api/settings/public-profile` endpoint with GET (fetch current state) and POST (update state) methods, following same pattern as region settings endpoint
+- Public profile route: Created `/profile/[user_id]` route that displays user's public profile with stats and favourites, accessible without authentication if profile is enabled
+- Profile visibility check: Public profile route validates UUID format, checks if user exists and has `public_profile_enabled` set to true, returns 403 if profile is not public
+- Profile stats calculation: Profile displays watched count, favourites count, watchlist count, and average rating calculated using SQL aggregation with FILTER clauses for efficient counting
+- Favourites display: Public profile shows up to 20 most recent favourites with poster images, titles, types, and release years, using same ContentGrid component pattern as other content displays
+- Profile URL display: Settings page shows public profile URL (`/profile/{userId}`) when enabled, with clickable link that opens in new tab
+- Query result pattern: The `query()` function from `lib/db.ts` returns an array directly (not an object with `.rows` property), so use `result.length` and `result[0]` instead of `result.rows.length` and `result.rows[0]`
