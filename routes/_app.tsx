@@ -1,6 +1,26 @@
-import { type PageProps } from "$fresh/server.ts";
+import { type Handlers, type PageProps } from "$fresh/server.ts";
+import { getSessionFromRequest } from "../lib/auth/middleware.ts";
+import Navigation from "../islands/Navigation.tsx";
 
-export default function App({ Component }: PageProps) {
+interface AppProps {
+  currentPath: string;
+  isAuthenticated: boolean;
+}
+
+export const handler: Handlers<AppProps> = {
+  async GET(req, ctx) {
+    const session = await getSessionFromRequest(req);
+    const url = new URL(req.url);
+    return ctx.render({
+      currentPath: url.pathname,
+      isAuthenticated: session !== null,
+    });
+  },
+};
+
+export default function App({ Component, data }: PageProps<AppProps>) {
+  const { currentPath, isAuthenticated } = data;
+  
   return (
     <html>
       <head>
@@ -9,6 +29,7 @@ export default function App({ Component }: PageProps) {
         <title>Stream Owl</title>
       </head>
       <body>
+        <Navigation currentPath={currentPath} isAuthenticated={isAuthenticated} />
         <Component />
       </body>
     </html>
