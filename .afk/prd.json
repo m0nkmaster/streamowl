@@ -1,0 +1,1499 @@
+{
+  "tasks": [
+    {
+      "id": "project-init-deno-fresh",
+      "category": "technical",
+      "description": "Initialise Deno Fresh 2.x project with TypeScript configuration and folder structure",
+      "priority": 1,
+      "steps": [
+        "Step 1: Run deno init fresh project command",
+        "Step 2: Verify deno.json contains Fresh configuration",
+        "Step 3: Run deno task dev and confirm server starts on localhost",
+        "Step 4: Navigate to homepage and verify Fresh welcome page renders"
+      ],
+      "passes": false
+    },
+    {
+      "id": "database-postgresql-setup",
+      "category": "technical",
+      "description": "Configure PostgreSQL database connection with environment-based configuration",
+      "priority": 1,
+      "steps": [
+        "Step 1: Create database configuration module with connection pooling",
+        "Step 2: Add DATABASE_URL to .env.example",
+        "Step 3: Verify connection by running a simple SELECT query",
+        "Step 4: Confirm connection pool handles concurrent requests"
+      ],
+      "passes": false
+    },
+    {
+      "id": "database-schema-users",
+      "category": "technical",
+      "description": "Create users table migration with id, email, display_name, avatar_url, preferences, and timestamps",
+      "priority": 1,
+      "steps": [
+        "Step 1: Create migration file for users table",
+        "Step 2: Run migration against database",
+        "Step 3: Verify table exists with correct columns using psql or admin tool",
+        "Step 4: Test inserting and retrieving a user record"
+      ],
+      "passes": false
+    },
+    {
+      "id": "database-schema-content",
+      "category": "technical",
+      "description": "Create content table migration with tmdb_id, type, title, overview, release_date, poster/backdrop paths, and metadata",
+      "priority": 1,
+      "steps": [
+        "Step 1: Create migration file for content table",
+        "Step 2: Add enum type for content_type (movie, tv, documentary)",
+        "Step 3: Run migration and verify table structure",
+        "Step 4: Test inserting sample movie and TV show records"
+      ],
+      "passes": false
+    },
+    {
+      "id": "database-schema-user-content",
+      "category": "technical",
+      "description": "Create user_content junction table for tracking watched/to_watch/favourite status with ratings and notes",
+      "priority": 1,
+      "steps": [
+        "Step 1: Create migration with user_id, content_id, status enum, rating, notes, watched_at",
+        "Step 2: Add foreign key constraints to users and content tables",
+        "Step 3: Add unique constraint on user_id + content_id",
+        "Step 4: Verify cascade delete behaviour works correctly"
+      ],
+      "passes": false
+    },
+    {
+      "id": "database-schema-lists",
+      "category": "technical",
+      "description": "Create lists and list_items tables for custom user collections",
+      "priority": 1,
+      "steps": [
+        "Step 1: Create lists table with user_id, name, description, is_public",
+        "Step 2: Create list_items table with list_id, content_id, position",
+        "Step 3: Add foreign key constraints",
+        "Step 4: Test creating a list and adding items with ordering"
+      ],
+      "passes": false
+    },
+    {
+      "id": "database-schema-tags",
+      "category": "technical",
+      "description": "Create tags and content_tags tables for user-defined content organisation",
+      "priority": 1,
+      "steps": [
+        "Step 1: Create tags table with user_id, name, colour",
+        "Step 2: Create content_tags junction table",
+        "Step 3: Add unique constraint on user_id + tag name",
+        "Step 4: Test applying multiple tags to content"
+      ],
+      "passes": false
+    },
+    {
+      "id": "database-schema-streaming-services",
+      "category": "technical",
+      "description": "Create streaming_services and content_streaming tables for availability tracking",
+      "priority": 1,
+      "steps": [
+        "Step 1: Create streaming_services table with name, logo_url, deep_link_template",
+        "Step 2: Create content_streaming table with service_id, region, type (subscription/rent/buy), price",
+        "Step 3: Seed common streaming services (Netflix, Disney+, Amazon, etc.)",
+        "Step 4: Test querying availability for a title in a specific region"
+      ],
+      "passes": false
+    },
+    {
+      "id": "auth-session-management",
+      "category": "security",
+      "description": "Implement JWT-based session management with secure cookie storage",
+      "priority": 1,
+      "steps": [
+        "Step 1: Create JWT signing and verification utilities",
+        "Step 2: Implement secure HTTP-only cookie setting",
+        "Step 3: Create middleware to extract and validate session from requests",
+        "Step 4: Test that invalid/expired tokens are rejected"
+      ],
+      "passes": false
+    },
+    {
+      "id": "auth-email-password-signup",
+      "category": "functional",
+      "description": "Allow users to create an account with email and password",
+      "priority": 1,
+      "steps": [
+        "Step 1: Navigate to /signup page",
+        "Step 2: Enter valid email and password (min 8 chars)",
+        "Step 3: Submit form and verify redirect to dashboard",
+        "Step 4: Verify user record created in database with hashed password"
+      ],
+      "passes": false
+    },
+    {
+      "id": "auth-email-password-login",
+      "category": "functional",
+      "description": "Allow existing users to log in with email and password",
+      "priority": 1,
+      "steps": [
+        "Step 1: Navigate to /login page",
+        "Step 2: Enter valid credentials for existing user",
+        "Step 3: Submit form and verify redirect to dashboard",
+        "Step 4: Verify session cookie is set correctly"
+      ],
+      "passes": false
+    },
+    {
+      "id": "auth-google-oauth",
+      "category": "functional",
+      "description": "Allow users to sign up and log in with Google OAuth",
+      "priority": 2,
+      "steps": [
+        "Step 1: Click 'Continue with Google' button on login/signup page",
+        "Step 2: Complete Google OAuth flow in popup/redirect",
+        "Step 3: Verify redirect back to app with user logged in",
+        "Step 4: Verify user record created with Google profile data"
+      ],
+      "passes": false
+    },
+    {
+      "id": "auth-logout",
+      "category": "functional",
+      "description": "Allow users to log out and clear their session",
+      "priority": 2,
+      "steps": [
+        "Step 1: While logged in, click logout button",
+        "Step 2: Verify redirect to homepage or login page",
+        "Step 3: Verify session cookie is cleared",
+        "Step 4: Attempt to access protected route and verify redirect to login"
+      ],
+      "passes": false
+    },
+    {
+      "id": "auth-protected-routes",
+      "category": "security",
+      "description": "Protect authenticated routes and redirect unauthenticated users to login",
+      "priority": 1,
+      "steps": [
+        "Step 1: While logged out, navigate to /library",
+        "Step 2: Verify redirect to /login with return URL preserved",
+        "Step 3: Log in and verify redirect back to /library",
+        "Step 4: Verify API routes return 401 for unauthenticated requests"
+      ],
+      "passes": false
+    },
+    {
+      "id": "tmdb-api-integration",
+      "category": "technical",
+      "description": "Create TMDB API client with authentication and rate limiting",
+      "priority": 1,
+      "steps": [
+        "Step 1: Create TMDB client module with API key configuration",
+        "Step 2: Implement request rate limiting (50 req/sec)",
+        "Step 3: Test fetching a movie by TMDB ID",
+        "Step 4: Verify error handling for invalid IDs and rate limit exceeded"
+      ],
+      "passes": false
+    },
+    {
+      "id": "tmdb-search-movies",
+      "category": "technical",
+      "description": "Implement movie search using TMDB API with pagination",
+      "priority": 1,
+      "steps": [
+        "Step 1: Create search function accepting query string and page number",
+        "Step 2: Map TMDB response to internal content model",
+        "Step 3: Test searching for 'Inception' returns correct results",
+        "Step 4: Verify pagination returns different results for page 2"
+      ],
+      "passes": false
+    },
+    {
+      "id": "tmdb-search-tv",
+      "category": "technical",
+      "description": "Implement TV show search using TMDB API with pagination",
+      "priority": 1,
+      "steps": [
+        "Step 1: Create TV search function accepting query string",
+        "Step 2: Map TMDB TV response to internal content model",
+        "Step 3: Test searching for 'Breaking Bad' returns correct results",
+        "Step 4: Verify content type is correctly set to 'tv'"
+      ],
+      "passes": false
+    },
+    {
+      "id": "tmdb-content-details",
+      "category": "technical",
+      "description": "Fetch full content details including cast, crew, and images from TMDB",
+      "priority": 1,
+      "steps": [
+        "Step 1: Create getMovieDetails and getTvDetails functions",
+        "Step 2: Include credits and images in API request",
+        "Step 3: Test fetching details for a known movie ID",
+        "Step 4: Verify cast, crew, poster, and backdrop data is returned"
+      ],
+      "passes": false
+    },
+    {
+      "id": "tmdb-watch-providers",
+      "category": "technical",
+      "description": "Fetch streaming availability data from TMDB Watch Providers API",
+      "priority": 2,
+      "steps": [
+        "Step 1: Create getWatchProviders function for movie and TV",
+        "Step 2: Filter results by user's region (US, UK, CA, AU, DE, FR)",
+        "Step 3: Test fetching providers for a popular movie",
+        "Step 4: Verify subscription, rent, and buy options are correctly categorised"
+      ],
+      "passes": false
+    },
+    {
+      "id": "content-cache-layer",
+      "category": "technical",
+      "description": "Implement Redis caching for TMDB API responses to reduce API calls",
+      "priority": 2,
+      "steps": [
+        "Step 1: Configure Redis/Upstash connection",
+        "Step 2: Create cache wrapper for TMDB API calls with TTL",
+        "Step 3: Test that repeated requests return cached data",
+        "Step 4: Verify cache expiry refreshes data from TMDB"
+      ],
+      "passes": false
+    },
+    {
+      "id": "search-page-ui",
+      "category": "functional",
+      "description": "Create search page with input field and instant results display",
+      "priority": 2,
+      "steps": [
+        "Step 1: Navigate to /search page",
+        "Step 2: Type 'Inception' in search field",
+        "Step 3: Verify results appear showing movie posters and titles",
+        "Step 4: Verify results update as user types (debounced)"
+      ],
+      "passes": false
+    },
+    {
+      "id": "search-combined-results",
+      "category": "functional",
+      "description": "Display combined movie and TV show results in unified search",
+      "priority": 2,
+      "steps": [
+        "Step 1: Search for 'The Office' which has both movie and TV results",
+        "Step 2: Verify both movies and TV shows appear in results",
+        "Step 3: Verify content type badge distinguishes movies from TV",
+        "Step 4: Verify results are sorted by relevance"
+      ],
+      "passes": false
+    },
+    {
+      "id": "search-filter-by-type",
+      "category": "functional",
+      "description": "Allow filtering search results by content type (movies, TV, documentaries)",
+      "priority": 3,
+      "steps": [
+        "Step 1: Perform a search with results of multiple types",
+        "Step 2: Click 'Movies' filter button",
+        "Step 3: Verify only movie results are displayed",
+        "Step 4: Click 'TV Shows' filter and verify only TV shows display"
+      ],
+      "passes": false
+    },
+    {
+      "id": "search-filter-by-genre",
+      "category": "functional",
+      "description": "Allow filtering search results by genre",
+      "priority": 3,
+      "steps": [
+        "Step 1: Perform a search with varied results",
+        "Step 2: Open genre filter dropdown",
+        "Step 3: Select 'Action' genre",
+        "Step 4: Verify only action content remains in results"
+      ],
+      "passes": false
+    },
+    {
+      "id": "search-filter-by-year",
+      "category": "functional",
+      "description": "Allow filtering search results by release year range",
+      "priority": 3,
+      "steps": [
+        "Step 1: Perform a broad search",
+        "Step 2: Set year range filter to 2020-2024",
+        "Step 3: Verify all results have release dates within range",
+        "Step 4: Adjust range and verify results update"
+      ],
+      "passes": false
+    },
+    {
+      "id": "search-filter-by-streaming-service",
+      "category": "functional",
+      "description": "Allow filtering search results by streaming service availability",
+      "priority": 3,
+      "steps": [
+        "Step 1: Perform a search with results",
+        "Step 2: Select 'Netflix' from streaming service filter",
+        "Step 3: Verify all displayed results are available on Netflix",
+        "Step 4: Clear filter and verify full results return"
+      ],
+      "passes": false
+    },
+    {
+      "id": "content-detail-page",
+      "category": "functional",
+      "description": "Display full content details page with metadata, synopsis, and imagery",
+      "priority": 2,
+      "steps": [
+        "Step 1: Navigate to /content/{tmdb_id} for a known movie",
+        "Step 2: Verify poster image, backdrop, and title display",
+        "Step 3: Verify synopsis, runtime, release date, and rating display",
+        "Step 4: Verify cast list with photos displays"
+      ],
+      "passes": false
+    },
+    {
+      "id": "content-detail-streaming-availability",
+      "category": "functional",
+      "description": "Show where to watch content with streaming service logos and links",
+      "priority": 2,
+      "steps": [
+        "Step 1: Navigate to content detail page for available title",
+        "Step 2: Verify 'Where to Watch' section displays",
+        "Step 3: Verify streaming service logos show with availability type",
+        "Step 4: Click service link and verify deep link to streaming app/site"
+      ],
+      "passes": false
+    },
+    {
+      "id": "content-detail-trailer",
+      "category": "functional",
+      "description": "Embed trailer video on content detail page",
+      "priority": 3,
+      "steps": [
+        "Step 1: Navigate to content page with available trailer",
+        "Step 2: Verify trailer section displays with YouTube embed",
+        "Step 3: Click play and verify video plays",
+        "Step 4: Verify no trailer section for content without trailers"
+      ],
+      "passes": false
+    },
+    {
+      "id": "content-detail-similar-titles",
+      "category": "functional",
+      "description": "Display similar/recommended titles on content detail page",
+      "priority": 3,
+      "steps": [
+        "Step 1: Navigate to popular movie detail page",
+        "Step 2: Scroll to 'Similar Titles' section",
+        "Step 3: Verify 6-12 similar titles display with posters",
+        "Step 4: Click similar title and verify navigation to its detail page"
+      ],
+      "passes": false
+    },
+    {
+      "id": "content-detail-aggregate-ratings",
+      "category": "functional",
+      "description": "Display aggregate ratings from TMDB, IMDb, and Rotten Tomatoes",
+      "priority": 4,
+      "steps": [
+        "Step 1: Navigate to content detail page",
+        "Step 2: Verify TMDB rating displays with vote count",
+        "Step 3: Verify IMDb rating displays (if available via OMDb)",
+        "Step 4: Verify Rotten Tomatoes score displays (if available)"
+      ],
+      "passes": false
+    },
+    {
+      "id": "library-watched-list",
+      "category": "functional",
+      "description": "Allow users to mark content as watched and view watched history",
+      "priority": 2,
+      "steps": [
+        "Step 1: On content detail page, click 'Mark as Watched' button",
+        "Step 2: Verify button state changes to indicate watched",
+        "Step 3: Navigate to /library and select 'Watched' tab",
+        "Step 4: Verify content appears in watched list with date"
+      ],
+      "passes": false
+    },
+    {
+      "id": "library-to-watch-list",
+      "category": "functional",
+      "description": "Allow users to add content to their watchlist",
+      "priority": 2,
+      "steps": [
+        "Step 1: On content detail page, click 'Add to Watchlist' button",
+        "Step 2: Verify button state changes to indicate added",
+        "Step 3: Navigate to /library and select 'To Watch' tab",
+        "Step 4: Verify content appears in watchlist"
+      ],
+      "passes": false
+    },
+    {
+      "id": "library-favourites-list",
+      "category": "functional",
+      "description": "Allow users to mark content as favourite",
+      "priority": 2,
+      "steps": [
+        "Step 1: On content detail page, click heart/favourite icon",
+        "Step 2: Verify icon fills to indicate favourited",
+        "Step 3: Navigate to /library and select 'Favourites' tab",
+        "Step 4: Verify content appears in favourites list"
+      ],
+      "passes": false
+    },
+    {
+      "id": "library-quick-actions",
+      "category": "ux",
+      "description": "Add one-tap quick action buttons on search results and browse views",
+      "priority": 3,
+      "steps": [
+        "Step 1: Search for a movie",
+        "Step 2: Hover over result card and verify quick action buttons appear",
+        "Step 3: Click watchlist icon and verify added without navigating away",
+        "Step 4: Verify toast notification confirms action"
+      ],
+      "passes": false
+    },
+    {
+      "id": "rating-system",
+      "category": "functional",
+      "description": "Allow users to rate content on a 1-10 scale with half-point precision",
+      "priority": 2,
+      "steps": [
+        "Step 1: On content detail page, click rating component",
+        "Step 2: Select 8.5 rating",
+        "Step 3: Verify rating saves and displays on the page",
+        "Step 4: Verify rating appears in library view for this content"
+      ],
+      "passes": false
+    },
+    {
+      "id": "notes-system",
+      "category": "functional",
+      "description": "Allow users to add private notes to any content",
+      "priority": 3,
+      "steps": [
+        "Step 1: On content detail page, click 'Add Note' button",
+        "Step 2: Enter note text and save",
+        "Step 3: Verify note displays on content page",
+        "Step 4: Verify note is private (not visible to other users)"
+      ],
+      "passes": false
+    },
+    {
+      "id": "custom-lists-create",
+      "category": "functional",
+      "description": "Allow users to create custom lists with names and descriptions",
+      "priority": 2,
+      "steps": [
+        "Step 1: Navigate to /library and click 'Create List'",
+        "Step 2: Enter list name '80s Horror' and description",
+        "Step 3: Click create and verify list appears in sidebar",
+        "Step 4: Verify list has unique shareable URL"
+      ],
+      "passes": false
+    },
+    {
+      "id": "custom-lists-add-content",
+      "category": "functional",
+      "description": "Allow users to add content to custom lists",
+      "priority": 2,
+      "steps": [
+        "Step 1: On content detail page, click 'Add to List' dropdown",
+        "Step 2: Select custom list from dropdown",
+        "Step 3: Verify content added to list",
+        "Step 4: Navigate to list and verify content appears"
+      ],
+      "passes": false
+    },
+    {
+      "id": "custom-lists-reorder",
+      "category": "functional",
+      "description": "Allow users to drag and drop to reorder items in custom lists",
+      "priority": 3,
+      "steps": [
+        "Step 1: Navigate to custom list with multiple items",
+        "Step 2: Drag second item to first position",
+        "Step 3: Verify order updates visually",
+        "Step 4: Refresh page and verify order persists"
+      ],
+      "passes": false
+    },
+    {
+      "id": "custom-lists-limit-free",
+      "category": "functional",
+      "description": "Limit free tier users to 3 custom lists",
+      "priority": 3,
+      "steps": [
+        "Step 1: As free user, create 3 custom lists",
+        "Step 2: Attempt to create 4th list",
+        "Step 3: Verify upgrade prompt displays instead of creation",
+        "Step 4: Verify existing lists remain accessible"
+      ],
+      "passes": false
+    },
+    {
+      "id": "tags-create-apply",
+      "category": "functional",
+      "description": "Allow users to create and apply custom tags to content",
+      "priority": 3,
+      "steps": [
+        "Step 1: On content detail page, click 'Add Tag'",
+        "Step 2: Type new tag name 'Comfort Watch' and select colour",
+        "Step 3: Verify tag appears on content",
+        "Step 4: Apply same tag to another content item"
+      ],
+      "passes": false
+    },
+    {
+      "id": "tags-filter-library",
+      "category": "functional",
+      "description": "Allow filtering library by applied tags",
+      "priority": 3,
+      "steps": [
+        "Step 1: Navigate to /library with tagged content",
+        "Step 2: Click tag in filter sidebar",
+        "Step 3: Verify only content with that tag displays",
+        "Step 4: Select multiple tags and verify AND filtering works"
+      ],
+      "passes": false
+    },
+    {
+      "id": "browse-trending",
+      "category": "functional",
+      "description": "Display trending content on browse page",
+      "priority": 2,
+      "steps": [
+        "Step 1: Navigate to /browse",
+        "Step 2: Verify 'Trending' section displays",
+        "Step 3: Verify content updates periodically (not stale)",
+        "Step 4: Click trending item and verify navigation to detail page"
+      ],
+      "passes": false
+    },
+    {
+      "id": "browse-new-releases",
+      "category": "functional",
+      "description": "Display new releases section on browse page",
+      "priority": 3,
+      "steps": [
+        "Step 1: Navigate to /browse",
+        "Step 2: Locate 'New Releases' section",
+        "Step 3: Verify content has recent release dates",
+        "Step 4: Verify streaming availability shows for new releases"
+      ],
+      "passes": false
+    },
+    {
+      "id": "browse-leaving-soon",
+      "category": "functional",
+      "description": "Display content leaving streaming services soon",
+      "priority": 4,
+      "steps": [
+        "Step 1: Navigate to /browse",
+        "Step 2: Locate 'Leaving Soon' section",
+        "Step 3: Verify departure dates display on content cards",
+        "Step 4: Filter by streaming service and verify results update"
+      ],
+      "passes": false
+    },
+    {
+      "id": "region-detection",
+      "category": "functional",
+      "description": "Detect user region and show region-appropriate streaming availability",
+      "priority": 2,
+      "steps": [
+        "Step 1: Access app from UK IP address",
+        "Step 2: View content detail page streaming availability",
+        "Step 3: Verify UK streaming services display (BBC iPlayer, etc.)",
+        "Step 4: Verify region indicator shows in UI"
+      ],
+      "passes": false
+    },
+    {
+      "id": "region-manual-override",
+      "category": "functional",
+      "description": "Allow users to manually set their region",
+      "priority": 3,
+      "steps": [
+        "Step 1: Navigate to settings",
+        "Step 2: Change region from detected to different country",
+        "Step 3: Verify streaming availability updates to new region",
+        "Step 4: Verify preference persists across sessions"
+      ],
+      "passes": false
+    },
+    {
+      "id": "database-pgvector-setup",
+      "category": "technical",
+      "description": "Enable pgvector extension and add embedding columns to content and users tables",
+      "priority": 2,
+      "steps": [
+        "Step 1: Create migration to enable pgvector extension",
+        "Step 2: Add taste_embedding column to users table",
+        "Step 3: Add content_embedding column to content table",
+        "Step 4: Create vector similarity index for efficient queries"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ai-content-embeddings",
+      "category": "technical",
+      "description": "Generate and store vector embeddings for content using OpenAI embeddings API",
+      "priority": 2,
+      "steps": [
+        "Step 1: Create embedding generation function using text-embedding-3-small",
+        "Step 2: Generate embedding from title, synopsis, genres, and themes",
+        "Step 3: Store embedding in content table",
+        "Step 4: Verify embedding dimension matches pgvector column"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ai-content-embedding-pipeline",
+      "category": "technical",
+      "description": "Create background job to generate embeddings for new content",
+      "priority": 3,
+      "steps": [
+        "Step 1: Create job queue for embedding generation",
+        "Step 2: Queue new content when added to database",
+        "Step 3: Process queue with rate limiting for OpenAI API",
+        "Step 4: Verify embeddings generated within reasonable timeframe"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ai-taste-profile-calculation",
+      "category": "technical",
+      "description": "Calculate user taste profile as weighted average of watched content embeddings",
+      "priority": 2,
+      "steps": [
+        "Step 1: Create function to aggregate user's watched content embeddings",
+        "Step 2: Weight embeddings by user rating (higher rating = more weight)",
+        "Step 3: Store aggregated taste embedding in users table",
+        "Step 4: Recalculate when user rates or watches new content"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ai-recommendation-candidates",
+      "category": "technical",
+      "description": "Generate recommendation candidates using vector similarity search",
+      "priority": 2,
+      "steps": [
+        "Step 1: Query pgvector for content similar to user taste profile",
+        "Step 2: Exclude already watched content",
+        "Step 3: Apply diversity scoring to avoid repetitive recommendations",
+        "Step 4: Return top 20 candidates ranked by similarity"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ai-recommendation-explanations",
+      "category": "functional",
+      "description": "Generate natural language explanations for recommendations using GPT-4",
+      "priority": 2,
+      "steps": [
+        "Step 1: Create prompt template with user history and candidate details",
+        "Step 2: Call GPT-4 Turbo API with structured prompt",
+        "Step 3: Parse response to extract explanation text",
+        "Step 4: Verify explanation references specific user history items"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ai-recommendation-daily-feed",
+      "category": "functional",
+      "description": "Display daily personalised recommendations on home feed",
+      "priority": 2,
+      "steps": [
+        "Step 1: Navigate to home page while logged in",
+        "Step 2: Verify recommendation cards display with explanations",
+        "Step 3: Verify 3 recommendations show for free tier",
+        "Step 4: Verify recommendations update daily"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ai-recommendation-dismiss",
+      "category": "functional",
+      "description": "Allow users to dismiss recommendations to improve future suggestions",
+      "priority": 3,
+      "steps": [
+        "Step 1: View recommendation on home feed",
+        "Step 2: Click 'Not Interested' button",
+        "Step 3: Verify recommendation removed from feed",
+        "Step 4: Verify dismissed content not recommended again"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ai-recommendation-add-to-watchlist",
+      "category": "functional",
+      "description": "Allow adding recommended content to watchlist directly from recommendation card",
+      "priority": 3,
+      "steps": [
+        "Step 1: View recommendation card",
+        "Step 2: Click 'Add to Watchlist' button",
+        "Step 3: Verify content added to To Watch list",
+        "Step 4: Verify recommendation card updates to show added state"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ai-conversation-chat",
+      "category": "functional",
+      "description": "Provide conversational AI interface for premium users to discuss recommendations",
+      "priority": 3,
+      "steps": [
+        "Step 1: As premium user, click 'Tell me more' on recommendation",
+        "Step 2: Verify chat interface opens with context",
+        "Step 3: Ask follow-up question about the recommendation",
+        "Step 4: Verify AI responds with relevant, contextual answer"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ai-mood-recommendations",
+      "category": "functional",
+      "description": "Allow users to request recommendations by mood or context",
+      "priority": 3,
+      "steps": [
+        "Step 1: Open AI chat interface",
+        "Step 2: Type 'I want something light and funny tonight'",
+        "Step 3: Verify recommendations match mood request",
+        "Step 4: Verify explanations reference mood context"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ai-rate-limiting-free",
+      "category": "functional",
+      "description": "Limit free tier users to 3 AI recommendations per day",
+      "priority": 3,
+      "steps": [
+        "Step 1: As free user, view 3 recommendations",
+        "Step 2: Attempt to request more recommendations",
+        "Step 3: Verify limit message displays with upgrade prompt",
+        "Step 4: Verify limit resets after 24 hours"
+      ],
+      "passes": false
+    },
+    {
+      "id": "sharing-public-profile",
+      "category": "functional",
+      "description": "Allow users to enable public profiles showing stats and favourites",
+      "priority": 3,
+      "steps": [
+        "Step 1: Navigate to profile settings",
+        "Step 2: Toggle 'Public Profile' on",
+        "Step 3: View public profile URL",
+        "Step 4: Access URL logged out and verify public data displays"
+      ],
+      "passes": false
+    },
+    {
+      "id": "sharing-public-lists",
+      "category": "functional",
+      "description": "Allow users to make custom lists publicly shareable",
+      "priority": 3,
+      "steps": [
+        "Step 1: Navigate to custom list settings",
+        "Step 2: Toggle 'Public' on",
+        "Step 3: Copy shareable URL",
+        "Step 4: Access URL logged out and verify list displays"
+      ],
+      "passes": false
+    },
+    {
+      "id": "sharing-social-buttons",
+      "category": "functional",
+      "description": "Add share to Twitter, WhatsApp, and other platforms",
+      "priority": 4,
+      "steps": [
+        "Step 1: On content detail page, click share button",
+        "Step 2: Select Twitter from share options",
+        "Step 3: Verify Twitter compose opens with pre-filled text and URL",
+        "Step 4: Test WhatsApp and other platforms"
+      ],
+      "passes": false
+    },
+    {
+      "id": "pwa-manifest",
+      "category": "technical",
+      "description": "Create PWA manifest for installable web app",
+      "priority": 3,
+      "steps": [
+        "Step 1: Create manifest.json with app name, icons, theme colours",
+        "Step 2: Link manifest in HTML head",
+        "Step 3: Verify manifest loads in browser dev tools",
+        "Step 4: Test install prompt appears on mobile"
+      ],
+      "passes": false
+    },
+    {
+      "id": "pwa-service-worker",
+      "category": "technical",
+      "description": "Implement service worker for offline caching",
+      "priority": 3,
+      "steps": [
+        "Step 1: Create service worker with cache-first strategy for static assets",
+        "Step 2: Cache user library data for offline access",
+        "Step 3: Test app loads while offline",
+        "Step 4: Verify cached library data displays offline"
+      ],
+      "passes": false
+    },
+    {
+      "id": "pwa-push-notifications",
+      "category": "functional",
+      "description": "Implement push notifications for new releases and recommendations",
+      "priority": 4,
+      "steps": [
+        "Step 1: Request notification permission on first visit",
+        "Step 2: Send test notification",
+        "Step 3: Verify notification appears on device",
+        "Step 4: Click notification and verify deep link to content"
+      ],
+      "passes": false
+    },
+    {
+      "id": "premium-stripe-integration",
+      "category": "technical",
+      "description": "Integrate Stripe for premium subscription payments",
+      "priority": 3,
+      "steps": [
+        "Step 1: Configure Stripe API keys and webhook endpoint",
+        "Step 2: Create subscription product in Stripe dashboard",
+        "Step 3: Test checkout flow with Stripe test cards",
+        "Step 4: Verify webhook updates user premium status"
+      ],
+      "passes": false
+    },
+    {
+      "id": "premium-checkout-flow",
+      "category": "functional",
+      "description": "Create upgrade to premium checkout experience",
+      "priority": 3,
+      "steps": [
+        "Step 1: Click 'Upgrade to Premium' button",
+        "Step 2: Verify pricing page shows monthly and yearly options",
+        "Step 3: Select plan and complete Stripe checkout",
+        "Step 4: Verify redirect back to app with premium features unlocked"
+      ],
+      "passes": false
+    },
+    {
+      "id": "premium-subscription-management",
+      "category": "functional",
+      "description": "Allow users to manage their subscription in settings",
+      "priority": 3,
+      "steps": [
+        "Step 1: As premium user, navigate to subscription settings",
+        "Step 2: View current plan and billing date",
+        "Step 3: Click 'Manage Subscription' to open Stripe portal",
+        "Step 4: Verify cancel flow works and updates user status"
+      ],
+      "passes": false
+    },
+    {
+      "id": "premium-feature-gating",
+      "category": "functional",
+      "description": "Gate premium features behind subscription check",
+      "priority": 3,
+      "steps": [
+        "Step 1: As free user, attempt to create 4th custom list",
+        "Step 2: Verify upgrade modal displays",
+        "Step 3: As premium user, create unlimited lists",
+        "Step 4: Verify all premium features accessible"
+      ],
+      "passes": false
+    },
+    {
+      "id": "data-export",
+      "category": "functional",
+      "description": "Allow premium users to export their data as CSV or JSON",
+      "priority": 4,
+      "steps": [
+        "Step 1: Navigate to settings as premium user",
+        "Step 2: Click 'Export Data' button",
+        "Step 3: Select format (CSV or JSON)",
+        "Step 4: Verify download contains all user content and lists"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ui-home-feed",
+      "category": "ux",
+      "description": "Design and implement personalised home feed layout",
+      "priority": 2,
+      "steps": [
+        "Step 1: Navigate to home page while logged in",
+        "Step 2: Verify recommendations section displays prominently",
+        "Step 3: Verify continue watching section shows recent activity",
+        "Step 4: Verify new releases section shows fresh content"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ui-library-tabs",
+      "category": "ux",
+      "description": "Implement tabbed library view with Watched, To Watch, Favourites, and custom lists",
+      "priority": 2,
+      "steps": [
+        "Step 1: Navigate to /library",
+        "Step 2: Verify tabs for core lists display",
+        "Step 3: Click between tabs and verify content switches",
+        "Step 4: Verify custom lists appear in sidebar or dropdown"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ui-content-grid",
+      "category": "ux",
+      "description": "Create responsive poster grid component for content display",
+      "priority": 2,
+      "steps": [
+        "Step 1: View content list on desktop",
+        "Step 2: Verify 5-6 posters per row",
+        "Step 3: Resize to mobile width",
+        "Step 4: Verify grid adapts to 2-3 posters per row"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ui-skeleton-loading",
+      "category": "ux",
+      "description": "Implement skeleton loading states for all content areas",
+      "priority": 3,
+      "steps": [
+        "Step 1: Navigate to search and begin typing",
+        "Step 2: Verify skeleton placeholders appear during load",
+        "Step 3: Navigate to content detail page",
+        "Step 4: Verify skeleton shows before content loads"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ui-toast-notifications",
+      "category": "ux",
+      "description": "Implement toast notification system for user actions",
+      "priority": 3,
+      "steps": [
+        "Step 1: Add content to watchlist",
+        "Step 2: Verify toast appears confirming action",
+        "Step 3: Verify toast auto-dismisses after 3 seconds",
+        "Step 4: Verify toast has undo action where appropriate"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ui-optimistic-updates",
+      "category": "ux",
+      "description": "Implement optimistic UI updates for user actions",
+      "priority": 3,
+      "steps": [
+        "Step 1: Click watchlist button on content",
+        "Step 2: Verify button state changes immediately",
+        "Step 3: Simulate network failure",
+        "Step 4: Verify UI reverts if request fails"
+      ],
+      "passes": false
+    },
+    {
+      "id": "ui-dark-light-theme",
+      "category": "ux",
+      "description": "Implement dark and light theme with system preference detection",
+      "priority": 3,
+      "steps": [
+        "Step 1: Access app with system set to dark mode",
+        "Step 2: Verify dark theme applies automatically",
+        "Step 3: Toggle theme in settings",
+        "Step 4: Verify preference persists across sessions"
+      ],
+      "passes": false
+    },
+    {
+      "id": "accessibility-keyboard-nav",
+      "category": "ux",
+      "description": "Ensure full keyboard navigation support throughout app",
+      "priority": 3,
+      "steps": [
+        "Step 1: Navigate app using only Tab and Enter keys",
+        "Step 2: Verify all interactive elements are focusable",
+        "Step 3: Verify focus indicators are visible",
+        "Step 4: Verify modal dialogs trap focus correctly"
+      ],
+      "passes": false
+    },
+    {
+      "id": "accessibility-screen-reader",
+      "category": "ux",
+      "description": "Add ARIA labels and ensure screen reader compatibility",
+      "priority": 3,
+      "steps": [
+        "Step 1: Test key flows with VoiceOver or NVDA",
+        "Step 2: Verify images have alt text",
+        "Step 3: Verify form fields have labels",
+        "Step 4: Verify dynamic content updates are announced"
+      ],
+      "passes": false
+    },
+    {
+      "id": "accessibility-wcag-compliance",
+      "category": "ux",
+      "description": "Audit and fix colour contrast for WCAG 2.1 AA compliance",
+      "priority": 3,
+      "steps": [
+        "Step 1: Run automated accessibility audit (Lighthouse)",
+        "Step 2: Verify text contrast ratios meet 4.5:1 minimum",
+        "Step 3: Verify interactive elements have 3:1 contrast",
+        "Step 4: Fix any flagged issues"
+      ],
+      "passes": false
+    },
+    {
+      "id": "performance-image-optimisation",
+      "category": "non-functional",
+      "description": "Optimise image loading with lazy loading and responsive sizes",
+      "priority": 3,
+      "steps": [
+        "Step 1: View page with multiple poster images",
+        "Step 2: Verify images below fold lazy load on scroll",
+        "Step 3: Verify appropriate image sizes load for viewport",
+        "Step 4: Check network tab for image sizes"
+      ],
+      "passes": false
+    },
+    {
+      "id": "performance-lighthouse-score",
+      "category": "non-functional",
+      "description": "Achieve Lighthouse performance score of 90+",
+      "priority": 4,
+      "steps": [
+        "Step 1: Run Lighthouse audit on home page",
+        "Step 2: Verify performance score is 90 or above",
+        "Step 3: Run audit on content detail page",
+        "Step 4: Verify consistent scores across key pages"
+      ],
+      "passes": false
+    },
+    {
+      "id": "performance-api-caching",
+      "category": "non-functional",
+      "description": "Implement HTTP caching headers for API responses",
+      "priority": 3,
+      "steps": [
+        "Step 1: Make API request for content details",
+        "Step 2: Verify Cache-Control headers in response",
+        "Step 3: Make same request again",
+        "Step 4: Verify 304 Not Modified or cache hit"
+      ],
+      "passes": false
+    },
+    {
+      "id": "security-password-hashing",
+      "category": "security",
+      "description": "Hash passwords using bcrypt before storage",
+      "priority": 1,
+      "steps": [
+        "Step 1: Create new user with password",
+        "Step 2: Query database for user record",
+        "Step 3: Verify password field contains bcrypt hash, not plaintext",
+        "Step 4: Verify login works with correct password"
+      ],
+      "passes": false
+    },
+    {
+      "id": "security-sql-injection",
+      "category": "security",
+      "description": "Use parameterised queries to prevent SQL injection",
+      "priority": 1,
+      "steps": [
+        "Step 1: Attempt SQL injection in search field",
+        "Step 2: Verify query is safely escaped",
+        "Step 3: Review code for raw SQL string concatenation",
+        "Step 4: Verify all queries use parameterised statements"
+      ],
+      "passes": false
+    },
+    {
+      "id": "security-xss-prevention",
+      "category": "security",
+      "description": "Sanitise user input to prevent XSS attacks",
+      "priority": 1,
+      "steps": [
+        "Step 1: Submit script tag in notes field",
+        "Step 2: View content where notes display",
+        "Step 3: Verify script does not execute",
+        "Step 4: Verify HTML is escaped in output"
+      ],
+      "passes": false
+    },
+    {
+      "id": "security-csrf-protection",
+      "category": "security",
+      "description": "Implement CSRF tokens for state-changing requests",
+      "priority": 2,
+      "steps": [
+        "Step 1: Inspect form submission for CSRF token",
+        "Step 2: Attempt request without token",
+        "Step 3: Verify request is rejected",
+        "Step 4: Verify legitimate requests succeed with token"
+      ],
+      "passes": false
+    },
+    {
+      "id": "security-rate-limiting",
+      "category": "security",
+      "description": "Implement rate limiting on authentication endpoints",
+      "priority": 2,
+      "steps": [
+        "Step 1: Attempt 10 failed logins in rapid succession",
+        "Step 2: Verify rate limit kicks in",
+        "Step 3: Verify error message indicates rate limiting",
+        "Step 4: Wait and verify access restored after cooldown"
+      ],
+      "passes": false
+    },
+    {
+      "id": "error-handling-api",
+      "category": "non-functional",
+      "description": "Implement consistent error responses for API endpoints",
+      "priority": 2,
+      "steps": [
+        "Step 1: Make request to invalid endpoint",
+        "Step 2: Verify 404 response with JSON error body",
+        "Step 3: Make request with invalid data",
+        "Step 4: Verify 400 response with validation errors"
+      ],
+      "passes": false
+    },
+    {
+      "id": "error-handling-ui",
+      "category": "ux",
+      "description": "Display user-friendly error messages for failed operations",
+      "priority": 3,
+      "steps": [
+        "Step 1: Trigger network error during content load",
+        "Step 2: Verify error message displays with retry option",
+        "Step 3: Trigger validation error on form",
+        "Step 4: Verify field-level error messages display"
+      ],
+      "passes": false
+    },
+    {
+      "id": "error-handling-404-page",
+      "category": "ux",
+      "description": "Create helpful 404 page for invalid URLs",
+      "priority": 4,
+      "steps": [
+        "Step 1: Navigate to /nonexistent-page",
+        "Step 2: Verify custom 404 page displays",
+        "Step 3: Verify navigation options to return home",
+        "Step 4: Verify search functionality available"
+      ],
+      "passes": false
+    },
+    {
+      "id": "logging-application",
+      "category": "technical",
+      "description": "Implement structured logging for debugging and monitoring",
+      "priority": 3,
+      "steps": [
+        "Step 1: Trigger application error",
+        "Step 2: Verify error logged with stack trace",
+        "Step 3: Verify logs include request context",
+        "Step 4: Verify logs are JSON formatted for parsing"
+      ],
+      "passes": false
+    },
+    {
+      "id": "testing-unit-coverage",
+      "category": "technical",
+      "description": "Achieve 80% unit test coverage for core business logic",
+      "priority": 3,
+      "steps": [
+        "Step 1: Run test suite with coverage reporting",
+        "Step 2: Verify overall coverage is 80% or above",
+        "Step 3: Verify critical paths have 100% coverage",
+        "Step 4: Review uncovered code for risk"
+      ],
+      "passes": false
+    },
+    {
+      "id": "testing-integration",
+      "category": "technical",
+      "description": "Create integration tests for critical user flows",
+      "priority": 3,
+      "steps": [
+        "Step 1: Run integration test for signup flow",
+        "Step 2: Run integration test for content discovery",
+        "Step 3: Run integration test for adding to watchlist",
+        "Step 4: Verify all tests pass in CI"
+      ],
+      "passes": false
+    },
+    {
+      "id": "deployment-deno-deploy",
+      "category": "technical",
+      "description": "Configure deployment to Deno Deploy with environment variables",
+      "priority": 2,
+      "steps": [
+        "Step 1: Link repository to Deno Deploy",
+        "Step 2: Configure production environment variables",
+        "Step 3: Trigger deployment on main branch push",
+        "Step 4: Verify production site loads correctly"
+      ],
+      "passes": false
+    },
+    {
+      "id": "deployment-ci-pipeline",
+      "category": "technical",
+      "description": "Set up CI pipeline with linting, testing, and deployment",
+      "priority": 3,
+      "steps": [
+        "Step 1: Create GitHub Actions workflow file",
+        "Step 2: Configure lint, test, and deploy stages",
+        "Step 3: Push commit and verify pipeline runs",
+        "Step 4: Verify failed tests block deployment"
+      ],
+      "passes": false
+    },
+    {
+      "id": "database-migrations-runner",
+      "category": "technical",
+      "description": "Create database migration runner for schema changes",
+      "priority": 1,
+      "steps": [
+        "Step 1: Create migrations folder structure",
+        "Step 2: Implement migration runner with up/down support",
+        "Step 3: Test running pending migrations",
+        "Step 4: Test rolling back a migration"
+      ],
+      "passes": false
+    },
+    {
+      "id": "documentation-api",
+      "category": "technical",
+      "description": "Document API endpoints with OpenAPI/Swagger specification",
+      "priority": 4,
+      "steps": [
+        "Step 1: Create OpenAPI spec file",
+        "Step 2: Document all public endpoints",
+        "Step 3: Verify spec validates correctly",
+        "Step 4: Generate API docs page from spec"
+      ],
+      "passes": false
+    },
+    {
+      "id": "user-settings-page",
+      "category": "functional",
+      "description": "Create user settings page for profile and preferences",
+      "priority": 3,
+      "steps": [
+        "Step 1: Navigate to /settings",
+        "Step 2: View profile section with name, email, avatar",
+        "Step 3: Update display name and save",
+        "Step 4: Verify change persists across sessions"
+      ],
+      "passes": false
+    },
+    {
+      "id": "user-avatar-upload",
+      "category": "functional",
+      "description": "Allow users to upload profile avatar",
+      "priority": 4,
+      "steps": [
+        "Step 1: Navigate to profile settings",
+        "Step 2: Click avatar upload area",
+        "Step 3: Select image file and upload",
+        "Step 4: Verify avatar displays throughout app"
+      ],
+      "passes": false
+    },
+    {
+      "id": "user-notification-preferences",
+      "category": "functional",
+      "description": "Allow users to configure notification preferences",
+      "priority": 4,
+      "steps": [
+        "Step 1: Navigate to notification settings",
+        "Step 2: Toggle specific notification types on/off",
+        "Step 3: Save preferences",
+        "Step 4: Verify only enabled notifications are sent"
+      ],
+      "passes": false
+    },
+    {
+      "id": "user-delete-account",
+      "category": "functional",
+      "description": "Allow users to delete their account and data",
+      "priority": 4,
+      "steps": [
+        "Step 1: Navigate to account settings",
+        "Step 2: Click 'Delete Account'",
+        "Step 3: Confirm deletion with password",
+        "Step 4: Verify account and all data removed from database"
+      ],
+      "passes": false
+    },
+    {
+      "id": "mobile-responsive-navigation",
+      "category": "ux",
+      "description": "Implement mobile-friendly navigation with bottom bar or hamburger menu",
+      "priority": 2,
+      "steps": [
+        "Step 1: View app on mobile viewport",
+        "Step 2: Verify navigation adapts (bottom bar or hamburger)",
+        "Step 3: Test navigation to all main sections",
+        "Step 4: Verify touch targets are appropriately sized"
+      ],
+      "passes": false
+    },
+    {
+      "id": "mobile-swipe-actions",
+      "category": "ux",
+      "description": "Add swipe gestures for quick actions on mobile list items",
+      "priority": 4,
+      "steps": [
+        "Step 1: View library list on mobile",
+        "Step 2: Swipe left on item to reveal actions",
+        "Step 3: Tap action to add to watchlist",
+        "Step 4: Verify action completes correctly"
+      ],
+      "passes": false
+    },
+    {
+      "id": "deep-links-streaming",
+      "category": "functional",
+      "description": "Generate deep links to open content directly in streaming apps",
+      "priority": 3,
+      "steps": [
+        "Step 1: View content available on Netflix",
+        "Step 2: Click 'Open in Netflix' button",
+        "Step 3: Verify redirect to Netflix app or website",
+        "Step 4: Verify content page opens (where supported)"
+      ],
+      "passes": false
+    },
+    {
+      "id": "content-sync-background",
+      "category": "technical",
+      "description": "Create background job to sync streaming availability data periodically",
+      "priority": 3,
+      "steps": [
+        "Step 1: Create scheduled job for availability refresh",
+        "Step 2: Run job and verify content_streaming table updates",
+        "Step 3: Verify expired availability removed",
+        "Step 4: Verify job handles API rate limits"
+      ],
+      "passes": false
+    },
+    {
+      "id": "analytics-basic-tracking",
+      "category": "technical",
+      "description": "Implement basic analytics for key user actions",
+      "priority": 4,
+      "steps": [
+        "Step 1: Instrument page views",
+        "Step 2: Instrument key actions (search, add to list, rate)",
+        "Step 3: Verify events recorded in analytics system",
+        "Step 4: Create basic dashboard for key metrics"
+      ],
+      "passes": false
+    },
+    {
+      "id": "auth-email-verification",
+      "category": "security",
+      "description": "Send email verification on signup and require verification for full access",
+      "priority": 3,
+      "steps": [
+        "Step 1: Sign up with new email",
+        "Step 2: Verify email sent with verification link",
+        "Step 3: Click verification link",
+        "Step 4: Verify account status updates to verified"
+      ],
+      "passes": false
+    },
+    {
+      "id": "auth-password-reset",
+      "category": "functional",
+      "description": "Allow users to reset forgotten passwords via email",
+      "priority": 2,
+      "steps": [
+        "Step 1: Click 'Forgot Password' on login page",
+        "Step 2: Enter email address",
+        "Step 3: Receive email with reset link",
+        "Step 4: Set new password and verify login works"
+      ],
+      "passes": false
+    },
+    {
+      "id": "seo-meta-tags",
+      "category": "non-functional",
+      "description": "Add appropriate meta tags for SEO and social sharing",
+      "priority": 4,
+      "steps": [
+        "Step 1: View page source for content detail page",
+        "Step 2: Verify title, description, and og:image tags present",
+        "Step 3: Test sharing URL to Twitter/Facebook",
+        "Step 4: Verify rich preview displays correctly"
+      ],
+      "passes": false
+    },
+    {
+      "id": "seo-sitemap",
+      "category": "non-functional",
+      "description": "Generate sitemap.xml for search engine indexing",
+      "priority": 4,
+      "steps": [
+        "Step 1: Navigate to /sitemap.xml",
+        "Step 2: Verify XML sitemap returns with URLs",
+        "Step 3: Verify key pages included (home, popular content)",
+        "Step 4: Submit sitemap to Google Search Console"
+      ],
+      "passes": false
+    },
+    {
+      "id": "legal-privacy-policy",
+      "category": "non-functional",
+      "description": "Create privacy policy page with data handling disclosure",
+      "priority": 4,
+      "steps": [
+        "Step 1: Navigate to /privacy",
+        "Step 2: Verify policy content displays",
+        "Step 3: Verify link accessible from footer",
+        "Step 4: Verify policy covers data collection and third parties"
+      ],
+      "passes": false
+    },
+    {
+      "id": "legal-terms-of-service",
+      "category": "non-functional",
+      "description": "Create terms of service page",
+      "priority": 4,
+      "steps": [
+        "Step 1: Navigate to /terms",
+        "Step 2: Verify terms content displays",
+        "Step 3: Verify link accessible from footer",
+        "Step 4: Verify terms referenced during signup"
+      ],
+      "passes": false
+    },
+    {
+      "id": "attribution-tmdb",
+      "category": "non-functional",
+      "description": "Add required TMDB attribution as per API terms",
+      "priority": 2,
+      "steps": [
+        "Step 1: View footer or about page",
+        "Step 2: Verify TMDB logo and attribution text present",
+        "Step 3: Verify attribution visible on content pages",
+        "Step 4: Verify link to TMDB is functional"
+      ],
+      "passes": false
+    }
+  ]
+}

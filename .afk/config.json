@@ -1,0 +1,38 @@
+{
+  "sources": [],
+  "feedback_loops": {
+    "custom": {}
+  },
+  "limits": {
+    "max_iterations": 20,
+    "max_task_failures": 3,
+    "timeout_minutes": 30
+  },
+  "output": {
+    "default": "clipboard",
+    "file_path": ".afk/prompt.md"
+  },
+  "ai_cli": {
+    "command": "claude",
+    "args": [
+      "--dangerously-skip-permissions",
+      "-p"
+    ]
+  },
+  "prompt": {
+    "template": "default",
+    "context_files": [],
+    "instructions": []
+  },
+  "git": {
+    "auto_commit": true,
+    "auto_branch": false,
+    "branch_prefix": "afk/",
+    "commit_message_template": "afk: {task_id} - {message}"
+  },
+  "archive": {
+    "enabled": true,
+    "directory": ".afk/archive",
+    "on_branch_change": true
+  }
+}
