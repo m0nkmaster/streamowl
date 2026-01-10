@@ -21,7 +21,9 @@ const results: TestResult[] = [];
 /**
  * Extract CSRF token from Set-Cookie header
  */
-function extractCsrfTokenFromCookie(cookieHeader: string | null): string | null {
+function extractCsrfTokenFromCookie(
+  cookieHeader: string | null,
+): string | null {
   if (!cookieHeader) return null;
   const cookies = cookieHeader.split(", ");
   const csrfCookie = cookies.find((c) => c.startsWith("csrf_token="));
@@ -101,7 +103,10 @@ async function testRateLimitActivation(): Promise<void> {
   }
 
   // 11th attempt should be rate limited
-  const rateLimitedResponse = await makeFailedLoginAttempt(csrfToken, csrfCookie);
+  const rateLimitedResponse = await makeFailedLoginAttempt(
+    csrfToken,
+    csrfCookie,
+  );
 
   if (rateLimitedResponse.status === 429) {
     const body = await rateLimitedResponse.json();
@@ -110,7 +115,9 @@ async function testRateLimitActivation(): Promise<void> {
       body.error.includes("Too many failed login attempts")
     ) {
       results.push({ name: "Rate limit activation", passed: true });
-      console.log("✓ Passed: Rate limit correctly activated after 10 failed attempts");
+      console.log(
+        "✓ Passed: Rate limit correctly activated after 10 failed attempts",
+      );
     } else {
       results.push({
         name: "Rate limit activation",
@@ -206,7 +213,10 @@ async function testRateLimitCooldown(): Promise<void> {
   }
 
   // Verify rate limited
-  const rateLimitedResponse = await makeFailedLoginAttempt(csrfToken, csrfCookie);
+  const rateLimitedResponse = await makeFailedLoginAttempt(
+    csrfToken,
+    csrfCookie,
+  );
   const rateLimitedBody = await rateLimitedResponse.json();
 
   if (rateLimitedResponse.status !== 429) {

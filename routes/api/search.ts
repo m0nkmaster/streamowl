@@ -1,5 +1,9 @@
 import { type Handlers } from "$fresh/server.ts";
 import { type Content, searchMovies, searchTv } from "../../lib/tmdb/client.ts";
+import {
+  createBadRequestResponse,
+  createInternalServerErrorResponse,
+} from "../../lib/api/errors.ts";
 
 interface SearchResponse {
   results: Content[];
@@ -21,23 +25,14 @@ export const handler: Handlers = {
 
       // Validate query
       if (!query || query.trim().length === 0) {
-        return new Response(
-          JSON.stringify({ error: "Search query is required" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        return createBadRequestResponse("Search query is required", "q");
       }
 
       // Validate page number
       if (!Number.isInteger(page) || page < 1) {
-        return new Response(
-          JSON.stringify({ error: "Page must be a positive integer" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
+        return createBadRequestResponse(
+          "Page must be a positive integer",
+          "page",
         );
       }
 
@@ -103,14 +98,9 @@ export const handler: Handlers = {
         },
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.error("Search error:", message);
-      return new Response(
-        JSON.stringify({ error: "Failed to search content" }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        },
+      return createInternalServerErrorResponse(
+        "Failed to search content",
+        error,
       );
     }
   },

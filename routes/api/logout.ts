@@ -1,8 +1,8 @@
 import { type Handlers } from "$fresh/server.ts";
 import { clearSessionCookie } from "../../lib/auth/cookies.ts";
 import {
-  validateCsrfToken,
   createCsrfErrorResponse,
+  validateCsrfToken,
 } from "../../lib/security/csrf.ts";
 
 /**

@@ -67,9 +67,7 @@ export function getCsrfTokenFromCookie(request: Request): string | undefined {
   }
 
   const cookies = cookieHeader.split(";").map((c) => c.trim());
-  const csrfCookie = cookies.find((c) =>
-    c.startsWith(`${CSRF_COOKIE_NAME}=`)
-  );
+  const csrfCookie = cookies.find((c) => c.startsWith(`${CSRF_COOKIE_NAME}=`));
 
   if (!csrfCookie) {
     return undefined;
@@ -95,7 +93,9 @@ export function getCsrfTokenFromForm(formData: FormData): string | undefined {
  * @param body JSON body object
  * @returns CSRF token if present, undefined otherwise
  */
-export function getCsrfTokenFromJson(body: Record<string, unknown>): string | undefined {
+export function getCsrfTokenFromJson(
+  body: Record<string, unknown>,
+): string | undefined {
   const token = body[CSRF_FIELD_NAME];
   return typeof token === "string" ? token : undefined;
 }
@@ -131,7 +131,10 @@ export async function validateCsrfToken(
   } else {
     // Try to parse as form data if content type is form-urlencoded
     const contentType = request.headers.get("Content-Type") || "";
-    if (contentType.includes("application/x-www-form-urlencoded") || contentType.includes("multipart/form-data")) {
+    if (
+      contentType.includes("application/x-www-form-urlencoded") ||
+      contentType.includes("multipart/form-data")
+    ) {
       const fd = await request.formData();
       bodyToken = getCsrfTokenFromForm(fd);
     } else if (contentType.includes("application/json")) {
@@ -198,17 +201,13 @@ function constantTimeEquals(a: string, b: string): boolean {
   return result === 0;
 }
 
+import { createErrorResponse } from "../api/errors.ts";
+
 /**
  * Create CSRF error response
  *
  * @returns Response with 403 Forbidden status and error message
  */
 export function createCsrfErrorResponse(): Response {
-  return new Response(
-    JSON.stringify({ error: "Invalid CSRF token" }),
-    {
-      status: 403,
-      headers: { "Content-Type": "application/json" },
-    },
-  );
+  return createErrorResponse(403, "Forbidden", "Invalid CSRF token");
 }

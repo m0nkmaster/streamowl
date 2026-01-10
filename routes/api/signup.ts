@@ -4,15 +4,21 @@ import { hashPassword } from "../../lib/auth/password.ts";
 import { createSessionToken } from "../../lib/auth/jwt.ts";
 import { setSessionCookie } from "../../lib/auth/cookies.ts";
 import {
-  validateCsrfToken,
   createCsrfErrorResponse,
+  validateCsrfToken,
 } from "../../lib/security/csrf.ts";
 import {
   checkRateLimit,
-  recordFailedAttempt,
   clearFailedAttempts,
   getClientIp,
+  recordFailedAttempt,
 } from "../../lib/security/rate-limit.ts";
+import {
+  createBadRequestResponse,
+  createErrorResponse,
+  createInternalServerErrorResponse,
+  createTooManyRequestsResponse,
+} from "../../lib/api/errors.ts";
 
 interface SignupRequest {
   email: string;
@@ -40,52 +46,28 @@ export const handler: Handlers = {
       const clientIp = getClientIp(req);
       const rateLimitCheck = checkRateLimit(clientIp);
       if (rateLimitCheck.isBlocked) {
-        return new Response(
-          JSON.stringify({
-            error: "Too many signup attempts. Please try again later.",
-            rateLimitExceeded: true,
-            remainingSeconds: rateLimitCheck.remainingSeconds,
-          }),
-          {
-            status: 429,
-            headers: { "Content-Type": "application/json" },
-          },
+        return createTooManyRequestsResponse(
+          "Too many signup attempts. Please try again later.",
+          rateLimitCheck.remainingSeconds,
         );
       }
 
       // Validate input
       if (!email || !password) {
-        return new Response(
-          JSON.stringify({ error: "Email and password are required" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        return createBadRequestResponse("Email and password are required");
       }
 
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        return new Response(
-          JSON.stringify({ error: "Invalid email format" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        return createBadRequestResponse("Invalid email format", "email");
       }
 
       // Validate password length
       if (password.length < 8) {
-        return new Response(
-          JSON.stringify({
-            error: "Password must be at least 8 characters long",
-          }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
+        return createBadRequestResponse(
+          "Password must be at least 8 characters long",
+          "password",
         );
       }
 
@@ -98,12 +80,10 @@ export const handler: Handlers = {
       if (existingUsers.length > 0) {
         // Record failed attempt for duplicate email (potential abuse)
         recordFailedAttempt(clientIp);
-        return new Response(
-          JSON.stringify({ error: "Email already registered" }),
-          {
-            status: 409,
-            headers: { "Content-Type": "application/json" },
-          },
+        return createErrorResponse(
+          409,
+          "Conflict",
+          "Email already registered",
         );
       }
 
@@ -139,14 +119,9 @@ export const handler: Handlers = {
         headers,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.error("Signup error:", message);
-      return new Response(
-        JSON.stringify({ error: "Failed to create account" }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        },
+      return createInternalServerErrorResponse(
+        "Failed to create account",
+        error,
       );
     }
   },

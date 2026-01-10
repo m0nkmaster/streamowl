@@ -1,8 +1,8 @@
 import { type Handlers, type PageProps } from "$fresh/server.ts";
 import {
+  CSRF_FIELD_NAME,
   generateCsrfToken,
   setCsrfCookie,
-  CSRF_FIELD_NAME,
 } from "../lib/security/csrf.ts";
 
 interface SignupPageProps {

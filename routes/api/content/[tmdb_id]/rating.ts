@@ -9,6 +9,11 @@ import {
   type MovieDetails,
   type TvDetails,
 } from "../../../../lib/tmdb/client.ts";
+import {
+  createBadRequestResponse,
+  createInternalServerErrorResponse,
+  createNotFoundResponse,
+} from "../../../../lib/api/errors.ts";
 
 /**
  * API endpoint to set user rating for content
@@ -31,13 +36,7 @@ export const handler: Handlers = {
 
       // Validate TMDB ID
       if (!Number.isInteger(tmdbId) || tmdbId <= 0) {
-        return new Response(
-          JSON.stringify({ error: "Invalid content ID" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        return createBadRequestResponse("Invalid content ID", "tmdb_id");
       }
 
       // Parse request body
@@ -46,12 +45,9 @@ export const handler: Handlers = {
 
       // Validate rating
       if (typeof rating !== "number" || rating < 0 || rating > 10) {
-        return new Response(
-          JSON.stringify({ error: "Rating must be between 0 and 10" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
+        return createBadRequestResponse(
+          "Rating must be between 0 and 10",
+          "rating",
         );
       }
 
@@ -70,13 +66,7 @@ export const handler: Handlers = {
           tmdbDetails = await getTvDetails(tmdbId);
           contentType = "tv";
         } catch (_tvError) {
-          return new Response(
-            JSON.stringify({ error: "Content not found" }),
-            {
-              status: 404,
-              headers: { "Content-Type": "application/json" },
-            },
-          );
+          return createNotFoundResponse("Content not found");
         }
       }
 
@@ -125,13 +115,9 @@ export const handler: Handlers = {
         },
       );
     } catch (error) {
-      console.error("Error setting rating:", error);
-      return new Response(
-        JSON.stringify({ error: "Internal server error" }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        },
+      return createInternalServerErrorResponse(
+        "Failed to set rating",
+        error,
       );
     }
   },
@@ -147,13 +133,7 @@ export const handler: Handlers = {
 
       // Validate TMDB ID
       if (!Number.isInteger(tmdbId) || tmdbId <= 0) {
-        return new Response(
-          JSON.stringify({ error: "Invalid content ID" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        return createBadRequestResponse("Invalid content ID", "tmdb_id");
       }
 
       // Get content record
@@ -163,13 +143,7 @@ export const handler: Handlers = {
       );
 
       if (content.length === 0) {
-        return new Response(
-          JSON.stringify({ error: "Content not found" }),
-          {
-            status: 404,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        return createNotFoundResponse("Content not found");
       }
 
       const contentId = content[0].id;
@@ -198,13 +172,9 @@ export const handler: Handlers = {
         },
       );
     } catch (error) {
-      console.error("Error removing rating:", error);
-      return new Response(
-        JSON.stringify({ error: "Internal server error" }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        },
+      return createInternalServerErrorResponse(
+        "Failed to remove rating",
+        error,
       );
     }
   },

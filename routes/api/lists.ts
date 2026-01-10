@@ -1,6 +1,10 @@
 import { type Handlers } from "$fresh/server.ts";
 import { requireAuthForApi } from "../../lib/auth/middleware.ts";
 import { query } from "../../lib/db.ts";
+import {
+  createBadRequestResponse,
+  createInternalServerErrorResponse,
+} from "../../lib/api/errors.ts";
 
 /**
  * API endpoint for managing custom lists
@@ -23,34 +27,22 @@ export const handler: Handlers = {
 
       // Validate input
       if (!name || typeof name !== "string" || name.trim().length === 0) {
-        return new Response(
-          JSON.stringify({ error: "List name is required" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        return createBadRequestResponse("List name is required", "name");
       }
 
       // Validate name length
       if (name.trim().length > 255) {
-        return new Response(
-          JSON.stringify({ error: "List name must be 255 characters or less" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
+        return createBadRequestResponse(
+          "List name must be 255 characters or less",
+          "name",
         );
       }
 
       // Validate description if provided
       if (description !== undefined && typeof description !== "string") {
-        return new Response(
-          JSON.stringify({ error: "Description must be a string" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
+        return createBadRequestResponse(
+          "Description must be a string",
+          "description",
         );
       }
 
@@ -90,13 +82,9 @@ export const handler: Handlers = {
         },
       );
     } catch (error) {
-      console.error("Error creating list:", error);
-      return new Response(
-        JSON.stringify({ error: "Internal server error" }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        },
+      return createInternalServerErrorResponse(
+        "Failed to create list",
+        error,
       );
     }
   },

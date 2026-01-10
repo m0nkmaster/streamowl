@@ -1,5 +1,9 @@
 import { type Handlers } from "$fresh/server.ts";
 import { type Content, getTrending } from "../../lib/tmdb/client.ts";
+import {
+  createBadRequestResponse,
+  createInternalServerErrorResponse,
+} from "../../lib/api/errors.ts";
 
 interface TrendingResponse {
   results: Content[];
@@ -23,23 +27,17 @@ export const handler: Handlers = {
 
       // Validate time window
       if (timeWindow !== "day" && timeWindow !== "week") {
-        return new Response(
-          JSON.stringify({ error: "time_window must be 'day' or 'week'" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
+        return createBadRequestResponse(
+          "time_window must be 'day' or 'week'",
+          "time_window",
         );
       }
 
       // Validate page number
       if (!Number.isInteger(page) || page < 1) {
-        return new Response(
-          JSON.stringify({ error: "Page must be a positive integer" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
+        return createBadRequestResponse(
+          "Page must be a positive integer",
+          "page",
         );
       }
 
@@ -61,14 +59,9 @@ export const handler: Handlers = {
         },
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.error("Trending error:", message);
-      return new Response(
-        JSON.stringify({ error: "Failed to fetch trending content" }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        },
+      return createInternalServerErrorResponse(
+        "Failed to fetch trending content",
+        error,
       );
     }
   },

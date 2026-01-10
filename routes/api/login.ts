@@ -4,15 +4,21 @@ import { verifyPassword } from "../../lib/auth/password.ts";
 import { createSessionToken } from "../../lib/auth/jwt.ts";
 import { setSessionCookie } from "../../lib/auth/cookies.ts";
 import {
-  validateCsrfToken,
   createCsrfErrorResponse,
+  validateCsrfToken,
 } from "../../lib/security/csrf.ts";
 import {
   checkRateLimit,
-  recordFailedAttempt,
   clearFailedAttempts,
   getClientIp,
+  recordFailedAttempt,
 } from "../../lib/security/rate-limit.ts";
+import {
+  createBadRequestResponse,
+  createInternalServerErrorResponse,
+  createTooManyRequestsResponse,
+  createUnauthorizedResponse,
+} from "../../lib/api/errors.ts";
 
 interface LoginRequest {
   email: string;
@@ -40,40 +46,21 @@ export const handler: Handlers = {
       const clientIp = getClientIp(req);
       const rateLimitCheck = checkRateLimit(clientIp);
       if (rateLimitCheck.isBlocked) {
-        return new Response(
-          JSON.stringify({
-            error: "Too many failed login attempts. Please try again later.",
-            rateLimitExceeded: true,
-            remainingSeconds: rateLimitCheck.remainingSeconds,
-          }),
-          {
-            status: 429,
-            headers: { "Content-Type": "application/json" },
-          },
+        return createTooManyRequestsResponse(
+          "Too many failed login attempts. Please try again later.",
+          rateLimitCheck.remainingSeconds,
         );
       }
 
       // Validate input
       if (!email || !password) {
-        return new Response(
-          JSON.stringify({ error: "Email and password are required" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        return createBadRequestResponse("Email and password are required");
       }
 
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
-        return new Response(
-          JSON.stringify({ error: "Invalid email format" }),
-          {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        return createBadRequestResponse("Invalid email format", "email");
       }
 
       // Find user by email
@@ -89,13 +76,7 @@ export const handler: Handlers = {
       if (users.length === 0) {
         // Record failed attempt for invalid email
         recordFailedAttempt(clientIp);
-        return new Response(
-          JSON.stringify({ error: "Invalid email or password" }),
-          {
-            status: 401,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        return createUnauthorizedResponse("Invalid email or password");
       }
 
       const user = users[0];
@@ -109,13 +90,7 @@ export const handler: Handlers = {
       if (!isValidPassword) {
         // Record failed attempt for invalid password
         recordFailedAttempt(clientIp);
-        return new Response(
-          JSON.stringify({ error: "Invalid email or password" }),
-          {
-            status: 401,
-            headers: { "Content-Type": "application/json" },
-          },
-        );
+        return createUnauthorizedResponse("Invalid email or password");
       }
 
       // Clear failed attempts on successful login
@@ -140,15 +115,7 @@ export const handler: Handlers = {
         headers,
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      console.error("Login error:", message);
-      return new Response(
-        JSON.stringify({ error: "Failed to log in" }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
+      return createInternalServerErrorResponse("Failed to log in", error);
     }
   },
 };

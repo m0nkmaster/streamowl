@@ -37,7 +37,9 @@ async function makeRequest(
 /**
  * Extract CSRF token from Set-Cookie header
  */
-function extractCsrfTokenFromCookie(cookieHeader: string | null): string | null {
+function extractCsrfTokenFromCookie(
+  cookieHeader: string | null,
+): string | null {
   if (!cookieHeader) return null;
   const cookies = cookieHeader.split(", ");
   const csrfCookie = cookies.find((c) => c.startsWith("csrf_token="));
@@ -125,7 +127,9 @@ async function testInvalidCsrfToken(): Promise<void> {
     const body = await response.json();
     if (body.error === "Invalid CSRF token") {
       results.push({ name: "Invalid CSRF token rejected", passed: true });
-      console.log("✓ Passed: Request with invalid CSRF token correctly rejected");
+      console.log(
+        "✓ Passed: Request with invalid CSRF token correctly rejected",
+      );
     } else {
       results.push({
         name: "Invalid CSRF token rejected",
@@ -213,7 +217,7 @@ async function testValidCsrfToken(): Promise<void> {
  */
 async function runTests(): Promise<void> {
   console.log("Testing CSRF Protection\n");
-  console.log("=" .repeat(50));
+  console.log("=".repeat(50));
 
   try {
     await testMissingCsrfToken();
