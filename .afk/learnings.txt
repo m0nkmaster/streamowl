@@ -1019,3 +1019,15 @@
 - Pattern for updating: POST with { displayName } to /api/settings/profile endpoint
 - Avatar display: Shows user's avatar_url if set, otherwise shows a coloured circle with first letter of name/email
 
+
+## Streaming Deep Links
+
+- Deep links utility module: Created `lib/streaming/deep-links.ts` for generating provider-specific URLs
+- Provider mapping: Maps TMDB provider names (e.g., "Netflix", "Disney+") to their web search URLs
+- Deep link templates: Use placeholders like `{title}` that get URL-encoded at runtime
+- Search-based approach: Links go to provider search pages (e.g., netflix.com/search?q=title) rather than direct content pages since streaming services don't expose content IDs compatible with TMDB IDs
+- Content detail integration: Updated `routes/content/[tmdb_id].tsx` to show "Open in app →" label for providers with deep link support
+- Fallback behaviour: If no deep link template exists for a provider, falls back to TMDB's generic watch provider link
+- Provider coverage: Supports 30+ streaming services including Netflix, Disney+, Amazon, BBC iPlayer, Hulu, Paramount+, etc.
+- Helper functions: `generateDeepLink()` creates URLs, `hasDeepLinkSupport()` checks if provider is mapped
+

@@ -1376,7 +1376,7 @@
         "Step 3: Verify redirect to Netflix app or website",
         "Step 4: Verify content page opens (where supported)"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "content-sync-background",
