@@ -1,5 +1,6 @@
 {
-  "sources": [],
+  "sources": [
+  ],
   "feedback_loops": {
     "custom": {}
   },
@@ -13,15 +14,14 @@
     "file_path": ".afk/prompt.md"
   },
   "ai_cli": {
-    "command": "claude",
-    "args": [
-      "--dangerously-skip-permissions",
-      "-p"
-    ]
+    "command": "agent", 
+    "args": ["--force", "-p"]
   },
   "prompt": {
     "template": "default",
-    "context_files": [],
+    "context_files": [
+      "AGENTS.md"
+    ],
     "instructions": []
   },
   "git": {
