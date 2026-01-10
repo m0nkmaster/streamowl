@@ -134,3 +134,8 @@
 - Content model mapping: Map TMDB movie search results to internal Content interface with tmdb_id, type: 'movie', title, overview, release_date, poster_path, backdrop_path, and metadata object
 - Pagination validation: Validate page number is positive integer, validate query is non-empty string before making API request
 - Search test script: Created `scripts/test-tmdb-search.ts` to test search functionality, pagination, and error handling, added `deno task test:tmdb-search` to deno.json
+- TV show search function: Created `searchTv()` function in TMDB client that accepts query string and page number, returns paginated results with type 'tv'
+- TMDB TV search endpoint: Use `/search/tv` endpoint with `query` and `page` parameters for TV show search
+- TV show field mapping: TMDB TV shows use `name` field instead of `title`, and `first_air_date` instead of `release_date` - map these to internal Content model fields
+- TV search response mapping: TMDB TV search returns same structure as movie search but with TV-specific fields, map to Content model with type 'tv'
+- TV content type verification: Test script verifies all search results have type 'tv' to ensure correct mapping

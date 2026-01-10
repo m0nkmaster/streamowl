@@ -219,7 +219,7 @@
         "Step 3: Test searching for 'Breaking Bad' returns correct results",
         "Step 4: Verify content type is correctly set to 'tv'"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "tmdb-content-details",
