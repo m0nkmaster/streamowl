@@ -102,6 +102,16 @@ export function createInternalServerErrorResponse(
 }
 
 /**
+ * Create a 403 Forbidden response
+ */
+export function createForbiddenResponse(
+  message: string,
+  code?: string,
+): Response {
+  return createErrorResponse(403, "Forbidden", message, undefined, code);
+}
+
+/**
  * Create a 429 Too Many Requests response
  */
 export function createTooManyRequestsResponse(

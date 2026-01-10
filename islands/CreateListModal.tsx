@@ -19,6 +19,7 @@ export default function CreateListModal({
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
 
   if (!IS_BROWSER || !isOpen) {
     return null;
@@ -43,7 +44,12 @@ export default function CreateListModal({
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Failed to create list");
+        // Check if this is a list limit error
+        if (data.code === "LIST_LIMIT_REACHED") {
+          setShowUpgradePrompt(true);
+          return;
+        }
+        throw new Error(data.message || data.error || "Failed to create list");
       }
 
       // Reset form
@@ -62,6 +68,7 @@ export default function CreateListModal({
     setName("");
     setDescription("");
     setError(null);
+    setShowUpgradePrompt(false);
     onClose();
   };
 
@@ -155,17 +162,63 @@ export default function CreateListModal({
                       />
                     </div>
 
-                    {error && (
-                      <div class="rounded-md bg-red-50 p-4">
-                        <p class="text-sm text-red-800">{error}</p>
-                      </div>
-                    )}
+                    {showUpgradePrompt
+                      ? (
+                        <div class="rounded-md bg-indigo-50 p-4">
+                          <div class="flex">
+                            <div class="flex-shrink-0">
+                              <svg
+                                class="h-5 w-5 text-indigo-400"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                  clip-rule="evenodd"
+                                />
+                              </svg>
+                            </div>
+                            <div class="ml-3 flex-1">
+                              <h3 class="text-sm font-medium text-indigo-800">
+                                List Limit Reached
+                              </h3>
+                              <div class="mt-2 text-sm text-indigo-700">
+                                <p>
+                                  Free accounts are limited to 3 custom lists.
+                                  Upgrade to Premium for unlimited lists and
+                                  other exclusive features.
+                                </p>
+                              </div>
+                              <div class="mt-4">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    // TODO: Navigate to upgrade page when implemented
+                                    globalThis.location.href = "/settings";
+                                  }}
+                                  class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                                >
+                                  Upgrade to Premium
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                      : error
+                      ? (
+                        <div class="rounded-md bg-red-50 p-4">
+                          <p class="text-sm text-red-800">{error}</p>
+                        </div>
+                      )
+                      : null}
                   </div>
 
                   <div class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
                     <button
                       type="submit"
-                      disabled={loading || !name.trim()}
+                      disabled={loading || !name.trim() || showUpgradePrompt}
                       class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:col-start-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {loading ? "Creating..." : "Create List"}
