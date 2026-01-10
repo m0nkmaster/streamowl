@@ -104,3 +104,13 @@
 - Authentication errors: Return generic "Invalid email or password" message for both non-existent users and incorrect passwords (prevents user enumeration)
 - Error status codes: Use 401 Unauthorized for authentication failures, 400 for validation errors
 - Session creation on login: Create JWT session token and set cookie after successful password verification, same as signup flow
+
+## Route Protection & Authentication
+
+- Protected routes in Fresh: Export a `handler` object with GET/POST/etc methods from route files to add middleware logic
+- Route protection pattern: Check session in handler, redirect to login with return URL if unauthenticated, render page if authenticated
+- Return URL handling: Preserve original destination in `returnTo` query parameter, validate to prevent open redirects (must start with "/")
+- Login redirect flow: Extract `returnTo` from form data after login, default to "/dashboard" if not provided, redirect user back to original destination
+- API route protection: Use `requireAuthForApi()` helper function to check authentication and return 401 JSON response for unauthenticated requests
+- Redirect status codes: Use 302 Found for redirects to login page, 303 See Other for redirects after POST requests
+- Session checking: Use `getSessionFromRequest()` from middleware to extract and validate session token in route handlers

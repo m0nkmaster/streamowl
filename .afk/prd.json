@@ -180,7 +180,7 @@
         "Step 3: Log in and verify redirect back to /library",
         "Step 4: Verify API routes return 401 for unauthenticated requests"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "tmdb-api-integration",

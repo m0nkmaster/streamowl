@@ -86,3 +86,31 @@ export function requireAuth(
   }
   return ctx.state.session;
 }
+
+/**
+ * Require authentication for API route handlers
+ * 
+ * Use this in API route handlers to ensure the user is authenticated.
+ * Returns 401 JSON response if not authenticated.
+ * 
+ * @param request Request object
+ * @returns Session payload if authenticated
+ * @throws Response with 401 JSON status if not authenticated
+ */
+export async function requireAuthForApi(
+  request: Request,
+): Promise<SessionPayload> {
+  const session = await getSessionFromRequest(request);
+  
+  if (!session) {
+    throw new Response(
+      JSON.stringify({ error: "Unauthorized" }),
+      {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  }
+  
+  return session;
+}

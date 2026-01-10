@@ -2,7 +2,7 @@ import { type Handlers } from "$fresh/server.ts";
 import { getSessionFromRequest } from "../lib/auth/middleware.ts";
 
 /**
- * Protected dashboard route - requires authentication
+ * Protected library route - requires authentication
  * Redirects unauthenticated users to login with return URL
  */
 export const handler: Handlers = {
@@ -28,13 +28,13 @@ export const handler: Handlers = {
   },
 };
 
-export default function DashboardPage() {
+export default function LibraryPage() {
   return (
     <div class="min-h-screen bg-gray-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <h1 class="text-3xl font-bold text-gray-900">Library</h1>
         <p class="mt-2 text-gray-600">
-          Welcome to your Stream Owl dashboard!
+          Your content library will appear here.
         </p>
       </div>
     </div>

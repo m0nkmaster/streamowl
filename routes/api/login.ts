@@ -84,10 +84,16 @@ export const handler: Handlers = {
       // Create session token
       const token = await createSessionToken(user.id, user.email);
 
-      // Set session cookie and redirect to dashboard
+      // Get return URL from form data or default to dashboard
+      const returnTo = formData.get("returnTo")?.toString() || "/dashboard";
+      
+      // Validate returnTo to prevent open redirects (must be relative path)
+      const returnUrl = returnTo.startsWith("/") ? returnTo : "/dashboard";
+
+      // Set session cookie and redirect to return URL
       const headers = new Headers();
       setSessionCookie(headers, token);
-      headers.set("Location", "/dashboard");
+      headers.set("Location", returnUrl);
 
       return new Response(null, {
         status: 303, // See Other (redirect after POST)

@@ -1,4 +1,8 @@
-export default function LoginPage() {
+import { type PageProps } from "$fresh/server.ts";
+
+export default function LoginPage(props: PageProps) {
+  const returnTo = props.url.searchParams.get("returnTo") || "/dashboard";
+  
   return (
     <div class="min-h-screen flex items-center justify-center bg-gray-50">
       <div class="max-w-md w-full space-y-8 p-8">
@@ -8,6 +12,7 @@ export default function LoginPage() {
           </h2>
         </div>
         <form class="mt-8 space-y-6" method="POST" action="/api/login">
+          <input type="hidden" name="returnTo" value={returnTo} />
           <div class="rounded-md shadow-sm -space-y-px">
             <div>
               <label for="email" class="sr-only">Email address</label>
