@@ -9,7 +9,9 @@
     "preview": "deno run -A main.ts",
     "update": "deno run -A -r https://fresh.deno.dev/update .",
     "typecheck": "deno check **/*.ts **/*.tsx",
-    "test:db": "deno run -A scripts/test-db.ts"
+    "test:db": "deno run -A scripts/test-db.ts",
+    "migrate": "deno run -A scripts/migrate.ts",
+    "test:users": "deno run -A scripts/test-users-table.ts"
   },
   "lint": {
     "rules": {

@@ -37,7 +37,7 @@
         "Step 3: Verify table exists with correct columns using psql or admin tool",
         "Step 4: Test inserting and retrieving a user record"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "database-schema-content",
