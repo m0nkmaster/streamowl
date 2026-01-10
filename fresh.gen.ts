@@ -3,28 +3,163 @@
 // This file is automatically updated during development when running `dev.ts`.
 
 import * as $_app from "./routes/_app.tsx";
+import * as $api_path_ from "./routes/api/[...path].ts";
+import * as $api_auth_google from "./routes/api/auth/google.ts";
+import * as $api_auth_google_callback from "./routes/api/auth/google/callback.ts";
+import * as $api_content_tmdb_id_favourite from "./routes/api/content/[tmdb_id]/favourite.ts";
+import * as $api_content_tmdb_id_notes from "./routes/api/content/[tmdb_id]/notes.ts";
+import * as $api_content_tmdb_id_rating from "./routes/api/content/[tmdb_id]/rating.ts";
+import * as $api_content_tmdb_id_status from "./routes/api/content/[tmdb_id]/status.ts";
+import * as $api_content_tmdb_id_tags from "./routes/api/content/[tmdb_id]/tags.ts";
+import * as $api_content_tmdb_id_tags_tag_id_ from "./routes/api/content/[tmdb_id]/tags/[tag_id].ts";
+import * as $api_content_tmdb_id_watched from "./routes/api/content/[tmdb_id]/watched.ts";
+import * as $api_content_tmdb_id_watchlist from "./routes/api/content/[tmdb_id]/watchlist.ts";
+import * as $api_forgot_password from "./routes/api/forgot-password.ts";
+import * as $api_jobs_process_embeddings from "./routes/api/jobs/process-embeddings.ts";
+import * as $api_library_favourites from "./routes/api/library/favourites.ts";
+import * as $api_library_lists from "./routes/api/library/lists.ts";
+import * as $api_library_watched from "./routes/api/library/watched.ts";
+import * as $api_library_watchlist from "./routes/api/library/watchlist.ts";
+import * as $api_lists from "./routes/api/lists.ts";
+import * as $api_lists_list_id_ from "./routes/api/lists/[list_id].ts";
+import * as $api_lists_list_id_items from "./routes/api/lists/[list_id]/items.ts";
 import * as $api_login from "./routes/api/login.ts";
+import * as $api_logout from "./routes/api/logout.ts";
+import * as $api_new_releases from "./routes/api/new-releases.ts";
+import * as $api_recommendations from "./routes/api/recommendations.ts";
+import * as $api_recommendations_tmdb_id_chat from "./routes/api/recommendations/[tmdb_id]/chat.ts";
+import * as $api_recommendations_tmdb_id_dismiss from "./routes/api/recommendations/[tmdb_id]/dismiss.ts";
+import * as $api_recommendations_chat from "./routes/api/recommendations/chat.ts";
+import * as $api_recommendations_mood from "./routes/api/recommendations/mood.ts";
+import * as $api_reset_password from "./routes/api/reset-password.ts";
+import * as $api_search from "./routes/api/search.ts";
+import * as $api_search_providers from "./routes/api/search/providers.ts";
+import * as $api_settings_public_profile from "./routes/api/settings/public-profile.ts";
+import * as $api_settings_region from "./routes/api/settings/region.ts";
 import * as $api_signup from "./routes/api/signup.ts";
+import * as $api_tags from "./routes/api/tags.ts";
+import * as $api_trending from "./routes/api/trending.ts";
+import * as $api_user_premium from "./routes/api/user/premium.ts";
+import * as $browse from "./routes/browse.tsx";
+import * as $content_tmdb_id_ from "./routes/content/[tmdb_id].tsx";
 import * as $dashboard from "./routes/dashboard.tsx";
+import * as $forgot_password from "./routes/forgot-password.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $library from "./routes/library.tsx";
+import * as $lists_list_id_ from "./routes/lists/[list_id].tsx";
 import * as $login from "./routes/login.tsx";
+import * as $profile_user_id_ from "./routes/profile/[user_id].tsx";
+import * as $reset_password from "./routes/reset-password.tsx";
+import * as $search from "./routes/search.tsx";
+import * as $settings from "./routes/settings.tsx";
 import * as $signup from "./routes/signup.tsx";
-
+import * as $AddToListButton from "./islands/AddToListButton.tsx";
+import * as $AddToWatchlistButton from "./islands/AddToWatchlistButton.tsx";
+import * as $BrowsePage from "./islands/BrowsePage.tsx";
+import * as $ContinueWatching from "./islands/ContinueWatching.tsx";
+import * as $CreateListModal from "./islands/CreateListModal.tsx";
+import * as $FavouriteButton from "./islands/FavouriteButton.tsx";
+import * as $LibraryTabs from "./islands/LibraryTabs.tsx";
+import * as $ListSettings from "./islands/ListSettings.tsx";
+import * as $MarkAsWatchedButton from "./islands/MarkAsWatchedButton.tsx";
+import * as $Navigation from "./islands/Navigation.tsx";
+import * as $NewReleases from "./islands/NewReleases.tsx";
+import * as $NotesComponent from "./islands/NotesComponent.tsx";
+import * as $PublicProfilePage from "./islands/PublicProfilePage.tsx";
+import * as $QuickActions from "./islands/QuickActions.tsx";
+import * as $RatingComponent from "./islands/RatingComponent.tsx";
+import * as $RecommendationChat from "./islands/RecommendationChat.tsx";
+import * as $RecommendationFeed from "./islands/RecommendationFeed.tsx";
+import * as $ReorderableList from "./islands/ReorderableList.tsx";
+import * as $SearchPage from "./islands/SearchPage.tsx";
+import * as $SettingsPage from "./islands/SettingsPage.tsx";
+import * as $TagsComponent from "./islands/TagsComponent.tsx";
+import * as $Toast from "./islands/Toast.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
   routes: {
     "./routes/_app.tsx": $_app,
+    "./routes/api/[...path].ts": $api_path_,
+    "./routes/api/auth/google.ts": $api_auth_google,
+    "./routes/api/auth/google/callback.ts": $api_auth_google_callback,
+    "./routes/api/content/[tmdb_id]/favourite.ts":
+      $api_content_tmdb_id_favourite,
+    "./routes/api/content/[tmdb_id]/notes.ts": $api_content_tmdb_id_notes,
+    "./routes/api/content/[tmdb_id]/rating.ts": $api_content_tmdb_id_rating,
+    "./routes/api/content/[tmdb_id]/status.ts": $api_content_tmdb_id_status,
+    "./routes/api/content/[tmdb_id]/tags.ts": $api_content_tmdb_id_tags,
+    "./routes/api/content/[tmdb_id]/tags/[tag_id].ts":
+      $api_content_tmdb_id_tags_tag_id_,
+    "./routes/api/content/[tmdb_id]/watched.ts": $api_content_tmdb_id_watched,
+    "./routes/api/content/[tmdb_id]/watchlist.ts":
+      $api_content_tmdb_id_watchlist,
+    "./routes/api/forgot-password.ts": $api_forgot_password,
+    "./routes/api/jobs/process-embeddings.ts": $api_jobs_process_embeddings,
+    "./routes/api/library/favourites.ts": $api_library_favourites,
+    "./routes/api/library/lists.ts": $api_library_lists,
+    "./routes/api/library/watched.ts": $api_library_watched,
+    "./routes/api/library/watchlist.ts": $api_library_watchlist,
+    "./routes/api/lists.ts": $api_lists,
+    "./routes/api/lists/[list_id].ts": $api_lists_list_id_,
+    "./routes/api/lists/[list_id]/items.ts": $api_lists_list_id_items,
     "./routes/api/login.ts": $api_login,
+    "./routes/api/logout.ts": $api_logout,
+    "./routes/api/new-releases.ts": $api_new_releases,
+    "./routes/api/recommendations.ts": $api_recommendations,
+    "./routes/api/recommendations/[tmdb_id]/chat.ts":
+      $api_recommendations_tmdb_id_chat,
+    "./routes/api/recommendations/[tmdb_id]/dismiss.ts":
+      $api_recommendations_tmdb_id_dismiss,
+    "./routes/api/recommendations/chat.ts": $api_recommendations_chat,
+    "./routes/api/recommendations/mood.ts": $api_recommendations_mood,
+    "./routes/api/reset-password.ts": $api_reset_password,
+    "./routes/api/search.ts": $api_search,
+    "./routes/api/search/providers.ts": $api_search_providers,
+    "./routes/api/settings/public-profile.ts": $api_settings_public_profile,
+    "./routes/api/settings/region.ts": $api_settings_region,
     "./routes/api/signup.ts": $api_signup,
+    "./routes/api/tags.ts": $api_tags,
+    "./routes/api/trending.ts": $api_trending,
+    "./routes/api/user/premium.ts": $api_user_premium,
+    "./routes/browse.tsx": $browse,
+    "./routes/content/[tmdb_id].tsx": $content_tmdb_id_,
     "./routes/dashboard.tsx": $dashboard,
+    "./routes/forgot-password.tsx": $forgot_password,
     "./routes/index.tsx": $index,
     "./routes/library.tsx": $library,
+    "./routes/lists/[list_id].tsx": $lists_list_id_,
     "./routes/login.tsx": $login,
+    "./routes/profile/[user_id].tsx": $profile_user_id_,
+    "./routes/reset-password.tsx": $reset_password,
+    "./routes/search.tsx": $search,
+    "./routes/settings.tsx": $settings,
     "./routes/signup.tsx": $signup,
   },
-  islands: {},
+  islands: {
+    "./islands/AddToListButton.tsx": $AddToListButton,
+    "./islands/AddToWatchlistButton.tsx": $AddToWatchlistButton,
+    "./islands/BrowsePage.tsx": $BrowsePage,
+    "./islands/ContinueWatching.tsx": $ContinueWatching,
+    "./islands/CreateListModal.tsx": $CreateListModal,
+    "./islands/FavouriteButton.tsx": $FavouriteButton,
+    "./islands/LibraryTabs.tsx": $LibraryTabs,
+    "./islands/ListSettings.tsx": $ListSettings,
+    "./islands/MarkAsWatchedButton.tsx": $MarkAsWatchedButton,
+    "./islands/Navigation.tsx": $Navigation,
+    "./islands/NewReleases.tsx": $NewReleases,
+    "./islands/NotesComponent.tsx": $NotesComponent,
+    "./islands/PublicProfilePage.tsx": $PublicProfilePage,
+    "./islands/QuickActions.tsx": $QuickActions,
+    "./islands/RatingComponent.tsx": $RatingComponent,
+    "./islands/RecommendationChat.tsx": $RecommendationChat,
+    "./islands/RecommendationFeed.tsx": $RecommendationFeed,
+    "./islands/ReorderableList.tsx": $ReorderableList,
+    "./islands/SearchPage.tsx": $SearchPage,
+    "./islands/SettingsPage.tsx": $SettingsPage,
+    "./islands/TagsComponent.tsx": $TagsComponent,
+    "./islands/Toast.tsx": $Toast,
+  },
   baseUrl: import.meta.url,
 } satisfies Manifest;
 

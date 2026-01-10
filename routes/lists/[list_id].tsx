@@ -2,6 +2,7 @@ import { type Handlers } from "$fresh/server.ts";
 import { getSessionFromRequest } from "../../lib/auth/middleware.ts";
 import { query } from "../../lib/db.ts";
 import ReorderableList from "../../islands/ReorderableList.tsx";
+import ListSettings from "../../islands/ListSettings.tsx";
 
 /**
  * Route for viewing a custom list
@@ -153,6 +154,15 @@ export default function ListPage({ data }: { data: ListPageProps }) {
             )}
           </div>
         </div>
+
+        {isOwner && (
+          <div class="mb-6">
+            <ListSettings
+              listId={list.id}
+              initialIsPublic={list.is_public}
+            />
+          </div>
+        )}
 
         <ReorderableList
           listId={list.id}
