@@ -1045,3 +1045,16 @@
 - Provider mapping: `getOrCreateStreamingService()` creates streaming_services records on-the-fly from TMDB provider names
 - Statistics: `getStreamingAvailabilityStats()` provides counts for monitoring sync coverage
 - Pattern follows embedding-queue.ts for background job structure
+
+
+## Email Verification
+
+- Token table structure: Similar to password_reset_tokens, with user_id, token, expires_at, used_at, created_at columns
+- Token generation: Uses crypto.getRandomValues() with 32 bytes, base64 encoded, URL-safe characters
+- Token expiry: Default 48 hours for email verification (longer than password reset's 24 hours since less sensitive)
+- Verification flow: GET /api/auth/verify-email?token=xxx verifies email, updates user.email_verified_at, marks token as used
+- Signup integration: After creating user and session, creates verification token and sends email
+- Resend verification: POST /api/auth/resend-verification allows authenticated users to request new verification email
+- User column added: email_verified_at TIMESTAMP WITH TIME ZONE DEFAULT NULL (NULL means unverified)
+- Email logging: sendVerificationEmail() logs to console in development (replace with email provider in production)
+- URL generation: generateVerificationUrl() creates full verification URL with token as query parameter

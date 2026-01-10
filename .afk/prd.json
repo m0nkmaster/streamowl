@@ -1415,7 +1415,7 @@
         "Step 3: Click verification link",
         "Step 4: Verify account status updates to verified"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-password-reset",
