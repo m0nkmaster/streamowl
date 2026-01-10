@@ -902,3 +902,16 @@
 - Settings integration: Theme toggle added to Settings page as first setting, allowing users to change theme preference from account settings
 - Tailwind dark mode: Uses Tailwind's built-in dark mode support with `dark:` prefix for all dark mode styles, no additional configuration needed
 - GlobalThis usage: Used `globalThis` instead of `window` in client-side code to satisfy Deno lint rules while maintaining browser compatibility
+
+## Accessibility - Keyboard Navigation Implementation
+
+- Focus trap utility: Created `lib/accessibility/focus-trap.ts` utility for modal dialogs that traps focus within modal container, cycles through focusable elements with Tab/Shift+Tab, and handles Escape key to close modals
+- Focus trap implementation: Uses `querySelectorAll` with focusable selectors (a[href], button, input, textarea, select, [tabindex]) to find all focusable elements, stores previous active element for focus restoration on close
+- Modal focus management: Modals use `useRef` to reference modal container, `useEffect` to set up focus trap when modal opens, cleanup function restores focus to previous element when modal closes
+- Escape key handling: Focus trap utility accepts optional `onClose` callback for Escape key, falls back to finding and clicking close button with aria-label containing "close" if no callback provided
+- Global focus styles: Added global CSS in `_app.tsx` with `*:focus-visible` selector to ensure all interactive elements have visible focus indicators (2px solid indigo outline with 2px offset)
+- Focus indicators: All buttons, links, inputs, and other interactive elements should have `focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2` classes for consistent visible focus indicators
+- Keyboard accessibility: All interactive elements (buttons, links, form inputs) are naturally keyboard accessible, but modals require explicit focus trapping to prevent focus from escaping modal boundaries
+- ARIA attributes: Modals should have `role="dialog"`, `aria-modal="true"`, and `aria-labelledby` pointing to modal title for screen reader compatibility
+- Navigation aria-expanded: Mobile menu button uses `aria-expanded={isMobileMenuOpen}` to reflect current state for screen readers
+- Focus restoration: When modals close, focus should return to the element that triggered the modal (stored in `previousActiveElement` before modal opens)

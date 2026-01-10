@@ -1025,7 +1025,7 @@
         "Step 3: Verify focus indicators are visible",
         "Step 4: Verify modal dialogs trap focus correctly"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "accessibility-screen-reader",
