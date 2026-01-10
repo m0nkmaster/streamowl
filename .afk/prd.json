@@ -557,7 +557,7 @@
         "Step 3: Verify only content with that tag displays",
         "Step 4: Select multiple tags and verify AND filtering works"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "browse-trending",

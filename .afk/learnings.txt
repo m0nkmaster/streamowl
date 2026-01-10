@@ -682,3 +682,15 @@
 - Tag fetching: Component fetches user's tags on mount to populate tag selector dropdown, filters out already-applied tags from available tags list
 - Content detail integration: Updated content detail page handler to fetch tags applied to content, passes initialTags prop to TagsComponent for server-side rendering
 - Tag display: Applied tags displayed as colour-coded badges with tag name, sorted alphabetically for consistent display, hover shows remove button for better UX
+
+## Tags - Filter Library Implementation
+
+- Tag filtering API: Updated library API endpoints (/api/library/watched, /api/library/watchlist, /api/library/favourites) to include tag_ids array for each content item using PostgreSQL ARRAY_AGG with LEFT JOIN to content_tags and tags tables, filters tags by user_id to ensure users only see their own tags
+- Tag aggregation query: Use COALESCE(ARRAY_AGG(DISTINCT ct.tag_id) FILTER (WHERE ct.tag_id IS NOT NULL), ARRAY[]::uuid[]) to aggregate tag IDs into array, handles NULL case with empty array, uses DISTINCT to prevent duplicate tags
+- Tag filter sidebar: Added tag filter section to LibraryTabs sidebar above custom lists, displays all user tags with colour indicators, shows selected state with indigo background and checkmark icon
+- Tag selection state: Use Set<string> for selectedTagIds to efficiently track multiple selected tags, toggleTag function adds/removes tags from set, clearTagFilters function resets selection
+- AND filtering logic: filterContentByTags function filters content to only show items that have ALL selected tags (AND logic), checks each selected tag against content's tag_ids array, returns all content when no tags selected
+- Filter application: Applied filterContentByTags to all three content arrays (watchedContent, watchlistContent, favouritesContent) before rendering, ensures filtering works across all library tabs
+- Empty state handling: Added empty state messages when filtered results are empty but original content exists, includes "Clear filters" button to reset tag selection, provides helpful guidance to users
+- Tag fetching: Fetch user's tags on component mount using /api/tags endpoint, displays tags in sidebar sorted alphabetically, shows empty state when no tags exist
+- Tag filter UI: Tag buttons show colour indicator (coloured circle), selected tags have indigo background with checkmark, hover states provide visual feedback, "Clear" button appears when tags are selected
