@@ -1,7 +1,7 @@
 import { type Handlers } from "$fresh/server.ts";
 import { getSessionFromRequest } from "../../lib/auth/middleware.ts";
 import { query } from "../../lib/db.ts";
-import ContentGrid from "../../components/ContentGrid.tsx";
+import ReorderableList from "../../islands/ReorderableList.tsx";
 
 /**
  * Route for viewing a custom list
@@ -97,6 +97,7 @@ export const handler: Handlers = {
           title: item.title,
           poster_path: item.poster_path,
           release_date: item.release_date,
+          position: item.position,
         })),
         isOwner,
       });
@@ -122,19 +123,13 @@ interface ListPageProps {
     title: string;
     poster_path: string | null;
     release_date: string | null;
+    position: number;
   }>;
   isOwner: boolean;
 }
 
 export default function ListPage({ data }: { data: ListPageProps }) {
   const { list, items, isOwner } = data;
-
-  const getPosterUrl = (posterPath: string | null): string => {
-    if (!posterPath) {
-      return "https://via.placeholder.com/300x450?text=No+Poster";
-    }
-    return `https://image.tmdb.org/t/p/w300${posterPath}`;
-  };
 
   return (
     <div class="min-h-screen bg-gray-50">
@@ -159,47 +154,11 @@ export default function ListPage({ data }: { data: ListPageProps }) {
           </div>
         </div>
 
-        {items.length === 0
-          ? (
-            <div class="text-center py-12">
-              <p class="text-gray-600 mb-2">This list is empty.</p>
-              {isOwner && (
-                <p class="text-gray-500 text-sm">
-                  Add content to this list to see it here.
-                </p>
-              )}
-            </div>
-          )
-          : (
-            <ContentGrid>
-              {items.map((item) => (
-                <a
-                  href={`/content/${item.tmdb_id}`}
-                  key={`${item.type}-${item.tmdb_id}`}
-                  class="block group hover:scale-105 transition-transform"
-                >
-                  <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    <img
-                      src={getPosterUrl(item.poster_path)}
-                      alt={item.title}
-                      class="w-full aspect-[2/3] object-cover"
-                      loading="lazy"
-                    />
-                    <div class="p-3">
-                      <h3 class="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-indigo-600">
-                        {item.title}
-                      </h3>
-                      {item.release_date && (
-                        <p class="text-xs text-gray-500 mt-1">
-                          {new Date(item.release_date).getFullYear()}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </a>
-              ))}
-            </ContentGrid>
-          )}
+        <ReorderableList
+          listId={list.id}
+          items={items}
+          isOwner={isOwner}
+        />
       </div>
     </div>
   );
