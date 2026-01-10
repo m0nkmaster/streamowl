@@ -908,7 +908,7 @@
         "Step 3: As premium user, create unlimited lists",
         "Step 4: Verify all premium features accessible"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "data-export",

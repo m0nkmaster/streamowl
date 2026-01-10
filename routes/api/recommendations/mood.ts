@@ -1,5 +1,6 @@
 import { type Handlers } from "$fresh/server.ts";
 import { requireAuthForApi } from "../../../lib/auth/middleware.ts";
+import { isPremiumUser } from "../../../lib/auth/premium.ts";
 import {
   generateMoodBasedRecommendations,
   type RecommendationCandidate,
@@ -17,25 +18,6 @@ interface MoodRecommendationsRequest {
 
 interface MoodRecommendationsResponse {
   recommendations: RecommendationCandidate[];
-}
-
-/**
- * Check if user is premium
- * Premium status is stored in user preferences as preferences.premium = true
- */
-async function isPremiumUser(userId: string): Promise<boolean> {
-  const { query } = await import("../../../lib/db.ts");
-  const result = await query<{ preferences: Record<string, unknown> }>(
-    "SELECT preferences FROM users WHERE id = $1",
-    [userId],
-  );
-
-  if (result.length === 0) {
-    return false;
-  }
-
-  const preferences = result[0].preferences || {};
-  return preferences.premium === true;
 }
 
 /**

@@ -113,7 +113,9 @@ export default function SettingsPage({
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Failed to open subscription portal",
+        err instanceof Error
+          ? err.message
+          : "Failed to open subscription portal",
       );
       setTimeout(() => setError(null), 5000);
     } finally {
@@ -232,7 +234,9 @@ export default function SettingsPage({
                       </h3>
                       <p class="mt-1 text-sm text-indigo-700">
                         {subscriptionDetails.currentPeriodEnd
-                          ? `Renews on ${formatDate(subscriptionDetails.currentPeriodEnd)}`
+                          ? `Renews on ${
+                            formatDate(subscriptionDetails.currentPeriodEnd)
+                          }`
                           : "Active subscription"}
                       </p>
                     </div>
@@ -262,8 +266,8 @@ export default function SettingsPage({
                 </h2>
                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
                   <p class="text-sm text-gray-700 mb-4">
-                    Upgrade to Premium to unlock unlimited custom lists, more
-                    AI recommendations, and exclusive features.
+                    Upgrade to Premium to unlock unlimited custom lists, more AI
+                    recommendations, and exclusive features.
                   </p>
                   <a
                     href="/premium"

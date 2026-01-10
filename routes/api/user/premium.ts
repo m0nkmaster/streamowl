@@ -1,6 +1,6 @@
 import { type Handlers } from "$fresh/server.ts";
 import { requireAuthForApi } from "../../../lib/auth/middleware.ts";
-import { query } from "../../../lib/db.ts";
+import { isPremiumUser } from "../../../lib/auth/premium.ts";
 import { createInternalServerErrorResponse } from "../../../lib/api/errors.ts";
 
 interface PremiumStatusResponse {
@@ -16,17 +16,7 @@ export const handler: Handlers = {
     try {
       const session = await requireAuthForApi(req);
 
-      const result = await query<{ preferences: Record<string, unknown> }>(
-        "SELECT preferences FROM users WHERE id = $1",
-        [session.userId],
-      );
-
-      if (result.length === 0) {
-        return createInternalServerErrorResponse("User not found");
-      }
-
-      const preferences = result[0].preferences || {};
-      const isPremium = preferences.premium === true;
+      const isPremium = await isPremiumUser(session.userId);
 
       const response: PremiumStatusResponse = {
         isPremium,

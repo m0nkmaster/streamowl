@@ -846,3 +846,13 @@
 - Customer metadata: Webhook ensures Stripe customer metadata contains userId for reliable user identification in subscription events, updates metadata on checkout completion
 - Subscription cancellation: When subscription is deleted via webhook, premium status is deactivated and subscription details are cleared from user preferences using JSONB key deletion
 - Plan name formatting: Subscription plan names are formatted for display (e.g., "Premium Monthly", "Premium Yearly") based on plan nickname or price ID
+
+## Premium Feature Gating
+
+- Shared premium utility: Created `lib/auth/premium.ts` with `isPremiumUser()` function to centralise premium status checking, eliminates code duplication across multiple API endpoints
+- Premium status check: Premium status stored in `users.preferences.premium` JSONB field (boolean), checked via shared utility function that queries user preferences
+- List creation gating: Updated `/api/lists` endpoint to check premium status before enforcing free tier limit (3 lists), premium users bypass limit check entirely and can create unlimited lists
+- Feature gating pattern: Check premium status first, then apply free tier restrictions only if user is not premium, allows premium users to access all features without restrictions
+- Refactoring duplicate code: Replaced duplicate `isPremiumUser()` functions in `lib/ai/recommendation-rate-limit.ts`, `routes/api/recommendations/chat.ts`, `routes/api/recommendations/[tmdb_id]/chat.ts`, `routes/api/recommendations/mood.ts`, and `routes/api/user/premium.ts` with shared utility import
+- Premium features gated: Custom lists (unlimited for premium), AI recommendations (unlimited for premium), AI chat/conversation (premium only), mood-based recommendations (premium only)
+- Upgrade modal: Existing upgrade prompt UI in `CreateListModal` already handles `LIST_LIMIT_REACHED` error code and displays upgrade message with link to `/premium` page

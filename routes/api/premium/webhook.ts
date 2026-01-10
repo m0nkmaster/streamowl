@@ -189,7 +189,7 @@ export const handler: Handlers = {
           const session = event.data.object as Stripe.Checkout.Session;
           if (session.mode === "subscription" && session.subscription) {
             await updatePremiumStatus(userId, true);
-            
+
             // Retrieve subscription to get details
             const subscriptionId = typeof session.subscription === "string"
               ? session.subscription
@@ -197,15 +197,15 @@ export const handler: Handlers = {
             const subscription = await stripe.subscriptions.retrieve(
               subscriptionId,
             );
-            
+
             const customerId = typeof subscription.customer === "string"
               ? subscription.customer
               : subscription.customer.id;
-            
+
             // Get plan name from subscription items
             const planName = subscription.items.data[0]?.price.nickname ||
               subscription.items.data[0]?.price.id || null;
-            
+
             await updateSubscriptionDetails(
               userId,
               customerId,
@@ -213,15 +213,16 @@ export const handler: Handlers = {
               subscription.current_period_end,
               planName,
             );
-            
+
             // Ensure customer metadata has userId for future lookups
-            const customerIdForMetadata = typeof subscription.customer === "string"
-              ? subscription.customer
-              : subscription.customer.id;
+            const customerIdForMetadata =
+              typeof subscription.customer === "string"
+                ? subscription.customer
+                : subscription.customer.id;
             await stripe.customers.update(customerIdForMetadata, {
               metadata: { userId },
             });
-            
+
             console.log(`Premium activated for user ${userId}`);
           }
           break;
@@ -233,15 +234,15 @@ export const handler: Handlers = {
           const isActive = subscription.status === "active" ||
             subscription.status === "trialing";
           await updatePremiumStatus(userId, isActive);
-          
+
           if (isActive) {
             const customerId = typeof subscription.customer === "string"
               ? subscription.customer
               : subscription.customer.id;
-            
+
             const planName = subscription.items.data[0]?.price.nickname ||
               subscription.items.data[0]?.price.id || null;
-            
+
             await updateSubscriptionDetails(
               userId,
               customerId,
@@ -250,7 +251,7 @@ export const handler: Handlers = {
               planName,
             );
           }
-          
+
           console.log(
             `Premium status updated for user ${userId}: ${isActive}`,
           );

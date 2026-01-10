@@ -6,24 +6,7 @@
  */
 
 import { redisCache } from "../cache/redis.ts";
-import { query } from "../db.ts";
-
-/**
- * Check if user is premium
- */
-async function isPremiumUser(userId: string): Promise<boolean> {
-  const result = await query<{ preferences: Record<string, unknown> }>(
-    "SELECT preferences FROM users WHERE id = $1",
-    [userId],
-  );
-
-  if (result.length === 0) {
-    return false;
-  }
-
-  const preferences = result[0].preferences || {};
-  return preferences.premium === true;
-}
+import { isPremiumUser } from "../auth/premium.ts";
 
 /**
  * Get daily usage key for a user

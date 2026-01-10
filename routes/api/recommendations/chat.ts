@@ -1,5 +1,6 @@
 import { type Handlers } from "$fresh/server.ts";
 import { requireAuthForApi } from "../../../lib/auth/middleware.ts";
+import { isPremiumUser } from "../../../lib/auth/premium.ts";
 import { query } from "../../../lib/db.ts";
 import {
   type ChatMessage,
@@ -23,24 +24,6 @@ interface ChatRequest {
 interface ChatResponse {
   response: string;
   recommendations?: RecommendationCandidate[]; // Mood-based recommendations if applicable
-}
-
-/**
- * Check if user is premium
- * Premium status is stored in user preferences as preferences.premium = true
- */
-async function isPremiumUser(userId: string): Promise<boolean> {
-  const result = await query<{ preferences: Record<string, unknown> }>(
-    "SELECT preferences FROM users WHERE id = $1",
-    [userId],
-  );
-
-  if (result.length === 0) {
-    return false;
-  }
-
-  const preferences = result[0].preferences || {};
-  return preferences.premium === true;
 }
 
 /**

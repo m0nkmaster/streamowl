@@ -1,5 +1,6 @@
 import { type Handlers } from "$fresh/server.ts";
 import { requireAuthForApi } from "../../lib/auth/middleware.ts";
+import { isPremiumUser } from "../../lib/auth/premium.ts";
 import { query } from "../../lib/db.ts";
 import {
   createBadRequestResponse,
@@ -47,21 +48,25 @@ export const handler: Handlers = {
         );
       }
 
-      // Check user's list count (free tier limit: 3 lists)
-      // TODO: Check user's premium status when premium tier is implemented
-      const listCountResult = await query<{ count: number }>(
-        `SELECT COUNT(*)::INTEGER as count FROM lists WHERE user_id = $1`,
-        [userId],
-      );
+      // Check user's premium status
+      const isPremium = await isPremiumUser(userId);
 
-      const listCount = listCountResult[0]?.count || 0;
-      const FREE_TIER_LIST_LIMIT = 3;
-
-      if (listCount >= FREE_TIER_LIST_LIMIT) {
-        return createForbiddenResponse(
-          `You've reached the limit of ${FREE_TIER_LIST_LIMIT} custom lists for free accounts. Upgrade to Premium for unlimited lists.`,
-          "LIST_LIMIT_REACHED",
+      // Check user's list count (free tier limit: 3 lists, premium: unlimited)
+      if (!isPremium) {
+        const listCountResult = await query<{ count: number }>(
+          `SELECT COUNT(*)::INTEGER as count FROM lists WHERE user_id = $1`,
+          [userId],
         );
+
+        const listCount = listCountResult[0]?.count || 0;
+        const FREE_TIER_LIST_LIMIT = 3;
+
+        if (listCount >= FREE_TIER_LIST_LIMIT) {
+          return createForbiddenResponse(
+            `You've reached the limit of ${FREE_TIER_LIST_LIMIT} custom lists for free accounts. Upgrade to Premium for unlimited lists.`,
+            "LIST_LIMIT_REACHED",
+          );
+        }
       }
 
       // Create list in database
