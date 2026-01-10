@@ -1,5 +1,6 @@
 import { type Handlers } from "$fresh/server.ts";
 import { getSessionFromRequest } from "../lib/auth/middleware.ts";
+import LibraryTabs from "../islands/LibraryTabs.tsx";
 
 /**
  * Protected library route - requires authentication
@@ -32,10 +33,8 @@ export default function LibraryPage() {
   return (
     <div class="min-h-screen bg-gray-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 class="text-3xl font-bold text-gray-900">Library</h1>
-        <p class="mt-2 text-gray-600">
-          Your content library will appear here.
-        </p>
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Library</h1>
+        <LibraryTabs initialTab="watched" />
       </div>
     </div>
   );

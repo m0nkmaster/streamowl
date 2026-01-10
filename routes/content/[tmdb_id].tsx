@@ -1,4 +1,5 @@
 import { type Handlers, type PageProps } from "$fresh/server.ts";
+import { getSessionFromRequest } from "../../lib/auth/middleware.ts";
 import {
   type CategorisedWatchProviders,
   getMovieDetails,
@@ -8,11 +9,14 @@ import {
   type MovieDetails,
   type TvDetails,
 } from "../../lib/tmdb/client.ts";
+import MarkAsWatchedButton from "../../islands/MarkAsWatchedButton.tsx";
 
 interface ContentDetailPageProps {
   content: MovieDetails | TvDetails;
   contentType: "movie" | "tv";
   watchProviders: CategorisedWatchProviders | null;
+  userStatus: "watched" | "to_watch" | "favourite" | null;
+  isAuthenticated: boolean;
 }
 
 /**
@@ -60,7 +64,39 @@ export const handler: Handlers<ContentDetailPageProps> = {
       console.error("Failed to fetch watch providers:", error);
     }
 
-    return ctx.render({ content, contentType, watchProviders });
+    // Fetch user status if authenticated
+    let userStatus: "watched" | "to_watch" | "favourite" | null = null;
+    const session = await getSessionFromRequest(_req);
+    if (session) {
+      try {
+        const { query } = await import("../../lib/db.ts");
+        const { getContentByTmdbId } = await import("../../lib/content.ts");
+
+        const contentRecord = await getContentByTmdbId(contentId);
+        if (contentRecord) {
+          const userContent = await query<{
+            status: "watched" | "to_watch" | "favourite";
+          }>(
+            "SELECT status FROM user_content WHERE user_id = $1 AND content_id = $2",
+            [session.userId, contentRecord.id],
+          );
+          if (userContent.length > 0) {
+            userStatus = userContent[0].status;
+          }
+        }
+      } catch (error) {
+        // Log error but don't fail the page if status fetch fails
+        console.error("Failed to fetch user status:", error);
+      }
+    }
+
+    return ctx.render({
+      content,
+      contentType,
+      watchProviders,
+      userStatus,
+      isAuthenticated: session !== null,
+    });
   },
 };
 
@@ -155,7 +191,8 @@ function getProviderLogoUrl(logoPath: string | null): string {
 export default function ContentDetailPage(
   { data }: PageProps<ContentDetailPageProps>,
 ) {
-  const { content, contentType, watchProviders } = data;
+  const { content, contentType, watchProviders, userStatus, isAuthenticated } =
+    data;
   const isMovie = contentType === "movie";
   const title = isMovie
     ? (content as MovieDetails).title
@@ -168,6 +205,7 @@ export default function ContentDetailPage(
     : (content as TvDetails).episode_run_time;
   const cast = content.credits?.cast || [];
   const backdropUrl = getBackdropUrl(content.backdrop_path);
+  const tmdbId = content.id;
 
   return (
     <div class="min-h-screen bg-gray-50">
@@ -230,6 +268,16 @@ export default function ContentDetailPage(
                     </span>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Mark as Watched Button */}
+            {isAuthenticated && (
+              <div class="mb-6">
+                <MarkAsWatchedButton
+                  tmdbId={tmdbId}
+                  initialStatus={userStatus}
+                />
               </div>
             )}
 
