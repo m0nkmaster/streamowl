@@ -1091,3 +1091,13 @@
 - Departure date badges use colour-coded urgency: red (≤3 days), orange (≤7 days), yellow (>7 days)
 - formatDepartureDate() shows relative time: "Leaving today!", "Leaving tomorrow", "Leaving in X days"
 - Empty states handled gracefully when no content is leaving soon
+
+## Social Sharing Feature
+
+- ShareButton island component at `islands/ShareButton.tsx` handles social sharing
+- Supports Twitter/X, WhatsApp, Facebook, LinkedIn, email, and copy link
+- Uses Web Share API on mobile devices when available (`navigator.share`)
+- Falls back to dropdown menu on desktop browsers
+- Generates proper share URLs with encoded title, description, and URL parameters
+- Integrated into content detail page for both authenticated and non-authenticated users
+- Uses the existing Toast system for "copied to clipboard" feedback
