@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import type { Content } from "../lib/tmdb/client.ts";
+import ContentGrid from "../components/ContentGrid.tsx";
 
 interface SearchResponse {
   results: Content[];
@@ -114,7 +115,7 @@ export default function SearchPage() {
           <p class="text-gray-600 mb-4">
             Found {results.length} result{results.length !== 1 ? "s" : ""}
           </p>
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <ContentGrid>
             {results.map((content) => (
               <a
                 href={`/content/${content.tmdb_id}`}
@@ -146,7 +147,7 @@ export default function SearchPage() {
                 </div>
               </a>
             ))}
-          </div>
+          </ContentGrid>
         </div>
       )}
 

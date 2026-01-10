@@ -1,6 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import CreateListModal from "./CreateListModal.tsx";
+import ContentGrid from "../components/ContentGrid.tsx";
 
 interface WatchedContent {
   tmdb_id: number;
@@ -333,7 +334,7 @@ export default function LibraryTabs(
               )}
 
               {!loading && !error && watchedContent.length > 0 && (
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <ContentGrid>
                   {watchedContent.map((item) => (
                     <a
                       href={`/content/${item.tmdb_id}`}
@@ -365,7 +366,7 @@ export default function LibraryTabs(
                       </div>
                     </a>
                   ))}
-                </div>
+                </ContentGrid>
               )}
             </div>
           )}
@@ -394,7 +395,7 @@ export default function LibraryTabs(
               )}
 
               {!loading && !error && watchlistContent.length > 0 && (
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <ContentGrid>
                   {watchlistContent.map((item) => (
                     <a
                       href={`/content/${item.tmdb_id}`}
@@ -426,7 +427,7 @@ export default function LibraryTabs(
                       </div>
                     </a>
                   ))}
-                </div>
+                </ContentGrid>
               )}
             </div>
           )}
@@ -455,7 +456,7 @@ export default function LibraryTabs(
               )}
 
               {!loading && !error && favouritesContent.length > 0 && (
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <ContentGrid>
                   {favouritesContent.map((item) => (
                     <a
                       href={`/content/${item.tmdb_id}`}
@@ -487,7 +488,7 @@ export default function LibraryTabs(
                       </div>
                     </a>
                   ))}
-                </div>
+                </ContentGrid>
               )}
             </div>
           )}

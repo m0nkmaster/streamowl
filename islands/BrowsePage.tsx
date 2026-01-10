@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import type { Content } from "../lib/tmdb/client.ts";
+import ContentGrid from "../components/ContentGrid.tsx";
 
 interface TrendingResponse {
   results: Content[];
@@ -72,7 +73,7 @@ export default function BrowsePage() {
 
         {/* Trending Content Grid */}
         {!loading && !error && trending.length > 0 && (
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <ContentGrid>
             {trending.map((content) => (
               <a
                 href={`/content/${content.tmdb_id}`}
@@ -104,7 +105,7 @@ export default function BrowsePage() {
                 </div>
               </a>
             ))}
-          </div>
+          </ContentGrid>
         )}
 
         {/* Empty State */}

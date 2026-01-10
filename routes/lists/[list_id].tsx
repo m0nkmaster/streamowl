@@ -1,6 +1,7 @@
 import { type Handlers } from "$fresh/server.ts";
 import { getSessionFromRequest } from "../../lib/auth/middleware.ts";
 import { query } from "../../lib/db.ts";
+import ContentGrid from "../../components/ContentGrid.tsx";
 
 /**
  * Route for viewing a custom list
@@ -170,7 +171,7 @@ export default function ListPage({ data }: { data: ListPageProps }) {
             </div>
           )
           : (
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <ContentGrid>
               {items.map((item) => (
                 <a
                   href={`/content/${item.tmdb_id}`}
@@ -197,7 +198,7 @@ export default function ListPage({ data }: { data: ListPageProps }) {
                   </div>
                 </a>
               ))}
-            </div>
+            </ContentGrid>
           )}
       </div>
     </div>
