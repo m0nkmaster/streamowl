@@ -7,8 +7,10 @@ import {
   getTvDetails,
   getTvWatchProvidersByRegion,
   type MovieDetails,
+  type SupportedRegion,
   type TvDetails,
 } from "../../lib/tmdb/client.ts";
+import { detectRegionFromRequest, getRegionName } from "../../lib/region.ts";
 import MarkAsWatchedButton from "../../islands/MarkAsWatchedButton.tsx";
 import AddToWatchlistButton from "../../islands/AddToWatchlistButton.tsx";
 import FavouriteButton from "../../islands/FavouriteButton.tsx";
@@ -22,6 +24,7 @@ interface ContentDetailPageProps {
   userStatus: "watched" | "to_watch" | "favourite" | null;
   userRating: number | null;
   isAuthenticated: boolean;
+  region: SupportedRegion;
 }
 
 /**
@@ -37,6 +40,9 @@ export const handler: Handlers<ContentDetailPageProps> = {
     if (!Number.isInteger(contentId) || contentId <= 0) {
       return new Response("Invalid content ID", { status: 400 });
     }
+
+    // Detect user region from request headers
+    const region = detectRegionFromRequest(_req);
 
     // Try fetching as movie first, then as TV show
     let content: MovieDetails | TvDetails;
@@ -56,13 +62,16 @@ export const handler: Handlers<ContentDetailPageProps> = {
       }
     }
 
-    // Fetch watch providers (default to US region for now)
+    // Fetch watch providers using detected region
     let watchProviders: CategorisedWatchProviders | null = null;
     try {
       if (contentType === "movie") {
-        watchProviders = await getMovieWatchProvidersByRegion(contentId, "US");
+        watchProviders = await getMovieWatchProvidersByRegion(
+          contentId,
+          region,
+        );
       } else {
-        watchProviders = await getTvWatchProvidersByRegion(contentId, "US");
+        watchProviders = await getTvWatchProvidersByRegion(contentId, region);
       }
     } catch (error) {
       // Log error but don't fail the page if watch providers fail
@@ -105,6 +114,7 @@ export const handler: Handlers<ContentDetailPageProps> = {
       userStatus,
       userRating,
       isAuthenticated: session !== null,
+      region,
     });
   },
 };
@@ -207,6 +217,7 @@ export default function ContentDetailPage(
     userStatus,
     userRating,
     isAuthenticated,
+    region,
   } = data;
   const isMovie = contentType === "movie";
   const title = isMovie
@@ -361,9 +372,19 @@ export default function ContentDetailPage(
             {/* Where to Watch */}
             {watchProviders && (
               <div class="mb-8">
-                <h2 class="text-2xl font-semibold text-gray-900 mb-4">
-                  Where to Watch
-                </h2>
+                <div class="flex items-center gap-3 mb-4">
+                  <h2 class="text-2xl font-semibold text-gray-900">
+                    Where to Watch
+                  </h2>
+                  <span
+                    class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                    title={`Streaming availability for ${
+                      getRegionName(region)
+                    }`}
+                  >
+                    {region}
+                  </span>
+                </div>
                 <div class="space-y-6">
                   {/* Subscription Services */}
                   {watchProviders.subscription.length > 0 && (
