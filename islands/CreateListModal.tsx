@@ -1,5 +1,6 @@
-import { useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
+import { trapFocus } from "../lib/accessibility/focus-trap.ts";
 
 interface CreateListModalProps {
   isOpen: boolean;
@@ -20,6 +21,15 @@ export default function CreateListModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showUpgradePrompt, setShowUpgradePrompt] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Set up focus trap when modal opens
+  useEffect(() => {
+    if (!IS_BROWSER || !isOpen || !modalRef.current) return;
+
+    const cleanup = trapFocus(modalRef.current, handleClose);
+    return cleanup;
+  }, [isOpen]);
 
   if (!IS_BROWSER || !isOpen) {
     return null;
@@ -87,11 +97,15 @@ export default function CreateListModal({
 
       {/* Modal */}
       <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-        <div class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+        <div
+          ref={modalRef}
+          class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6"
+        >
           <div class="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
             <button
               type="button"
               onClick={handleClose}
+              aria-label="Close modal"
               class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               <span class="sr-only">Close</span>
@@ -225,7 +239,7 @@ export default function CreateListModal({
                     <button
                       type="button"
                       onClick={handleClose}
-                      class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
+                      class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-1 sm:mt-0"
                     >
                       Cancel
                     </button>

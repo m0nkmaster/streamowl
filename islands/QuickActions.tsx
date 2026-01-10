@@ -124,7 +124,7 @@ export default function QuickActions({
           handleAction("watchlist");
         }}
         disabled={isLoading === "watchlist"}
-        class={`p-2 rounded-full transition-colors ${
+        class={`p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
           isInWatchlist
             ? "bg-indigo-600 text-white hover:bg-indigo-700"
             : "bg-white text-gray-800 hover:bg-gray-100"
@@ -158,7 +158,7 @@ export default function QuickActions({
           handleAction("favourite");
         }}
         disabled={isLoading === "favourite"}
-        class={`p-2 rounded-full transition-colors ${
+        class={`p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 ${
           isFavourite
             ? "bg-red-600 text-white hover:bg-red-700"
             : "bg-white text-gray-800 hover:bg-gray-100"
@@ -192,7 +192,7 @@ export default function QuickActions({
           handleAction("watched");
         }}
         disabled={isLoading === "watched"}
-        class={`p-2 rounded-full transition-colors ${
+        class={`p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${
           isWatched
             ? "bg-green-600 text-white hover:bg-green-700"
             : "bg-white text-gray-800 hover:bg-gray-100"

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import type { ChatMessage } from "../lib/ai/openai.ts";
 import type { RecommendationCandidate } from "../lib/ai/recommendations.ts";
+import { trapFocus } from "../lib/accessibility/focus-trap.ts";
 
 interface RecommendationChatProps {
   tmdbId?: number; // Optional - if not provided, enables general chat mode
@@ -28,6 +29,7 @@ export default function RecommendationChat({
   >([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -36,10 +38,21 @@ export default function RecommendationChat({
     }
   }, [messages]);
 
+  // Set up focus trap when modal opens
+  useEffect(() => {
+    if (!isOpen || !modalRef.current) return;
+
+    const cleanup = trapFocus(modalRef.current, onClose);
+    return cleanup;
+  }, [isOpen, onClose]);
+
   // Focus input when chat opens
   useEffect(() => {
     if (isOpen && inputRef.current) {
-      inputRef.current.focus();
+      // Small delay to ensure modal is fully rendered
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
     }
   }, [isOpen]);
 
@@ -117,11 +130,17 @@ export default function RecommendationChat({
 
   return (
     <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl h-[80vh] flex flex-col">
+      <div
+        ref={modalRef}
+        class="bg-white rounded-lg shadow-xl w-full max-w-2xl h-[80vh] flex flex-col"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="chat-title"
+      >
         {/* Header */}
         <div class="flex items-center justify-between p-4 border-b">
           <div>
-            <h3 class="text-lg font-semibold text-gray-900">
+            <h3 id="chat-title" class="text-lg font-semibold text-gray-900">
               {contentTitle
                 ? `Chat about "${contentTitle}"`
                 : "AI Recommendations Chat"}
@@ -135,7 +154,7 @@ export default function RecommendationChat({
           <button
             type="button"
             onClick={onClose}
-            class="text-gray-400 hover:text-gray-600 transition-colors"
+            class="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 rounded transition-colors"
             aria-label="Close chat"
           >
             <svg
@@ -283,7 +302,7 @@ export default function RecommendationChat({
               type="button"
               onClick={handleSend}
               disabled={!input.trim() || loading}
-              class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed font-medium"
+              class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed font-medium"
             >
               Send
             </button>

@@ -49,6 +49,22 @@ export default function App({ Component, data }: PageProps<AppProps>) {
           .animate-slide-in {
             animation: slide-in 0.3s ease-out;
           }
+          
+          /* Global focus styles for keyboard navigation */
+          *:focus-visible {
+            outline: 2px solid #6366f1;
+            outline-offset: 2px;
+          }
+          
+          /* Ensure buttons and links are keyboard accessible */
+          button:not([disabled]):focus-visible,
+          a:focus-visible,
+          input:not([disabled]):focus-visible,
+          textarea:not([disabled]):focus-visible,
+          select:not([disabled]):focus-visible {
+            outline: 2px solid #6366f1;
+            outline-offset: 2px;
+          }
         `}
         </style>
       </head>

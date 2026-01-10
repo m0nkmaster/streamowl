@@ -91,7 +91,7 @@ export default function FavouriteButton(
         type="button"
         onClick={handleToggle}
         disabled={isLoading}
-        class={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+        class={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
           isFavourite
             ? "bg-red-600 text-white hover:bg-red-700"
             : "bg-gray-200 text-gray-800 hover:bg-gray-300"
