@@ -8,6 +8,7 @@ interface WatchedContent {
   poster_path: string | null;
   release_date: string | null;
   watched_at: string;
+  rating: number | null;
 }
 
 interface WatchlistContent {
@@ -17,6 +18,7 @@ interface WatchlistContent {
   poster_path: string | null;
   release_date: string | null;
   added_at: string;
+  rating: number | null;
 }
 
 interface FavouritesContent {
@@ -26,6 +28,7 @@ interface FavouritesContent {
   poster_path: string | null;
   release_date: string | null;
   added_at: string;
+  rating: number | null;
 }
 
 interface LibraryTabsProps {
@@ -233,10 +236,15 @@ export default function LibraryTabs(
                       <h3 class="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-indigo-600">
                         {item.title}
                       </h3>
-                      <div class="mt-2">
+                      <div class="mt-2 space-y-1">
                         <p class="text-xs text-gray-500">
                           Watched: {formatDate(item.watched_at)}
                         </p>
+                        {item.rating !== null && (
+                          <p class="text-xs font-medium text-indigo-600">
+                            ⭐ {item.rating.toFixed(1)}/10
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -289,10 +297,15 @@ export default function LibraryTabs(
                       <h3 class="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-indigo-600">
                         {item.title}
                       </h3>
-                      <div class="mt-2">
+                      <div class="mt-2 space-y-1">
                         <p class="text-xs text-gray-500">
                           Added: {formatDate(item.added_at)}
                         </p>
+                        {item.rating !== null && (
+                          <p class="text-xs font-medium text-indigo-600">
+                            ⭐ {item.rating.toFixed(1)}/10
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -345,10 +358,15 @@ export default function LibraryTabs(
                       <h3 class="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-indigo-600">
                         {item.title}
                       </h3>
-                      <div class="mt-2">
+                      <div class="mt-2 space-y-1">
                         <p class="text-xs text-gray-500">
                           Added: {formatDate(item.added_at)}
                         </p>
+                        {item.rating !== null && (
+                          <p class="text-xs font-medium text-indigo-600">
+                            ⭐ {item.rating.toFixed(1)}/10
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>

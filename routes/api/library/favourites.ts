@@ -15,7 +15,7 @@ export const handler: Handlers = {
       const session = await requireAuthForApi(req);
       const userId = session.userId;
 
-      // Fetch favourites content with content details
+      // Fetch favourites content with content details and ratings
       const favouritesContent = await query<{
         tmdb_id: number;
         type: "movie" | "tv" | "documentary";
@@ -23,6 +23,7 @@ export const handler: Handlers = {
         poster_path: string | null;
         release_date: string | null;
         created_at: Date;
+        rating: number | null;
       }>(
         `SELECT 
           c.tmdb_id,
@@ -30,7 +31,8 @@ export const handler: Handlers = {
           c.title,
           c.poster_path,
           c.release_date,
-          uc.created_at
+          uc.created_at,
+          uc.rating
         FROM user_content uc
         INNER JOIN content c ON uc.content_id = c.id
         WHERE uc.user_id = $1 AND uc.status = 'favourite'
@@ -47,6 +49,7 @@ export const handler: Handlers = {
             poster_path: item.poster_path,
             release_date: item.release_date,
             added_at: item.created_at.toISOString(),
+            rating: item.rating,
           })),
         }),
         {

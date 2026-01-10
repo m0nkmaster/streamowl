@@ -49,18 +49,19 @@ export const handler: Handlers = {
 
       const contentId = content[0].id;
 
-      // Get user_content status
+      // Get user_content status and rating
       const userContent = await query<{
         status: "watched" | "to_watch" | "favourite";
         watched_at: Date | null;
+        rating: number | null;
       }>(
-        "SELECT status, watched_at FROM user_content WHERE user_id = $1 AND content_id = $2",
+        "SELECT status, watched_at, rating FROM user_content WHERE user_id = $1 AND content_id = $2",
         [userId, contentId],
       );
 
       if (userContent.length === 0) {
         return new Response(
-          JSON.stringify({ status: null }),
+          JSON.stringify({ status: null, rating: null }),
           {
             status: 200,
             headers: { "Content-Type": "application/json" },
@@ -72,6 +73,7 @@ export const handler: Handlers = {
         JSON.stringify({
           status: userContent[0].status,
           watched_at: userContent[0].watched_at?.toISOString() || null,
+          rating: userContent[0].rating,
         }),
         {
           status: 200,

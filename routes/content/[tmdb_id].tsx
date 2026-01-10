@@ -12,12 +12,14 @@ import {
 import MarkAsWatchedButton from "../../islands/MarkAsWatchedButton.tsx";
 import AddToWatchlistButton from "../../islands/AddToWatchlistButton.tsx";
 import FavouriteButton from "../../islands/FavouriteButton.tsx";
+import RatingComponent from "../../islands/RatingComponent.tsx";
 
 interface ContentDetailPageProps {
   content: MovieDetails | TvDetails;
   contentType: "movie" | "tv";
   watchProviders: CategorisedWatchProviders | null;
   userStatus: "watched" | "to_watch" | "favourite" | null;
+  userRating: number | null;
   isAuthenticated: boolean;
 }
 
@@ -66,8 +68,9 @@ export const handler: Handlers<ContentDetailPageProps> = {
       console.error("Failed to fetch watch providers:", error);
     }
 
-    // Fetch user status if authenticated
+    // Fetch user status and rating if authenticated
     let userStatus: "watched" | "to_watch" | "favourite" | null = null;
+    let userRating: number | null = null;
     const session = await getSessionFromRequest(_req);
     if (session) {
       try {
@@ -78,12 +81,14 @@ export const handler: Handlers<ContentDetailPageProps> = {
         if (contentRecord) {
           const userContent = await query<{
             status: "watched" | "to_watch" | "favourite";
+            rating: number | null;
           }>(
-            "SELECT status FROM user_content WHERE user_id = $1 AND content_id = $2",
+            "SELECT status, rating FROM user_content WHERE user_id = $1 AND content_id = $2",
             [session.userId, contentRecord.id],
           );
           if (userContent.length > 0) {
             userStatus = userContent[0].status;
+            userRating = userContent[0].rating;
           }
         }
       } catch (error) {
@@ -97,6 +102,7 @@ export const handler: Handlers<ContentDetailPageProps> = {
       contentType,
       watchProviders,
       userStatus,
+      userRating,
       isAuthenticated: session !== null,
     });
   },
@@ -193,8 +199,14 @@ function getProviderLogoUrl(logoPath: string | null): string {
 export default function ContentDetailPage(
   { data }: PageProps<ContentDetailPageProps>,
 ) {
-  const { content, contentType, watchProviders, userStatus, isAuthenticated } =
-    data;
+  const {
+    content,
+    contentType,
+    watchProviders,
+    userStatus,
+    userRating,
+    isAuthenticated,
+  } = data;
   const isMovie = contentType === "movie";
   const title = isMovie
     ? (content as MovieDetails).title
@@ -275,19 +287,28 @@ export default function ContentDetailPage(
 
             {/* Action Buttons */}
             {isAuthenticated && (
-              <div class="mb-6 flex gap-3 flex-wrap">
-                <MarkAsWatchedButton
-                  tmdbId={tmdbId}
-                  initialStatus={userStatus}
-                />
-                <AddToWatchlistButton
-                  tmdbId={tmdbId}
-                  initialStatus={userStatus}
-                />
-                <FavouriteButton
-                  tmdbId={tmdbId}
-                  initialStatus={userStatus}
-                />
+              <div class="mb-6 space-y-4">
+                <div class="flex gap-3 flex-wrap">
+                  <MarkAsWatchedButton
+                    tmdbId={tmdbId}
+                    initialStatus={userStatus}
+                  />
+                  <AddToWatchlistButton
+                    tmdbId={tmdbId}
+                    initialStatus={userStatus}
+                  />
+                  <FavouriteButton
+                    tmdbId={tmdbId}
+                    initialStatus={userStatus}
+                  />
+                </div>
+                {/* Rating Component */}
+                <div class="border-t pt-4">
+                  <RatingComponent
+                    tmdbId={tmdbId}
+                    initialRating={userRating}
+                  />
+                </div>
               </div>
             )}
 
