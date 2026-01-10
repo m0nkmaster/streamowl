@@ -50,7 +50,7 @@
         "Step 3: Run migration and verify table structure",
         "Step 4: Test inserting sample movie and TV show records"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "database-schema-user-content",
