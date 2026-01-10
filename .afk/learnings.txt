@@ -254,3 +254,19 @@
 - Combined search results sorting: When combining movie and TV search results, sort by relevance using vote_average (descending) as primary sort key, then vote_count (descending) as tiebreaker to maintain relevance ordering across content types
 - Relevance sorting: TMDB search results are already sorted by relevance within each category (movies/TV), but when combining results from separate API calls, explicit sorting is needed to maintain relevance across the unified results
 - Vote metadata access: Access vote_average and vote_count from Content.metadata object (stored as metadata.vote_average and metadata.vote_count) for sorting and filtering operations
+
+## Content Detail Page Implementation
+
+- Dynamic routes in Fresh: Create dynamic routes using square brackets in filename (e.g., `routes/content/[tmdb_id].tsx`) to handle URL parameters
+- Route parameter access: Access route parameters from `ctx.params` in Fresh route handlers (e.g., `ctx.params.tmdb_id`)
+- Content type detection: When TMDB ID could be either movie or TV show, try fetching as movie first, then fall back to TV show if movie fetch fails (TMDB IDs are unique across content types)
+- Movie vs TV details: Movies use `title` and `release_date` fields, TV shows use `name` and `first_air_date` fields - handle both cases in detail page component
+- TV runtime format: TV shows have `episode_run_time` as an array of episode lengths (in minutes), calculate average or use first value for display
+- Image URL construction: Use TMDB image base URL `https://image.tmdb.org/t/p/{size}` with sizes: w185 (profile), w300 (poster small), w500 (poster large), w1280 (backdrop)
+- Backdrop display: Display backdrop image as full-width header with overlay for better visual impact
+- Cast display: Show top 12 cast members with profile photos, names, and character names in responsive grid layout
+- Genre badges: Display genres as coloured badges (using Tailwind classes) for visual categorisation
+- Date formatting: Use `toLocaleDateString()` with locale "en-GB" for British English date formatting (e.g., "15 January 2024")
+- Rating display: Format vote_average to 1 decimal place and include vote_count with locale formatting for readability
+- Error handling: Return 404 status if content not found (both movie and TV fetch fail), return 400 for invalid content ID format
+- Type safety: Use TypeScript type guards and type assertions to safely handle MovieDetails vs TvDetails types in component
