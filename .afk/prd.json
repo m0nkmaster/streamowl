@@ -700,7 +700,7 @@
         "Step 3: Parse response to extract explanation text",
         "Step 4: Verify explanation references specific user history items"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "ai-recommendation-daily-feed",

@@ -1,8 +1,9 @@
 /**
- * OpenAI API client for embeddings
+ * OpenAI API client for embeddings and chat completions
  *
  * Provides functions to generate vector embeddings using OpenAI's
- * text-embedding-3-small model (1536 dimensions)
+ * text-embedding-3-small model (1536 dimensions) and chat completions
+ * using GPT-4 Turbo.
  */
 
 /**
@@ -82,4 +83,83 @@ export async function generateEmbedding(
   }
 
   return embedding;
+}
+
+/**
+ * OpenAI chat completion API response structure
+ */
+export interface OpenAIChatCompletionResponse {
+  id: string;
+  object: string;
+  created: number;
+  model: string;
+  choices: Array<{
+    index: number;
+    message: {
+      role: string;
+      content: string;
+    };
+    finish_reason: string;
+  }>;
+  usage: {
+    prompt_tokens: number;
+    completion_tokens: number;
+    total_tokens: number;
+  };
+}
+
+/**
+ * Chat message for GPT-4 API
+ */
+export interface ChatMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+/**
+ * Generate chat completion using GPT-4 Turbo
+ *
+ * @param messages Array of chat messages
+ * @returns Generated text response
+ */
+export async function generateChatCompletion(
+  messages: ChatMessage[],
+): Promise<string> {
+  const apiKey = getApiKey();
+  const apiUrl = "https://api.openai.com/v1/chat/completions";
+
+  const response = await fetch(apiUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "gpt-4-turbo",
+      messages: messages,
+      temperature: 0.7,
+      max_tokens: 500,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(
+      `OpenAI API error: ${response.status} ${response.statusText} - ${errorText}`,
+    );
+  }
+
+  const data: OpenAIChatCompletionResponse = await response.json();
+
+  if (!data.choices || data.choices.length === 0) {
+    throw new Error("OpenAI API returned no completion choices");
+  }
+
+  const content = data.choices[0].message.content;
+
+  if (!content) {
+    throw new Error("OpenAI API returned empty content");
+  }
+
+  return content;
 }

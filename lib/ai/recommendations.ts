@@ -2,11 +2,13 @@
  * AI-powered content recommendations
  *
  * Generates recommendation candidates using vector similarity search
- * based on user taste profiles.
+ * based on user taste profiles and provides natural language explanations
+ * for recommendations using GPT-4.
  */
 
 import { query } from "../db.ts";
 import type { ContentRecord } from "../content.ts";
+import { type ChatMessage, generateChatCompletion } from "./openai.ts";
 
 /**
  * Recommendation candidate with similarity score
@@ -14,6 +16,7 @@ import type { ContentRecord } from "../content.ts";
 export interface RecommendationCandidate extends ContentRecord {
   similarity: number; // Cosine similarity (1 - distance)
   distance: number; // Cosine distance from taste profile
+  explanation?: string; // Natural language explanation for the recommendation
 }
 
 /**
@@ -169,4 +172,94 @@ function applyDiversityScoring(
   }
 
   return selected;
+}
+
+/**
+ * User watched content item for explanation context
+ */
+interface WatchedContentItem {
+  title: string;
+  type: "movie" | "tv" | "documentary";
+  rating: number | null;
+  release_date: string | null;
+}
+
+/**
+ * Generate natural language explanation for a recommendation
+ *
+ * Creates a prompt with user's watched content history and the recommended
+ * content, then calls GPT-4 Turbo to generate a personalised explanation.
+ *
+ * @param userId User ID (UUID)
+ * @param candidate Recommended content candidate
+ * @returns Natural language explanation for the recommendation
+ */
+export async function generateRecommendationExplanation(
+  userId: string,
+  candidate: RecommendationCandidate,
+): Promise<string> {
+  // Get user's watched content history (top 10 most recent with ratings)
+  const watchedContent = await query<WatchedContentItem>(
+    `SELECT 
+      c.title,
+      c.type,
+      c.release_date,
+      uc.rating
+    FROM user_content uc
+    INNER JOIN content c ON uc.content_id = c.id
+    WHERE uc.user_id = $1 
+      AND uc.status = 'watched'
+    ORDER BY uc.watched_at DESC
+    LIMIT 10`,
+    [userId],
+  );
+
+  // Build watched content summary for prompt
+  const watchedSummary = watchedContent.length > 0
+    ? watchedContent.map((item) => {
+      const ratingText = item.rating !== null
+        ? ` (rated ${item.rating}/10)`
+        : "";
+      const year = item.release_date
+        ? ` (${new Date(item.release_date).getFullYear()})`
+        : "";
+      return `- ${item.title}${year}${ratingText}`;
+    }).join("\n")
+    : "No watched content yet.";
+
+  // Build prompt
+  const candidateYear = candidate.release_date
+    ? ` (${new Date(candidate.release_date).getFullYear()})`
+    : "";
+  const candidateType = candidate.type === "movie" ? "movie" : "TV show";
+  const candidateOverview = candidate.overview || "No description available.";
+
+  const messages: ChatMessage[] = [
+    {
+      role: "system",
+      content:
+        "You are a helpful movie and TV recommendation assistant. Generate brief, personalised explanations for content recommendations based on a user's viewing history. Keep explanations concise (2-3 sentences) and reference specific titles from their history when relevant.",
+    },
+    {
+      role: "user",
+      content: `Based on this user's viewing history:
+
+${watchedSummary}
+
+Explain why you're recommending this ${candidateType}: "${candidate.title}"${candidateYear}
+
+Description: ${candidateOverview}
+
+Provide a brief, personalised explanation (2-3 sentences) that references specific titles from their history when relevant.`,
+    },
+  ];
+
+  try {
+    const explanation = await generateChatCompletion(messages);
+    return explanation.trim();
+  } catch (error) {
+    console.error("Error generating recommendation explanation:", error);
+    // Return a fallback explanation if GPT-4 call fails
+    return `Based on your viewing history, we think you'll enjoy "${candidate.title}".`;
+  }
 }

@@ -4,9 +4,9 @@
     "custom": {}
   },
   "limits": {
-    "max_iterations": 20,
-    "max_task_failures": 3,
-    "timeout_minutes": 30
+    "max_iterations": 500,
+    "max_task_failures": 20,
+    "timeout_minutes": 90
   },
   "output": {
     "default": "clipboard",
