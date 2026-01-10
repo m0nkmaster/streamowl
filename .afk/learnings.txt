@@ -574,3 +574,16 @@
 - Result count display: Updated result count to show total count in parentheses when either filter is active, provides context about filtered vs total results
 - Empty state handling: Updated empty state message to include genre information when genre filter is active, provides "Show all genres" button to clear genre filter
 - Genre data structure: Genre IDs stored in Content.metadata.genre_ids as number array, accessed via type assertion (content.metadata.genre_ids as number[]) with fallback to empty array if missing
+
+## Search - Filter by Year Range Implementation
+
+- Year extraction from release dates: Extract years from Content.release_date strings using `new Date(content.release_date).getFullYear()`, handle invalid dates with `isNaN()` check to prevent filtering errors
+- Available year range calculation: Extract unique years from search results to determine min/max available years, display year range filter only when results contain valid release dates
+- Year range filter state: Added `minYear` and `maxYear` state (number | null) to track selected year range, both can be set independently or together for flexible filtering
+- Year range filtering logic: Filter results by checking if content's release year falls within range (year >= minYear if minYear set, year <= maxYear if maxYear set), exclude content without release dates when year filter is active
+- Year input validation: Year inputs use min/max attributes based on available year range and other filter value (min-year max constrained by maxYear, max-year min constrained by minYear), auto-adjusts other bound when user sets invalid range
+- Year range UI: Year range filter displays as two number inputs ("from" and "to") with placeholder values showing available range, includes "Clear" button when filter is active, styled consistently with other filter controls
+- Filter combination: Year range filter works in combination with content type and genre filters - all filters apply simultaneously, results must match all active filters to be displayed
+- Result count display: Updated result count to show total count in parentheses when year filter is active, provides context about filtered vs total results
+- Empty state handling: Updated empty state message to include year range information when year filter is active, provides "Show all years" button to clear year filter
+- Date parsing: Use JavaScript Date constructor to parse release_date strings (YYYY-MM-DD format from TMDB), getFullYear() extracts year component for filtering and display

@@ -323,7 +323,7 @@
         "Step 3: Verify all results have release dates within range",
         "Step 4: Adjust range and verify results update"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "search-filter-by-streaming-service",
