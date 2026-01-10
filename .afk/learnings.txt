@@ -114,3 +114,17 @@
 - API route protection: Use `requireAuthForApi()` helper function to check authentication and return 401 JSON response for unauthenticated requests
 - Redirect status codes: Use 302 Found for redirects to login page, 303 See Other for redirects after POST requests
 - Session checking: Use `getSessionFromRequest()` from middleware to extract and validate session token in route handlers
+
+## TMDB API Integration
+
+- TMDB API client: Created `lib/tmdb/client.ts` for TMDB API interactions with rate limiting and error handling
+- API key configuration: Store TMDB_API_KEY in environment variables, accessed via `Deno.env.get()`
+- Rate limiting: Implemented sliding window rate limiter to enforce 50 requests per second limit (TMDB free tier limit)
+- Rate limiter pattern: Use singleton RateLimiter class with request timestamp tracking, automatically waits when limit reached
+- TMDB API base URL: Use `https://api.themoviedb.org/3` as base URL for all API requests
+- API error handling: TMDB returns JSON with `success: false` and `status_code`/`status_message` fields for errors
+- Error code 34: TMDB status code 34 indicates resource not found (e.g., invalid movie ID)
+- Movie details interface: Define TypeScript interface for MovieDetails with required fields (id, title, overview, release_date, poster_path, backdrop_path, vote_average, vote_count, runtime, genres)
+- Request function: Generic `request<T>()` function handles rate limiting, API key injection, parameter encoding, and error parsing
+- Test script pattern: Created `scripts/test-tmdb-client.ts` following same pattern as other test scripts - verify functionality, test error cases, test rate limiting
+- Environment variable documentation: Added TMDB_API_KEY to `.env.example` with instructions to get API key from TMDB settings

@@ -193,7 +193,7 @@
         "Step 3: Test fetching a movie by TMDB ID",
         "Step 4: Verify error handling for invalid IDs and rate limit exceeded"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "tmdb-search-movies",
