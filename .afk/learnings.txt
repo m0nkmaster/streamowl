@@ -423,3 +423,15 @@
 - History references: Prompt explicitly asks GPT-4 to reference specific titles from user history when relevant, improves personalisation and trust in recommendations
 - Fallback handling: Return generic fallback explanation if GPT-4 API call fails, ensures recommendations always have explanations even if API is unavailable
 - Interface extension: Add optional explanation field to RecommendationCandidate interface, allows explanations to be attached to candidates without breaking existing code
+
+## AI - Recommendation Daily Feed Implementation
+
+- Daily recommendation API endpoint: Created `/api/recommendations` endpoint that requires authentication, generates up to 3 recommendations for free tier users, and includes explanations for each recommendation
+- Daily caching strategy: Use Redis cache with daily cache keys (`recommendations:${userId}:${date}`) to ensure recommendations update once per day, cache TTL calculated as hours until midnight to expire at start of next day
+- Recommendation limit: Free tier users receive 3 recommendations per day (configurable limit parameter in generateRecommendationCandidates function), premium tier can be extended in future
+- Explanation generation: Generate explanations for all recommendations in parallel using Promise.all for performance, handle individual explanation failures gracefully without breaking entire feed
+- Home page conditional rendering: Updated home page (`routes/index.tsx`) to show recommendation feed for authenticated users and welcome page for guests, uses handler to check authentication status and pass to component
+- Recommendation feed component: Created `islands/RecommendationFeed.tsx` island component that fetches recommendations on mount, displays cards with poster images, titles, explanations, similarity scores, and links to content detail pages
+- Error handling: Handle authentication errors (401), API failures, and empty states gracefully with helpful messages guiding users to watch content for recommendations
+- Cache key format: Use ISO date format (YYYY-MM-DD) in cache keys for consistent daily updates across timezones, ensures recommendations refresh at midnight local time
+- Client-side caching: Set Cache-Control header (private, max-age=3600) for 1-hour client-side caching to reduce API calls while maintaining freshness

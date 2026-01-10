@@ -713,7 +713,7 @@
         "Step 3: Verify 3 recommendations show for free tier",
         "Step 4: Verify recommendations update daily"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "ai-recommendation-dismiss",
