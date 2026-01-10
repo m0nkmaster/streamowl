@@ -42,6 +42,7 @@ import AddToListButton from "../../islands/AddToListButton.tsx";
 import RatingComponent from "../../islands/RatingComponent.tsx";
 import NotesComponent from "../../islands/NotesComponent.tsx";
 import TagsComponent from "../../islands/TagsComponent.tsx";
+import ShareButton from "../../islands/ShareButton.tsx";
 import ContentGrid from "../../components/ContentGrid.tsx";
 import AggregateRatings from "../../components/AggregateRatings.tsx";
 
@@ -458,6 +459,11 @@ export default function ContentDetailPage(
                     initialStatus={userStatus}
                   />
                   <AddToListButton tmdbId={tmdbId} />
+                  <ShareButton
+                    title={title}
+                    contentPath={`/content/${tmdbId}`}
+                    description={content.overview || undefined}
+                  />
                 </div>
                 {/* Rating Component */}
                 <div class="border-t pt-4">
@@ -478,6 +484,19 @@ export default function ContentDetailPage(
                   <TagsComponent
                     tmdbId={tmdbId}
                     initialTags={userTags}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Share Button for non-authenticated users */}
+            {!isAuthenticated && (
+              <div class="mb-6">
+                <div class="flex gap-3 flex-wrap">
+                  <ShareButton
+                    title={title}
+                    contentPath={`/content/${tmdbId}`}
+                    description={content.overview || undefined}
                   />
                 </div>
               </div>

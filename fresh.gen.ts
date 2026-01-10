@@ -85,6 +85,7 @@ import * as $RecommendationFeed from "./islands/RecommendationFeed.tsx";
 import * as $ReorderableList from "./islands/ReorderableList.tsx";
 import * as $SearchPage from "./islands/SearchPage.tsx";
 import * as $SettingsPage from "./islands/SettingsPage.tsx";
+import * as $ShareButton from "./islands/ShareButton.tsx";
 import * as $SignupForm from "./islands/SignupForm.tsx";
 import * as $TagsComponent from "./islands/TagsComponent.tsx";
 import * as $ThemeToggle from "./islands/ThemeToggle.tsx";
@@ -183,6 +184,7 @@ const manifest = {
     "./islands/ReorderableList.tsx": $ReorderableList,
     "./islands/SearchPage.tsx": $SearchPage,
     "./islands/SettingsPage.tsx": $SettingsPage,
+    "./islands/ShareButton.tsx": $ShareButton,
     "./islands/SignupForm.tsx": $SignupForm,
     "./islands/TagsComponent.tsx": $TagsComponent,
     "./islands/ThemeToggle.tsx": $ThemeToggle,
