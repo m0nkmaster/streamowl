@@ -14,7 +14,8 @@
     "test:users": "deno run -A scripts/test-users-table.ts",
     "test:content": "deno run -A scripts/test-content-table.ts",
     "test:user-content": "deno run -A scripts/test-user-content-table.ts",
-    "test:lists": "deno run -A scripts/test-lists-tables.ts"
+    "test:lists": "deno run -A scripts/test-lists-tables.ts",
+    "test:tags": "deno run -A scripts/test-tags-tables.ts"
   },
   "lint": {
     "rules": {
