@@ -587,3 +587,18 @@
 - Result count display: Updated result count to show total count in parentheses when year filter is active, provides context about filtered vs total results
 - Empty state handling: Updated empty state message to include year range information when year filter is active, provides "Show all years" button to clear year filter
 - Date parsing: Use JavaScript Date constructor to parse release_date strings (YYYY-MM-DD format from TMDB), getFullYear() extracts year component for filtering and display
+
+## Search - Filter by Streaming Service Implementation
+
+- Batch provider API endpoint: Created `/api/search/providers` endpoint that accepts array of content items and returns streaming availability for all items in a single request, reduces API calls compared to fetching providers individually
+- Provider availability caching: Provider availability fetched once per search result set and cached in component state, prevents redundant API calls when filter is applied or cleared
+- Streaming service filter state: Added `streamingServiceFilter` state (number | null) to track selected TMDB provider ID, defaults to null (no filter), can be cleared via dropdown or "Clear" button
+- Provider ID mapping: TMDB uses numeric provider IDs (e.g., 8 for Netflix, 9 for Amazon Prime Video, 337 for Disney+), filter dropdown displays human-readable service names mapped to provider IDs
+- Client-side provider filtering: Filter results by checking if content's provider_ids array (from batch API response) includes selected provider ID, works in combination with other filters (type, genre, year)
+- Provider availability fetching: Fetch providers only when streaming service filter is selected and results exist, uses useEffect hook with dependencies on filter state and results length to trigger fetch when needed
+- Loading states: Display "Loading availability..." message while fetching provider data, disable filter dropdown during fetch to prevent multiple simultaneous requests
+- Provider availability clearing: Clear provider availability state when new search is performed or filter is cleared, ensures fresh data for new search results
+- Filter combination: Streaming service filter works in combination with content type, genre, and year range filters - all filters apply simultaneously, results must match all active filters to be displayed
+- Empty state handling: Updated empty state message to include streaming service information when filter is active, provides "Show all services" button to clear streaming service filter
+- Batch API efficiency: Batch endpoint processes up to 50 content items per request, fetches providers in parallel using Promise.all for performance, handles individual item failures gracefully without breaking entire batch
+- Region detection: Batch API endpoint detects user region from request headers (Accept-Language) or accepts region parameter, uses detected region when fetching watch providers from TMDB API

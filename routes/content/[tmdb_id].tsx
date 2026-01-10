@@ -2,9 +2,12 @@ import { type Handlers, type PageProps } from "$fresh/server.ts";
 import { getSessionFromRequest } from "../../lib/auth/middleware.ts";
 import {
   type CategorisedWatchProviders,
+  extractTrailerKey,
   getMovieDetails,
+  getMovieVideos,
   getMovieWatchProvidersByRegion,
   getTvDetails,
+  getTvVideos,
   getTvWatchProvidersByRegion,
   type MovieDetails,
   type SupportedRegion,
@@ -21,6 +24,7 @@ interface ContentDetailPageProps {
   content: MovieDetails | TvDetails;
   contentType: "movie" | "tv";
   watchProviders: CategorisedWatchProviders | null;
+  trailerKey: string | null;
   userStatus: "watched" | "to_watch" | "favourite" | null;
   userRating: number | null;
   isAuthenticated: boolean;
@@ -78,6 +82,21 @@ export const handler: Handlers<ContentDetailPageProps> = {
       console.error("Failed to fetch watch providers:", error);
     }
 
+    // Fetch videos and extract trailer key
+    let trailerKey: string | null = null;
+    try {
+      if (contentType === "movie") {
+        const videos = await getMovieVideos(contentId);
+        trailerKey = extractTrailerKey(videos);
+      } else {
+        const videos = await getTvVideos(contentId);
+        trailerKey = extractTrailerKey(videos);
+      }
+    } catch (error) {
+      // Log error but don't fail the page if videos fail
+      console.error("Failed to fetch videos:", error);
+    }
+
     // Fetch user status and rating if authenticated
     let userStatus: "watched" | "to_watch" | "favourite" | null = null;
     let userRating: number | null = null;
@@ -111,6 +130,7 @@ export const handler: Handlers<ContentDetailPageProps> = {
       content,
       contentType,
       watchProviders,
+      trailerKey,
       userStatus,
       userRating,
       isAuthenticated: session !== null,
@@ -214,6 +234,7 @@ export default function ContentDetailPage(
     content,
     contentType,
     watchProviders,
+    trailerKey,
     userStatus,
     userRating,
     isAuthenticated,
@@ -332,6 +353,24 @@ export default function ContentDetailPage(
                   Synopsis
                 </h2>
                 <p class="text-gray-700 leading-relaxed">{content.overview}</p>
+              </div>
+            )}
+
+            {/* Trailer */}
+            {trailerKey && (
+              <div class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">
+                  Trailer
+                </h2>
+                <div class="relative w-full" style="padding-bottom: 56.25%">
+                  <iframe
+                    class="absolute top-0 left-0 w-full h-full rounded-lg"
+                    src={`https://www.youtube.com/embed/${trailerKey}`}
+                    title={`${title} Trailer`}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
               </div>
             )}
 

@@ -720,6 +720,95 @@ export async function getTrending(
 }
 
 /**
+ * Video from TMDB API
+ */
+export interface Video {
+  id: string;
+  key: string;
+  name: string;
+  site: string;
+  type: string;
+  official: boolean;
+  published_at: string;
+  [key: string]: unknown; // Allow additional fields
+}
+
+/**
+ * Videos response from TMDB API
+ */
+export interface VideosResponse {
+  id: number;
+  results: Video[];
+}
+
+/**
+ * Fetch videos for a movie by TMDB ID
+ *
+ * @param movieId TMDB movie ID
+ * @returns Videos response
+ * @throws Error if movie not found or API request fails
+ */
+export async function getMovieVideos(
+  movieId: number,
+): Promise<VideosResponse> {
+  if (!Number.isInteger(movieId) || movieId <= 0) {
+    throw new Error(`Invalid movie ID: ${movieId}`);
+  }
+
+  const videos = await request<VideosResponse>(`/movie/${movieId}/videos`);
+  return videos;
+}
+
+/**
+ * Fetch videos for a TV show by TMDB ID
+ *
+ * @param tvId TMDB TV show ID
+ * @returns Videos response
+ * @throws Error if TV show not found or API request fails
+ */
+export async function getTvVideos(tvId: number): Promise<VideosResponse> {
+  if (!Number.isInteger(tvId) || tvId <= 0) {
+    throw new Error(`Invalid TV show ID: ${tvId}`);
+  }
+
+  const videos = await request<VideosResponse>(`/tv/${tvId}/videos`);
+  return videos;
+}
+
+/**
+ * Extract YouTube trailer key from videos response
+ * Prefers official trailers, falls back to first trailer if no official one found
+ *
+ * @param videos Videos response from TMDB API
+ * @returns YouTube video key, or null if no trailer found
+ */
+export function extractTrailerKey(videos: VideosResponse): string | null {
+  if (!videos.results || videos.results.length === 0) {
+    return null;
+  }
+
+  // Filter for YouTube trailers
+  const trailers = videos.results.filter(
+    (video) =>
+      video.site === "YouTube" &&
+      (video.type === "Trailer" || video.type === "Teaser"),
+  );
+
+  if (trailers.length === 0) {
+    return null;
+  }
+
+  // Prefer official trailers
+  const officialTrailer = trailers.find((trailer) => trailer.official);
+  if (officialTrailer) {
+    return officialTrailer.key;
+  }
+
+  // Fall back to first trailer
+  return trailers[0].key;
+}
+
+/**
  * TMDB API client instance
  */
 export const tmdbClient = {
@@ -734,5 +823,8 @@ export const tmdbClient = {
   getTvWatchProvidersByRegion,
   filterWatchProvidersByRegion,
   getTrending,
+  getMovieVideos,
+  getTvVideos,
+  extractTrailerKey,
   request,
 };
