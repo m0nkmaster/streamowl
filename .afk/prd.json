@@ -869,7 +869,7 @@
         "Step 3: Test checkout flow with Stripe test cards",
         "Step 4: Verify webhook updates user premium status"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "premium-checkout-flow",

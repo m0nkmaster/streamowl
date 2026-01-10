@@ -817,3 +817,17 @@
 - Cache cleanup: Activate event deletes old caches when service worker updates, prevents cache accumulation and ensures only current caches are used
 - Cross-origin protection: Service worker only handles same-origin requests, skips cross-origin requests to prevent caching external resources inappropriately
 - Request method filtering: Service worker only handles GET requests, skips POST/PUT/DELETE requests to prevent caching state-changing operations
+
+## Stripe Integration
+
+- Stripe SDK: Use `stripe` package from esm.sh with `?target=deno` parameter for Deno compatibility
+- Stripe client: Created singleton Stripe client in `lib/stripe/client.ts` with API version configuration and fetch HTTP client for Deno compatibility
+- Environment variables: Stripe requires STRIPE_SECRET_KEY (server-side), STRIPE_PUBLISHABLE_KEY (client-side), STRIPE_WEBHOOK_SECRET (webhook verification), and APP_BASE_URL (for redirect URLs)
+- Checkout session: Created `/api/premium/checkout` endpoint that creates Stripe Checkout sessions for subscription payments, accepts priceId in request body, returns session URL for redirect
+- Webhook endpoint: Created `/api/premium/webhook` endpoint at `/api/premium/webhook` to handle Stripe subscription events (checkout.session.completed, customer.subscription.created/updated/deleted, invoice.payment_succeeded/failed)
+- Webhook security: Webhook endpoint verifies Stripe signature using `stripe.webhooks.constructEvent()` with raw request body and webhook secret to prevent unauthorised requests
+- Raw request body: Webhook endpoints must use `req.text()` to get raw body text before parsing, as Stripe signature verification requires the exact raw body
+- Premium status storage: Premium status stored in `users.preferences.premium` as boolean, updated via `jsonb_set()` PostgreSQL function when subscription events occur
+- User ID extraction: Webhook extracts userId from event metadata, checkout session client_reference_id, or customer metadata depending on event type
+- Subscription events: Handles subscription lifecycle events - activates premium on checkout completion and subscription creation/update, deactivates on subscription deletion
+- API version: Use Stripe API version "2024-11-20.acacia" or later for latest features and security updates
