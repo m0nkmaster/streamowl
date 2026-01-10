@@ -792,3 +792,13 @@
 - Favourites display: Public profile shows up to 20 most recent favourites with poster images, titles, types, and release years, using same ContentGrid component pattern as other content displays
 - Profile URL display: Settings page shows public profile URL (`/profile/{userId}`) when enabled, with clickable link that opens in new tab
 - Query result pattern: The `query()` function from `lib/db.ts` returns an array directly (not an object with `.rows` property), so use `result.length` and `result[0]` instead of `result.rows.length` and `result.rows[0]`
+
+## PWA Manifest Implementation
+
+- PWA manifest location: Created `static/manifest.json` for PWA configuration - static assets in Fresh are served from the `static/` directory
+- Manifest structure: Includes app name, short_name, description, start_url, display mode (standalone), theme colours, icons, shortcuts, and categories
+- Theme colour: Set to `#86efac` (matching the app's green accent colour from logo) - this controls browser chrome colour on mobile
+- Manifest linking: Added `<link rel="manifest" href="/manifest.json" />` in `routes/_app.tsx` head section, along with `<meta name="theme-color">` for browser chrome
+- Icon configuration: Manifest references SVG icon (`/logo.svg`) for any size, plus PNG icons (`/icon-192.png`, `/icon-512.png`) for better mobile support - PNG icons should be generated from SVG for production
+- PWA shortcuts: Added shortcuts for Search and Library pages to allow quick navigation from home screen
+- Display mode: Set to "standalone" for app-like experience without browser UI when installed

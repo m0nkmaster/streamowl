@@ -830,7 +830,7 @@
         "Step 3: Verify manifest loads in browser dev tools",
         "Step 4: Test install prompt appears on mobile"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "pwa-service-worker",
