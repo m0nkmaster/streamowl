@@ -730,3 +730,11 @@
 - Stuck job recovery: `resetStuckJobs()` function resets jobs stuck in 'processing' status for more than 5 minutes back to 'pending', handles worker crashes gracefully
 - Error handling: Failed jobs are marked with error messages, allows debugging and monitoring of embedding generation failures
 - Task command: Added `deno task process:embeddings` command for easy manual queue processing
+
+## AI - Recommendation Dismissal Implementation
+
+- Dismissed recommendations table: Created `dismissed_recommendations` table with user_id, content_id, and dismissed_at timestamp, includes unique constraint on (user_id, content_id) to prevent duplicate dismissals
+- Dismissal API endpoint: Created `/api/recommendations/[tmdb_id]/dismiss` endpoint that fetches TMDB details, creates content record if needed, and records dismissal (idempotent operation)
+- Recommendation exclusion: Updated `generateRecommendationCandidates()` to exclude dismissed content using NOT IN subquery on dismissed_recommendations table, ensures dismissed content never appears in future recommendations
+- Dismiss button UI: Added "Not Interested" button to RecommendationFeed component that appears on hover, uses optimistic UI updates (removes immediately, reverts on error), prevents navigation when clicked using stopPropagation
+- Content creation pattern: Dismiss endpoint follows same pattern as watched endpoint - fetches TMDB details first to determine content type (movie/tv), then creates content record if needed before recording dismissal
