@@ -838,3 +838,11 @@
 - Settings redirect handling: Settings page checks for `session_id` query parameter to show success message, checks for `canceled=true` to show cancellation message, webhook handles actual premium activation asynchronously
 - Upgrade button updates: All "Upgrade to Premium" buttons throughout app (CreateListModal, RecommendationFeed) now link to `/premium` instead of `/settings`, providing consistent upgrade experience
 - Premium status check: Pricing page checks if user already has premium and shows success message instead of pricing options, prevents duplicate subscriptions
+
+- Subscription management: Created `/api/premium/portal` endpoint that creates Stripe Customer Portal sessions for users to manage subscriptions, update payment methods, and view billing history
+- Customer Portal: Uses `stripe.billingPortal.sessions.create()` with customer ID and return URL, redirects user to Stripe-hosted portal for subscription management
+- Subscription details storage: Webhook stores Stripe customer ID, subscription ID, current period end timestamp, and plan name in `users.preferences` JSONB field for easy retrieval
+- Subscription display: Settings page displays subscription plan name, renewal date, and "Manage Subscription" button for premium users, shows upgrade prompt for free users
+- Customer metadata: Webhook ensures Stripe customer metadata contains userId for reliable user identification in subscription events, updates metadata on checkout completion
+- Subscription cancellation: When subscription is deleted via webhook, premium status is deactivated and subscription details are cleared from user preferences using JSONB key deletion
+- Plan name formatting: Subscription plan names are formatted for display (e.g., "Premium Monthly", "Premium Yearly") based on plan nickname or price ID

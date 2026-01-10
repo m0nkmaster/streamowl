@@ -895,7 +895,7 @@
         "Step 3: Click 'Manage Subscription' to open Stripe portal",
         "Step 4: Verify cancel flow works and updates user status"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "premium-feature-gating",
