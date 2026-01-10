@@ -1031,3 +1031,17 @@
 - Provider coverage: Supports 30+ streaming services including Netflix, Disney+, Amazon, BBC iPlayer, Hulu, Paramount+, etc.
 - Helper functions: `generateDeepLink()` creates URLs, `hasDeepLinkSupport()` checks if provider is mapped
 
+
+
+## Streaming Availability Background Sync
+
+- Streaming sync module location: `lib/streaming/sync.ts` contains core logic for syncing streaming availability from TMDB
+- API endpoint: POST `/api/jobs/sync-streaming` triggers sync, GET returns stats
+- Script runner: `scripts/sync-streaming-availability.ts` for manual/cron execution
+- Key functions: `processStreamingSyncJob()` orchestrates the sync with rate limiting
+- Stale data detection: Uses LEFT JOIN to find content with no streaming data or outdated records (configurable maxAgeHours)
+- Rate limiting: Default 25ms delay between TMDB API calls (40 req/sec) to stay within TMDB's 50 req/sec limit
+- Expired removal: `removeExpiredAvailability()` cleans up records where available_until < CURRENT_DATE
+- Provider mapping: `getOrCreateStreamingService()` creates streaming_services records on-the-fly from TMDB provider names
+- Statistics: `getStreamingAvailabilityStats()` provides counts for monitoring sync coverage
+- Pattern follows embedding-queue.ts for background job structure

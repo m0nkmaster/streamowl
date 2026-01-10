@@ -1389,7 +1389,7 @@
         "Step 3: Verify expired availability removed",
         "Step 4: Verify job handles API rate limits"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "analytics-basic-tracking",
