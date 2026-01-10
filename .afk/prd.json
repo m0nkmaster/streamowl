@@ -1090,7 +1090,7 @@
         "Step 3: Make same request again",
         "Step 4: Verify 304 Not Modified or cache hit"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "security-password-hashing",
