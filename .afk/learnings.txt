@@ -276,3 +276,21 @@
 - Watch provider links: Use TMDB's `link` field from `CategorisedWatchProviders` which provides a deep link to TMDB's page for watching content in that region
 - Graceful degradation: Handle watch provider fetch failures gracefully - log error but don't fail the page if providers are unavailable
 - Provider categorisation: TMDB categorises providers into subscription (flatrate), rent, buy, ads, and free arrays - display each category separately for clarity
+
+## Library - Watched List Implementation
+
+- Content helper module: Created `lib/content.ts` with functions to get or create content records from TMDB data, ensuring content exists in database before creating user_content relationships
+- Get or create pattern: Use `getOrCreateContent()` function that checks for existing content by TMDB ID, creates new record if not found, returns database UUID for user_content relationships
+- Content creation from TMDB: When marking content as watched, fetch full TMDB details and create content record with title, overview, release_date, poster_path, backdrop_path, and metadata (vote_average, vote_count)
+- User content status API: Created `/api/content/[tmdb_id]/status` endpoint to fetch user's status for specific content (watched, to_watch, favourite, or null) for initialising UI state
+- Mark as watched API: Created `/api/content/[tmdb_id]/watched` endpoint with POST (mark as watched) and DELETE (remove watched status) methods, handles upsert logic (insert or update existing user_content record)
+- Watched timestamp: Set `watched_at` timestamp automatically when marking content as watched, use current timestamp for both new inserts and updates
+- Watched content API: Created `/api/library/watched` endpoint to fetch all watched content for authenticated user, includes content details (tmdb_id, type, title, poster_path, release_date) and watched_at timestamp
+- Library tabs component: Created `islands/LibraryTabs.tsx` island component for tabbed library view with Watched, To Watch, and Favourites tabs, fetches watched content on mount when Watched tab is active
+- Mark as watched button: Created `islands/MarkAsWatchedButton.tsx` island component with optimistic UI updates, toggles between "Mark as Watched" and "✓ Watched" states, handles API errors with revert on failure
+- Optimistic updates: Update UI state immediately when user clicks button, revert if API call fails to maintain consistency between UI and server state
+- Button visibility: Only show "Mark as Watched" button for authenticated users on content detail page, check session in route handler and pass isAuthenticated prop to component
+- Library page integration: Updated `/routes/library.tsx` to use LibraryTabs island component, displays watched content in responsive grid layout with poster images, titles, and watched dates
+- Date formatting: Format watched_at timestamps using `toLocaleDateString()` with "en-GB" locale for British English date formatting (e.g., "15 January 2024")
+- Empty states: Display helpful messages when no watched content exists, guide users to mark content as watched to populate their library
+- Content grid layout: Use responsive grid (2-5 columns based on viewport) for displaying library content, consistent with search results page layout

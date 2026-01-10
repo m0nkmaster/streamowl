@@ -414,7 +414,7 @@
         "Step 3: Navigate to /library and select 'Watched' tab",
         "Step 4: Verify content appears in watched list with date"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "library-to-watch-list",
