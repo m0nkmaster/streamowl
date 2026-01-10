@@ -479,7 +479,7 @@
         "Step 3: Verify note displays on content page",
         "Step 4: Verify note is private (not visible to other users)"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "custom-lists-create",

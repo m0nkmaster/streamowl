@@ -635,3 +635,13 @@
 - Toast integration: Show success toast notifications when actions complete successfully, show error toast notifications when actions fail (including authentication errors), toast messages include content title for context
 - Search and browse integration: Updated `SearchPage` and `BrowsePage` islands to include QuickActions component on each content card, fetch statuses lazily on hover to reduce initial load time, handle authentication errors gracefully (show error toast for unauthenticated users)
 - CSS animations: Added slide-in animation for toast notifications using CSS keyframes in `_app.tsx` head section, animation uses `translateX(100%)` to `translateX(0)` for right-to-left slide effect
+
+## Notes System Implementation
+
+- Notes API endpoint: Created `/api/content/[tmdb_id]/notes` endpoint with GET (fetch notes) and POST (save/update notes) methods, follows same pattern as rating endpoint with authentication required
+- Notes storage: Notes stored in `user_content.notes` TEXT column (already exists in schema), normalised empty strings to null for consistency, limited to 10,000 characters
+- Notes component: Created `islands/NotesComponent.tsx` island component with edit/view modes, textarea for editing with character counter, displays notes with whitespace preservation using `whitespace-pre-wrap` CSS class
+- Privacy guarantee: Notes are private by design - API endpoints filter by user_id, ensuring users can only access their own notes, no sharing or public visibility
+- Content detail integration: Updated content detail page handler to fetch user notes alongside status and rating, added NotesComponent below RatingComponent in UI with border separator
+- Optimistic updates: Notes component uses optimistic UI updates (immediately update state on save), reverts on API failure to maintain consistency, shows loading states during save operations
+- Edit mode: Notes component has view mode (shows notes or placeholder) and edit mode (textarea with save/cancel buttons), toggles between modes with Edit/Add Note button
