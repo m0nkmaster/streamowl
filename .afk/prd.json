@@ -440,7 +440,7 @@
         "Step 3: Navigate to /library and select 'Favourites' tab",
         "Step 4: Verify content appears in favourites list"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "library-quick-actions",

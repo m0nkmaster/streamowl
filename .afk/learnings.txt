@@ -305,3 +305,13 @@
 - Tab-based data fetching: Use useEffect hook with activeTab dependency to fetch data only when specific tab is active, prevents unnecessary API calls
 - Multiple content states: Content can have different statuses (watched, to_watch, favourite) - buttons check initialStatus prop to determine current state and update accordingly
 - Button grouping: Display multiple action buttons (Mark as Watched, Add to Watchlist) side-by-side on content detail page using flex layout with gap spacing
+
+## Library - Favourites List Implementation
+
+- Favourites API endpoint: Created `/api/content/[tmdb_id]/favourite` endpoint with POST (add to favourites) and DELETE (remove from favourites) methods, follows same pattern as watchlist endpoint but uses 'favourite' status
+- Favourites status: Use 'favourite' status in user_content table to track favourite items, no watched_at timestamp needed for favourites
+- Favourite button: Created `islands/FavouriteButton.tsx` island component with optimistic UI updates, uses heart icon (filled when favourited) with red colour scheme to distinguish from other action buttons
+- Favourites content API: Created `/api/library/favourites` endpoint to fetch all favourites content for authenticated user, includes content details and created_at timestamp (when added to favourites)
+- Library tabs favourites: Updated `islands/LibraryTabs.tsx` to fetch and display favourites content when "Favourites" tab is active, uses same grid layout and date formatting as watched and watchlist tabs
+- Heart icon implementation: Use SVG heart icon with conditional fill styling - filled (fill="currentColor") when favourited, outline (fill="none" with stroke) when not favourited
+- Button accessibility: Add aria-label attributes to icon buttons for screen reader support, describing current state (e.g., "Remove from favourites" vs "Add to favourites")
