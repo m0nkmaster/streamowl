@@ -1181,7 +1181,7 @@
         "Step 3: Trigger validation error on form",
         "Step 4: Verify field-level error messages display"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "error-handling-404-page",

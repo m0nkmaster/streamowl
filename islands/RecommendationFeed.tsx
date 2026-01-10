@@ -8,6 +8,7 @@ import {
 } from "../lib/images.ts";
 import RecommendationChat from "./RecommendationChat.tsx";
 import { useToast } from "./Toast.tsx";
+import ErrorDisplay from "../components/ErrorDisplay.tsx";
 
 interface RecommendationsResponse {
   recommendations: RecommendationCandidate[];
@@ -68,50 +69,51 @@ export default function RecommendationFeed() {
     fetchPremiumStatus();
   }, []);
 
+  // Fetch recommendations function (extracted for reuse in retry)
+  const fetchRecommendations = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch("/api/recommendations");
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          // User not authenticated, but this shouldn't happen if component is only shown to authenticated users
+          throw new Error("Please log in to see recommendations");
+        }
+        if (response.status === 403) {
+          // Rate limit reached
+          const data: RecommendationsResponse = await response.json();
+          setRateLimitReached(true);
+          setRemainingRecommendations(data.remainingRecommendations || 0);
+          setUpgradePrompt(data.upgradePrompt || null);
+          setRecommendations([]);
+          return;
+        }
+        throw new Error("Failed to fetch recommendations");
+      }
+
+      const data: RecommendationsResponse = await response.json();
+      setRecommendations(data.recommendations || []);
+      setRateLimitReached(data.rateLimitReached || false);
+      setRemainingRecommendations(data.remainingRecommendations ?? null);
+      setUpgradePrompt(data.upgradePrompt || null);
+
+      // Fetch watchlist statuses for all recommendations
+      if (data.recommendations && data.recommendations.length > 0) {
+        fetchWatchlistStatuses(data.recommendations);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+      console.error("Error fetching recommendations:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch recommendations on mount
   useEffect(() => {
-    const fetchRecommendations = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const response = await fetch("/api/recommendations");
-
-        if (!response.ok) {
-          if (response.status === 401) {
-            // User not authenticated, but this shouldn't happen if component is only shown to authenticated users
-            throw new Error("Please log in to see recommendations");
-          }
-          if (response.status === 403) {
-            // Rate limit reached
-            const data: RecommendationsResponse = await response.json();
-            setRateLimitReached(true);
-            setRemainingRecommendations(data.remainingRecommendations || 0);
-            setUpgradePrompt(data.upgradePrompt || null);
-            setRecommendations([]);
-            return;
-          }
-          throw new Error("Failed to fetch recommendations");
-        }
-
-        const data: RecommendationsResponse = await response.json();
-        setRecommendations(data.recommendations || []);
-        setRateLimitReached(data.rateLimitReached || false);
-        setRemainingRecommendations(data.remainingRecommendations ?? null);
-        setUpgradePrompt(data.upgradePrompt || null);
-
-        // Fetch watchlist statuses for all recommendations
-        if (data.recommendations && data.recommendations.length > 0) {
-          fetchWatchlistStatuses(data.recommendations);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-        console.error("Error fetching recommendations:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchRecommendations();
   }, []);
 
@@ -343,13 +345,11 @@ export default function RecommendationFeed() {
 
       {/* Error State */}
       {error && !loading && (
-        <div class="text-center py-8">
-          <p class="text-red-600">Error: {error}</p>
-          <p class="text-sm text-gray-500 mt-2">
-            Make sure you've watched and rated some content to get
-            recommendations.
-          </p>
-        </div>
+        <ErrorDisplay
+          message={error}
+          helpText="Make sure you've watched and rated some content to get recommendations."
+          onRetry={fetchRecommendations}
+        />
       )}
 
       {/* Rate Limit Reached State */}

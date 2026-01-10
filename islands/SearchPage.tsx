@@ -9,6 +9,7 @@ import ContentGrid from "../components/ContentGrid.tsx";
 import QuickActions from "./QuickActions.tsx";
 import { useToast } from "./Toast.tsx";
 import SkeletonCard from "../components/SkeletonCard.tsx";
+import ErrorDisplay from "../components/ErrorDisplay.tsx";
 
 interface SearchResponse {
   results: Content[];
@@ -398,9 +399,17 @@ export default function SearchPage() {
 
       {/* Error State */}
       {error && !loading && (
-        <div class="text-center py-8" role="alert" aria-live="assertive">
-          <p class="text-red-600">Error: {error}</p>
-        </div>
+        <ErrorDisplay
+          message={`Failed to search: ${error}`}
+          helpText="Please check your connection and try again."
+          onRetry={() => {
+            setError(null);
+            // Trigger search again by updating query
+            const currentQuery = query;
+            setQuery("");
+            setTimeout(() => setQuery(currentQuery), 10);
+          }}
+        />
       )}
 
       {/* Filter Buttons */}

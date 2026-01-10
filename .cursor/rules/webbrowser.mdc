@@ -1,0 +1,8 @@
+---
+name: webbrowser
+description: Use Playwright MCP for testing web pages
+---
+
+# Overview
+
+Playwright MCP can be used to view webpages, screenshots, analyze console outputs, use it when designing webapps and ensuring they are working as expected.

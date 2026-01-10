@@ -957,3 +957,17 @@
 - API routes updated: Applied caching headers to all GET endpoints including search, recommendations, trending, new-releases, library endpoints, content status, tags, and lists
 - Async ETag generation: ETag generation is async (uses Web Crypto API), so `handleConditionalRequest` and `createCachedResponse` are async functions
 - Weak ETags: Uses weak ETags (W/) prefix since content may vary slightly but be semantically equivalent (e.g., JSON ordering differences)
+
+## Error Handling UI
+
+- ErrorDisplay component: Created reusable `components/ErrorDisplay.tsx` for consistent error UI with retry functionality
+- Retry functionality: ErrorDisplay accepts `onRetry` callback prop to allow users to retry failed operations
+- Network error handling: Updated SearchPage and RecommendationFeed to use ErrorDisplay component with retry buttons
+- Form validation errors: Created SignupForm and LoginForm island components with client-side error handling
+- Field-level errors: Forms display validation errors next to specific fields with ARIA attributes (aria-invalid, aria-describedby)
+- Error state management: Forms use useState to track field-level and general errors separately
+- API error parsing: Forms parse JSON error responses and extract field-specific errors from `details` object
+- Error styling: Error states use red borders and text, with error messages displayed below fields
+- Accessibility: Error messages use role="alert" and aria-live="assertive" for screen reader announcements
+- Form submission: Forms intercept submit events, make fetch requests, and handle errors without page reload
+- Retry pattern: Extracted fetch functions from useEffect hooks to allow reuse in retry handlers
