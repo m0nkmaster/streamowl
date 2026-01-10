@@ -76,7 +76,7 @@
         "Step 3: Add foreign key constraints",
         "Step 4: Test creating a list and adding items with ordering"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "database-schema-tags",

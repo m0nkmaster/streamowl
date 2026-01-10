@@ -47,3 +47,9 @@
 - Rating column: Use `NUMERIC(3, 1)` for ratings with CHECK constraint to enforce 0-10 range
 - Cascade delete testing: Test cascade behaviour by deleting parent records and verifying child records are automatically deleted
 - Junction table indexes: Create indexes on foreign key columns and commonly queried columns (status, watched_at) for performance
+- Lists tables: Created lists table for user collections and list_items junction table for many-to-many relationship with content
+- Lists table structure: Includes user_id (FK to users), name, description, is_public (boolean), and timestamps with cascade delete from users
+- List_items table structure: Includes list_id (FK to lists), content_id (FK to content), position (integer for ordering), with cascade delete from both parent tables
+- List ordering: Use integer position column with index on (list_id, position) for efficient ordered queries
+- Composite unique constraint: Use UNIQUE(list_id, content_id) to prevent duplicate content in the same list
+- Test script pattern: Follow consistent structure - verify table structure, test inserts, test ordering, test constraints, test cascade deletes
