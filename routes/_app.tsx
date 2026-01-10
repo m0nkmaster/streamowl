@@ -15,6 +15,19 @@ export default function App({ Component, url, data }: PageProps) {
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Stream Owl</title>
+        {/* Preconnect to critical third-party origins for faster resource loading */}
+        <link
+          rel="preconnect"
+          href="https://image.tmdb.org"
+          crossOrigin="anonymous"
+        />
+        <link rel="dns-prefetch" href="https://image.tmdb.org" />
+        {/* Preconnect for YouTube embeds (trailers) */}
+        <link rel="preconnect" href="https://www.youtube.com" />
+        <link rel="preconnect" href="https://www.youtube-nocookie.com" />
+        <link rel="dns-prefetch" href="https://www.youtube.com" />
+        {/* Preload critical CSS to avoid render-blocking */}
+        <link rel="preload" href="/styles.css" as="style" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#86efac" />
         <meta
