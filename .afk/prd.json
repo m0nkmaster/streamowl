@@ -674,7 +674,7 @@
         "Step 3: Store aggregated taste embedding in users table",
         "Step 4: Recalculate when user rates or watches new content"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "ai-recommendation-candidates",

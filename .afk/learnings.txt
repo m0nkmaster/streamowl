@@ -387,3 +387,16 @@
 - Convenience functions: Create helper functions like generateEmbeddingFromTmdbDetails() that extract title, overview, and genres from TMDB details and generate/store embeddings in one call
 - Error handling: Handle OpenAI API errors (network failures, rate limits, invalid responses) with clear error messages, verify embedding dimension matches expected before storage
 - Test script pattern: Create test scripts that verify embedding generation, dimension matching, database storage, and retrieval following consistent test patterns used in other modules
+
+## AI - User Taste Profile Calculation
+
+- Taste profile calculation: Calculate user taste profile as weighted average of watched content embeddings, stored in users.taste_embedding column (vector(1536))
+- Weighted average algorithm: Aggregate watched content embeddings weighted by user ratings (higher ratings contribute more weight), normalise weights to sum to 1.0 for proper averaging
+- Rating weighting: Use rating/10 as weight (0-1 scale), with minimum weight of 0.1 for very low ratings to ensure all content contributes, default weight of 5.0 (0.5 normalised) for unrated content
+- Embedding aggregation: Calculate weighted average by multiplying each embedding vector by its normalised weight and summing across all dimensions, verify all embeddings have same dimension (1536) before aggregation
+- Taste profile storage: Store calculated taste embedding in users.taste_embedding column using pgvector format '[0.1,0.2,...]' with explicit cast to vector(1536) type
+- Empty state handling: Set taste_embedding to NULL when user has no watched content or no content with embeddings, allows distinguishing between users without data and users with calculated profiles
+- Recalculation triggers: Recalculate taste profile automatically when user rates content or marks content as watched, call recalculateTasteProfile() after database updates in rating and watched endpoints
+- Error handling: Taste profile calculation errors are logged but don't fail the main operation (non-blocking), ensures user actions (rating/watching) succeed even if taste profile calculation fails
+- Content embedding requirement: Only include watched content that has content_embedding IS NOT NULL in taste profile calculation, filters out content without embeddings to prevent NULL errors
+- Test coverage: Test taste profile calculation with various scenarios: multiple watched items, rating weighting, unrated content, no watched content, content without embeddings
