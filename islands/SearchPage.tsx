@@ -56,6 +56,8 @@ export default function SearchPage() {
   const [error, setError] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<ContentTypeFilter>("all");
   const [genreFilter, setGenreFilter] = useState<number | null>(null);
+  const [minYear, setMinYear] = useState<number | null>(null);
+  const [maxYear, setMaxYear] = useState<number | null>(null);
   const [debounceTimer, setDebounceTimer] = useState<
     ReturnType<typeof setTimeout> | null
   >(null);
@@ -126,7 +128,23 @@ export default function SearchPage() {
   const sortedGenres = Array.from(availableGenres.entries())
     .sort((a, b) => a[1].localeCompare(b[1]));
 
-  // Filter results by content type and genre
+  // Extract available years from results
+  const availableYears = new Set<number>();
+  results.forEach((content) => {
+    if (content.release_date) {
+      const year = new Date(content.release_date).getFullYear();
+      if (!isNaN(year)) {
+        availableYears.add(year);
+      }
+    }
+  });
+  const sortedYears = Array.from(availableYears).sort((a, b) => a - b);
+  const minAvailableYear = sortedYears.length > 0 ? sortedYears[0] : null;
+  const maxAvailableYear = sortedYears.length > 0
+    ? sortedYears[sortedYears.length - 1]
+    : null;
+
+  // Filter results by content type, genre, and year range
   const filteredResults = results.filter((content) => {
     // Apply type filter
     if (typeFilter !== "all" && content.type !== typeFilter) {
@@ -137,6 +155,29 @@ export default function SearchPage() {
     if (genreFilter !== null) {
       const genreIds = (content.metadata.genre_ids as number[]) || [];
       if (!genreIds.includes(genreFilter)) {
+        return false;
+      }
+    }
+
+    // Apply year range filter
+    if (content.release_date) {
+      const year = new Date(content.release_date).getFullYear();
+      if (!isNaN(year)) {
+        if (minYear !== null && year < minYear) {
+          return false;
+        }
+        if (maxYear !== null && year > maxYear) {
+          return false;
+        }
+      } else {
+        // If date is invalid and year filter is set, exclude
+        if (minYear !== null || maxYear !== null) {
+          return false;
+        }
+      }
+    } else {
+      // If no release date and year filter is set, exclude
+      if (minYear !== null || maxYear !== null) {
         return false;
       }
     }
@@ -256,6 +297,67 @@ export default function SearchPage() {
               )}
             </div>
           )}
+
+          {/* Year Range Filter */}
+          {minAvailableYear !== null && maxAvailableYear !== null && (
+            <div class="flex items-center gap-2 flex-wrap">
+              <label
+                for="min-year"
+                class="text-sm font-medium text-gray-700"
+              >
+                Year Range:
+              </label>
+              <input
+                type="number"
+                id="min-year"
+                min={minAvailableYear}
+                max={maxYear !== null ? maxYear : maxAvailableYear}
+                value={minYear?.toString() || ""}
+                onChange={(e) => {
+                  const value = (e.target as HTMLInputElement).value;
+                  const year = value === "" ? null : parseInt(value, 10);
+                  if (year !== null && maxYear !== null && year > maxYear) {
+                    // If min year exceeds max year, update max year
+                    setMaxYear(year);
+                  }
+                  setMinYear(year);
+                }}
+                placeholder={minAvailableYear.toString()}
+                class="px-3 py-2 w-24 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+              />
+              <span class="text-gray-600">to</span>
+              <input
+                type="number"
+                id="max-year"
+                min={minYear !== null ? minYear : minAvailableYear}
+                max={maxAvailableYear}
+                value={maxYear?.toString() || ""}
+                onChange={(e) => {
+                  const value = (e.target as HTMLInputElement).value;
+                  const year = value === "" ? null : parseInt(value, 10);
+                  if (year !== null && minYear !== null && year < minYear) {
+                    // If max year is less than min year, update min year
+                    setMinYear(year);
+                  }
+                  setMaxYear(year);
+                }}
+                placeholder={maxAvailableYear.toString()}
+                class="px-3 py-2 w-24 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+              />
+              {(minYear !== null || maxYear !== null) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMinYear(null);
+                    setMaxYear(null);
+                  }}
+                  class="px-3 py-2 text-sm text-indigo-600 hover:text-indigo-700 underline"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -265,7 +367,8 @@ export default function SearchPage() {
           <p class="text-gray-600 mb-4">
             Found {filteredResults.length}{" "}
             result{filteredResults.length !== 1 ? "s" : ""}
-            {(typeFilter !== "all" || genreFilter !== null) &&
+            {(typeFilter !== "all" || genreFilter !== null ||
+              minYear !== null || maxYear !== null) &&
               ` (${results.length} total)`}
           </p>
           <ContentGrid>
@@ -320,31 +423,51 @@ export default function SearchPage() {
                     : "content"
                 }${
                   genreFilter !== null ? ` in ${GENRE_MAP[genreFilter]}` : ""
+                }${
+                  minYear !== null || maxYear !== null
+                    ? ` from ${
+                      minYear !== null ? minYear : minAvailableYear
+                    } to ${maxYear !== null ? maxYear : maxAvailableYear}`
+                    : ""
                 } found for "${query}"`}
             </p>
             {results.length > 0 &&
-              (typeFilter !== "all" || genreFilter !== null) && (
-              <div class="mt-4 flex gap-2 justify-center">
-                {typeFilter !== "all" && (
-                  <button
-                    type="button"
-                    onClick={() => setTypeFilter("all")}
-                    class="text-indigo-600 hover:text-indigo-700 underline"
-                  >
-                    Show all types
-                  </button>
-                )}
-                {genreFilter !== null && (
-                  <button
-                    type="button"
-                    onClick={() => setGenreFilter(null)}
-                    class="text-indigo-600 hover:text-indigo-700 underline"
-                  >
-                    Show all genres
-                  </button>
-                )}
-              </div>
-            )}
+              (typeFilter !== "all" || genreFilter !== null ||
+                minYear !== null || maxYear !== null) &&
+              (
+                <div class="mt-4 flex gap-2 justify-center flex-wrap">
+                  {typeFilter !== "all" && (
+                    <button
+                      type="button"
+                      onClick={() => setTypeFilter("all")}
+                      class="text-indigo-600 hover:text-indigo-700 underline"
+                    >
+                      Show all types
+                    </button>
+                  )}
+                  {genreFilter !== null && (
+                    <button
+                      type="button"
+                      onClick={() => setGenreFilter(null)}
+                      class="text-indigo-600 hover:text-indigo-700 underline"
+                    >
+                      Show all genres
+                    </button>
+                  )}
+                  {(minYear !== null || maxYear !== null) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMinYear(null);
+                        setMaxYear(null);
+                      }}
+                      class="text-indigo-600 hover:text-indigo-700 underline"
+                    >
+                      Show all years
+                    </button>
+                  )}
+                </div>
+              )}
           </div>
         )}
 
