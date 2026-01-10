@@ -13,6 +13,7 @@ import {
   hasReachedRecommendationLimit,
   incrementRecommendationUsage,
 } from "../../lib/ai/recommendation-rate-limit.ts";
+import { logError } from "../../lib/logging/logger.ts";
 
 interface RecommendationsResponse {
   recommendations: RecommendationCandidate[];
@@ -94,9 +95,11 @@ export const handler: Handlers = {
               explanation,
             };
           } catch (error) {
-            console.error(
-              `Error generating explanation for ${candidate.title}:`,
+            await logError(
+              `Error generating explanation for ${candidate.title}`,
+              req,
               error,
+              { candidateId: candidate.tmdb_id, candidateTitle: candidate.title },
             );
             // Continue without explanation if generation fails
             return candidate;
@@ -127,8 +130,11 @@ export const handler: Handlers = {
         return error;
       }
 
-      const message = error instanceof Error ? error.message : String(error);
-      console.error("Recommendations error:", message);
+      await logError(
+        "Failed to fetch recommendations",
+        req,
+        error,
+      );
       return new Response(
         JSON.stringify({ error: "Failed to fetch recommendations" }),
         {

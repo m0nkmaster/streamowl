@@ -96,6 +96,7 @@ export const handler: Handlers = {
     } catch (error) {
       return createInternalServerErrorResponse(
         "Failed to search content",
+        req,
         error,
       );
     }

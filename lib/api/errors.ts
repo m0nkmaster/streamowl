@@ -9,6 +9,8 @@
  * - Other HTTP status codes
  */
 
+import { logError } from "../logging/logger.ts";
+
 export interface ApiErrorResponse {
   error: string;
   message?: string;
@@ -87,17 +89,53 @@ export function createNotFoundResponse(
 
 /**
  * Create a 500 Internal Server Error response
+ *
+ * Supports both old signature (backward compatible) and new signature with request context:
+ * - Old: createInternalServerErrorResponse(message, error)
+ * - New: createInternalServerErrorResponse(message, req, error, metadata)
+ *
+ * Logs errors asynchronously without blocking the response.
  */
 export function createInternalServerErrorResponse(
   message: string = "Internal server error",
-  logError?: unknown,
+  reqOrError?: Request | unknown,
+  errorOrMetadata?: Error | unknown | Record<string, unknown>,
+  metadata?: Record<string, unknown>,
 ): Response {
-  if (logError) {
-    const errorMessage = logError instanceof Error
-      ? logError.message
-      : String(logError);
-    console.error("API error:", errorMessage);
+  // Determine which signature is being used
+  let req: Request | undefined;
+  let error: unknown;
+  let meta: Record<string, unknown> | undefined;
+
+  if (reqOrError instanceof Request) {
+    // New signature: (message, req, error?, metadata?)
+    req = reqOrError;
+    error = errorOrMetadata;
+    meta = metadata;
+  } else {
+    // Old signature: (message, error?)
+    error = reqOrError;
+    meta = errorOrMetadata as Record<string, unknown> | undefined;
   }
+
+  // Log asynchronously without blocking the response
+  if (error) {
+    logError(
+      `Internal server error: ${message}`,
+      req,
+      error,
+      meta,
+    ).catch((logErr) => {
+      // If logging fails, fall back to console.error
+      console.error("Failed to log error:", logErr);
+      if (error instanceof Error) {
+        console.error("Original error:", error.message, error.stack);
+      } else {
+        console.error("Original error:", String(error));
+      }
+    });
+  }
+
   return createErrorResponse(500, "Internal Server Error", message);
 }
 

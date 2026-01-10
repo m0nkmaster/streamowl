@@ -971,3 +971,17 @@
 - Accessibility: Error messages use role="alert" and aria-live="assertive" for screen reader announcements
 - Form submission: Forms intercept submit events, make fetch requests, and handle errors without page reload
 - Retry pattern: Extracted fetch functions from useEffect hooks to allow reuse in retry handlers
+
+## Logging - Structured Application Logging
+
+- Logging module: Created `lib/logging/logger.ts` module providing structured JSON logging with request context, error stack traces, and metadata
+- Log levels: Implemented four log levels (DEBUG, INFO, WARN, ERROR) with appropriate console methods (console.debug, console.info, console.warn, console.error)
+- JSON formatting: All logs are formatted as JSON strings for easy parsing by log aggregation tools (e.g., Datadog, CloudWatch, ELK stack)
+- Request context extraction: Logging automatically extracts request context including HTTP method, URL, pathname, client IP, user agent, and user session (userId, email) when available
+- Error logging: Errors are logged with full stack traces, error name, and error message in structured format
+- Backward compatibility: Updated `createInternalServerErrorResponse()` to support both old signature (message, error) and new signature (message, req, error, metadata) for gradual migration
+- Async logging: Error logging is performed asynchronously without blocking HTTP responses, with fallback to console.error if logging fails
+- IP extraction: Uses existing `getClientIp()` utility from rate limiting module to extract client IP from X-Forwarded-For or X-Real-IP headers
+- Session context: Logging attempts to extract user session from request using `getSessionFromRequest()` but gracefully handles failures (continues without user context)
+- Metadata support: All logging functions accept optional metadata parameter for additional context (e.g., candidateId, operation type)
+- Test script: Created `scripts/test-logging.ts` to verify logging functionality including JSON format, stack traces, and request context extraction

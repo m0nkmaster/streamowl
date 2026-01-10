@@ -115,7 +115,7 @@ export const handler: Handlers = {
         headers,
       });
     } catch (error) {
-      return createInternalServerErrorResponse("Failed to log in", error);
+      return createInternalServerErrorResponse("Failed to log in", req, error);
     }
   },
 };
