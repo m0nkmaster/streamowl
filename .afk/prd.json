@@ -1298,7 +1298,7 @@
         "Step 3: Update display name and save",
         "Step 4: Verify change persists across sessions"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "user-avatar-upload",

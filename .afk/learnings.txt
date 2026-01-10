@@ -1009,3 +1009,13 @@
 - Workflow triggers: Runs on push to main branch and on pull requests to main branch
 - Quality gates: Formatting check (`deno fmt --check`), linting (`deno lint`), type checking (`deno task typecheck`), unit tests (`deno task test:unit`), and integration tests (`deno task test:integration`)
 - Deployment blocking: Failed tests in CI will prevent deployment since Deno Deploy auto-deploys on push to main (CI runs before deployment)
+
+## User Settings Page
+
+- Profile section location: Added at the top of SettingsPage island before theme toggle
+- Profile API endpoint: /api/settings/profile (GET/POST) for fetching and updating user profile data
+- User table columns used: email (read-only), display_name (editable), avatar_url (displayed if set)
+- Display name editing: Uses inline edit mode with Save/Cancel buttons
+- Pattern for updating: POST with { displayName } to /api/settings/profile endpoint
+- Avatar display: Shows user's avatar_url if set, otherwise shows a coloured circle with first letter of name/email
+
