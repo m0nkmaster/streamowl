@@ -739,7 +739,7 @@
         "Step 3: Verify content added to To Watch list",
         "Step 4: Verify recommendation card updates to show added state"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "ai-conversation-chat",

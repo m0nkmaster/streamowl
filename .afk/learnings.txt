@@ -738,3 +738,11 @@
 - Recommendation exclusion: Updated `generateRecommendationCandidates()` to exclude dismissed content using NOT IN subquery on dismissed_recommendations table, ensures dismissed content never appears in future recommendations
 - Dismiss button UI: Added "Not Interested" button to RecommendationFeed component that appears on hover, uses optimistic UI updates (removes immediately, reverts on error), prevents navigation when clicked using stopPropagation
 - Content creation pattern: Dismiss endpoint follows same pattern as watched endpoint - fetches TMDB details first to determine content type (movie/tv), then creates content record if needed before recording dismissal
+
+## AI - Recommendation Add to Watchlist Implementation
+
+- Watchlist status fetching: RecommendationFeed component fetches watchlist statuses for all recommendations in parallel after recommendations are loaded, uses `/api/content/[tmdb_id]/status` endpoint to check if content is already in watchlist
+- Watchlist button UI: Added "Add to Watchlist" button to each recommendation card that appears on hover (opacity-0 group-hover:opacity-100), positioned at bottom-right of card, shows "✓ In Watchlist" when already added
+- Optimistic updates: Watchlist toggle uses optimistic UI updates (immediately updates button state), reverts on API failure to maintain consistency, shows loading state during API calls
+- Status tracking: Component tracks watchlist statuses in state (`watchlistStatuses` Record<number, boolean>) and loading states per recommendation (`loadingWatchlist` Record<number, boolean>) for independent state management
+- Button styling: Button uses indigo background when in watchlist, white background when not, includes proper aria-label and title attributes for accessibility, prevents navigation when clicked using stopPropagation
