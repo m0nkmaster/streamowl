@@ -28,7 +28,7 @@ The modern viewer faces:
 
 ### Primary Users
 
-- **Streaming subscribers** (25-45) juggling 2-4 services who want to maximise value
+- **Streaming subscribers** (25-45) juggling 2-6 services who want to maximise value
 - **Film enthusiasts** who track what they watch and curate personal lists
 - **Busy professionals** with limited leisure time who want quality recommendations
 
@@ -39,7 +39,7 @@ The modern viewer faces:
 
 ### Geographic Focus (MVP)
 
-United States, United Kingdom, Canada, Australia, Germany, France
+United Kingdom, United States, Canada, Australia, Germany, France
 
 ---
 
