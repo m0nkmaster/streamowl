@@ -882,7 +882,7 @@
         "Step 3: Select plan and complete Stripe checkout",
         "Step 4: Verify redirect back to app with premium features unlocked"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "premium-subscription-management",

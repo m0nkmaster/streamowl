@@ -831,3 +831,10 @@
 - User ID extraction: Webhook extracts userId from event metadata, checkout session client_reference_id, or customer metadata depending on event type
 - Subscription events: Handles subscription lifecycle events - activates premium on checkout completion and subscription creation/update, deactivates on subscription deletion
 - API version: Use Stripe API version "2024-11-20.acacia" or later for latest features and security updates
+- Premium pricing page: Created `/premium` route that displays monthly and yearly subscription options with pricing, feature lists, and checkout buttons
+- Price ID configuration: Stripe price IDs for monthly and yearly subscriptions stored in environment variables (STRIPE_PRICE_ID_MONTHLY, STRIPE_PRICE_ID_YEARLY), retrieved from Stripe Dashboard after creating products and prices
+- Pricing page component: PremiumPricingPage island component displays two pricing cards (monthly $4.99, yearly $39.99), handles checkout initiation by calling `/api/premium/checkout` with selected priceId, redirects to Stripe Checkout URL
+- Checkout flow: User clicks plan button → API creates Stripe Checkout session → redirects to Stripe hosted checkout → completes payment → redirects back to `/settings?session_id={CHECKOUT_SESSION_ID}`
+- Settings redirect handling: Settings page checks for `session_id` query parameter to show success message, checks for `canceled=true` to show cancellation message, webhook handles actual premium activation asynchronously
+- Upgrade button updates: All "Upgrade to Premium" buttons throughout app (CreateListModal, RecommendationFeed) now link to `/premium` instead of `/settings`, providing consistent upgrade experience
+- Premium status check: Pricing page checks if user already has premium and shows success message instead of pricing options, prevents duplicate subscriptions
