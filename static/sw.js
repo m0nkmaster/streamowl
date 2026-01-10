@@ -1,5 +1,5 @@
 // Service Worker for Stream Owl PWA
-// Version 1.0.0
+// Version 1.1.0 - Added push notification support
 
 const CACHE_NAME = "stream-owl-v1";
 const STATIC_CACHE_NAME = "stream-owl-static-v1";
@@ -142,6 +142,150 @@ self.addEventListener("fetch", (event) => {
       return new Response("Offline", {
         status: 503,
         headers: { "Content-Type": "text/plain" },
+      });
+    }),
+  );
+});
+
+// Push notification event - handles incoming push messages
+self.addEventListener("push", (event) => {
+  // Default notification data
+  let notificationData = {
+    title: "Stream Owl",
+    body: "You have a new notification",
+    icon: "/logo.svg",
+    badge: "/logo.svg",
+    tag: "stream-owl-notification",
+    data: {
+      url: "/",
+    },
+  };
+
+  // Parse push data if available
+  if (event.data) {
+    try {
+      const pushData = event.data.json();
+      notificationData = {
+        title: pushData.title || notificationData.title,
+        body: pushData.body || notificationData.body,
+        icon: pushData.icon || notificationData.icon,
+        badge: pushData.badge || notificationData.badge,
+        tag: pushData.tag || notificationData.tag,
+        data: {
+          url: pushData.url || pushData.data?.url || "/",
+          contentId: pushData.contentId || pushData.data?.contentId,
+          type: pushData.type || pushData.data?.type,
+        },
+      };
+    } catch (e) {
+      // If JSON parsing fails, try as text
+      console.error("Failed to parse push data:", e);
+      notificationData.body = event.data.text() || notificationData.body;
+    }
+  }
+
+  // Show the notification
+  const promiseChain = self.registration.showNotification(
+    notificationData.title,
+    {
+      body: notificationData.body,
+      icon: notificationData.icon,
+      badge: notificationData.badge,
+      tag: notificationData.tag,
+      data: notificationData.data,
+      // Notification options for better UX
+      vibrate: [100, 50, 100],
+      requireInteraction: false,
+      actions: [
+        {
+          action: "view",
+          title: "View",
+        },
+        {
+          action: "dismiss",
+          title: "Dismiss",
+        },
+      ],
+    },
+  );
+
+  event.waitUntil(promiseChain);
+});
+
+// Notification click event - handles user clicking on notification
+self.addEventListener("notificationclick", (event) => {
+  const notification = event.notification;
+  const action = event.action;
+  const data = notification.data || {};
+
+  // Close the notification
+  notification.close();
+
+  // Handle dismiss action
+  if (action === "dismiss") {
+    return;
+  }
+
+  // Determine the URL to open
+  let targetUrl = "/";
+  
+  if (data.url) {
+    targetUrl = data.url;
+  } else if (data.contentId) {
+    targetUrl = `/content/${data.contentId}`;
+  }
+
+  // Ensure absolute URL
+  if (!targetUrl.startsWith("http")) {
+    targetUrl = new URL(targetUrl, self.location.origin).href;
+  }
+
+  // Open or focus the appropriate window
+  const promiseChain = self.clients.matchAll({
+    type: "window",
+    includeUncontrolled: true,
+  }).then((windowClients) => {
+    // Check if there's already a window open with the target URL
+    for (const client of windowClients) {
+      if (client.url === targetUrl && "focus" in client) {
+        return client.focus();
+      }
+    }
+    
+    // Check if any window is open for our origin
+    for (const client of windowClients) {
+      if (client.url.startsWith(self.location.origin) && "navigate" in client) {
+        return client.navigate(targetUrl).then((client) => client.focus());
+      }
+    }
+    
+    // Open new window if needed
+    if (self.clients.openWindow) {
+      return self.clients.openWindow(targetUrl);
+    }
+  });
+
+  event.waitUntil(promiseChain);
+});
+
+// Push subscription change event - handles subscription expiration
+self.addEventListener("pushsubscriptionchange", (event) => {
+  // Re-subscribe when subscription changes
+  event.waitUntil(
+    self.registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: self.VAPID_PUBLIC_KEY,
+    }).then((subscription) => {
+      // Send new subscription to server
+      return fetch("/api/notifications/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subscription: subscription.toJSON(),
+          resubscribe: true,
+        }),
       });
     }),
   );

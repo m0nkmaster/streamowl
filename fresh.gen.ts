@@ -30,6 +30,9 @@ import * as $api_lists_list_id_items from "./routes/api/lists/[list_id]/items.ts
 import * as $api_login from "./routes/api/login.ts";
 import * as $api_logout from "./routes/api/logout.ts";
 import * as $api_new_releases from "./routes/api/new-releases.ts";
+import * as $api_notifications_subscribe from "./routes/api/notifications/subscribe.ts";
+import * as $api_notifications_test from "./routes/api/notifications/test.ts";
+import * as $api_notifications_vapid_key from "./routes/api/notifications/vapid-key.ts";
 import * as $api_premium_checkout from "./routes/api/premium/checkout.ts";
 import * as $api_premium_portal from "./routes/api/premium/portal.ts";
 import * as $api_premium_webhook from "./routes/api/premium/webhook.ts";
@@ -76,6 +79,7 @@ import * as $MarkAsWatchedButton from "./islands/MarkAsWatchedButton.tsx";
 import * as $Navigation from "./islands/Navigation.tsx";
 import * as $NewReleases from "./islands/NewReleases.tsx";
 import * as $NotesComponent from "./islands/NotesComponent.tsx";
+import * as $NotificationPrompt from "./islands/NotificationPrompt.tsx";
 import * as $PremiumPricingPage from "./islands/PremiumPricingPage.tsx";
 import * as $PublicProfilePage from "./islands/PublicProfilePage.tsx";
 import * as $QuickActions from "./islands/QuickActions.tsx";
@@ -125,6 +129,9 @@ const manifest = {
     "./routes/api/login.ts": $api_login,
     "./routes/api/logout.ts": $api_logout,
     "./routes/api/new-releases.ts": $api_new_releases,
+    "./routes/api/notifications/subscribe.ts": $api_notifications_subscribe,
+    "./routes/api/notifications/test.ts": $api_notifications_test,
+    "./routes/api/notifications/vapid-key.ts": $api_notifications_vapid_key,
     "./routes/api/premium/checkout.ts": $api_premium_checkout,
     "./routes/api/premium/portal.ts": $api_premium_portal,
     "./routes/api/premium/webhook.ts": $api_premium_webhook,
@@ -175,6 +182,7 @@ const manifest = {
     "./islands/Navigation.tsx": $Navigation,
     "./islands/NewReleases.tsx": $NewReleases,
     "./islands/NotesComponent.tsx": $NotesComponent,
+    "./islands/NotificationPrompt.tsx": $NotificationPrompt,
     "./islands/PremiumPricingPage.tsx": $PremiumPricingPage,
     "./islands/PublicProfilePage.tsx": $PublicProfilePage,
     "./islands/QuickActions.tsx": $QuickActions,
