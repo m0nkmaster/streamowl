@@ -7,6 +7,8 @@ interface SettingsPageProps {
   isAuthenticated: boolean;
   currentRegion: string;
   detectedRegion: string;
+  publicProfileEnabled: boolean;
+  userId: string;
 }
 
 /**
@@ -34,10 +36,24 @@ export const handler: Handlers<SettingsPageProps> = {
     // Get detected region (without preference)
     const detectedRegion = await getUserRegion(req, null);
 
+    // Get user preferences to check public profile setting
+    const { query } = await import("../lib/db.ts");
+    const userResult = await query<{
+      preferences: Record<string, unknown>;
+    }>(
+      "SELECT preferences FROM users WHERE id = $1",
+      [session.userId],
+    );
+
+    const preferences = userResult[0]?.preferences || {};
+    const publicProfileEnabled = preferences.public_profile_enabled === true;
+
     return ctx.render({
       isAuthenticated: true,
       currentRegion,
       detectedRegion,
+      publicProfileEnabled,
+      userId: session.userId,
     });
   },
 };

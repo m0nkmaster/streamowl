@@ -7,11 +7,15 @@ interface SettingsPageProps {
   isAuthenticated: boolean;
   currentRegion: string;
   detectedRegion: string;
+  publicProfileEnabled: boolean;
+  userId: string;
 }
 
 export default function SettingsPage({
   currentRegion,
   detectedRegion,
+  publicProfileEnabled,
+  userId,
 }: SettingsPageProps) {
   const [selectedRegion, setSelectedRegion] = useState<SupportedRegion>(
     currentRegion as SupportedRegion,
@@ -19,6 +23,8 @@ export default function SettingsPage({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [publicProfile, setPublicProfile] = useState(publicProfileEnabled);
+  const [profileLoading, setProfileLoading] = useState(false);
 
   // Fetch current region preference on mount
   useEffect(() => {
@@ -141,6 +147,99 @@ export default function SettingsPage({
                     different from your detected region (
                     {getRegionName(detectedRegion as SupportedRegion)}). This
                     preference will persist across sessions.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div class="mb-6 pt-6 border-t border-gray-200">
+              <h2 class="text-lg font-medium text-gray-900 mb-2">
+                Public Profile
+              </h2>
+              <p class="text-sm text-gray-500 mb-4">
+                Enable your public profile to share your stats and favourites
+                with others. Your profile will be accessible at{" "}
+                <span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                  /profile/{userId}
+                </span>
+              </p>
+
+              <div class="flex items-center">
+                <label class="flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={publicProfile}
+                    onChange={async (e) => {
+                      const enabled = e.currentTarget.checked;
+                      setPublicProfile(enabled);
+                      setProfileLoading(true);
+                      setError(null);
+
+                      try {
+                        const response = await fetch(
+                          "/api/settings/public-profile",
+                          {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({ enabled }),
+                          },
+                        );
+
+                        if (!response.ok) {
+                          const data = await response.json();
+                          throw new Error(
+                            data.message || "Failed to update public profile",
+                          );
+                        }
+
+                        setSuccess(true);
+                        setTimeout(() => setSuccess(false), 3000);
+                      } catch (err) {
+                        setError(
+                          err instanceof Error
+                            ? err.message
+                            : "Failed to update public profile",
+                        );
+                        // Revert on error
+                        setPublicProfile(!enabled);
+                      } finally {
+                        setProfileLoading(false);
+                      }
+                    }}
+                    disabled={profileLoading}
+                    class="sr-only"
+                  />
+                  <div
+                    class={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                      publicProfile ? "bg-indigo-600" : "bg-gray-300"
+                    } ${profileLoading ? "opacity-50" : ""}`}
+                  >
+                    <span
+                      class={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        publicProfile ? "translate-x-6" : "translate-x-1"
+                      }`}
+                    />
+                  </div>
+                  <span class="ml-3 text-sm font-medium text-gray-700">
+                    {publicProfile ? "Public Profile Enabled" : "Public Profile Disabled"}
+                  </span>
+                </label>
+              </div>
+
+              {publicProfile && (
+                <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                  <p class="text-sm text-blue-800">
+                    Your public profile is live! Share it at:{" "}
+                    <a
+                      href={`/profile/${userId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="font-mono text-xs underline hover:text-blue-900"
+                    >
+                      /profile/{userId}
+                    </a>
                   </p>
                 </div>
               )}
