@@ -720,6 +720,66 @@ export async function getTrending(
 }
 
 /**
+ * Get now playing movies from TMDB API
+ * These are movies currently in theatres
+ *
+ * @param page Page number (default: 1)
+ * @returns Paginated results mapped to internal content model
+ * @throws Error if API request fails
+ */
+export async function getNowPlayingMovies(
+  page: number = 1,
+): Promise<SearchResults> {
+  if (!Number.isInteger(page) || page < 1) {
+    throw new Error(`Page number must be a positive integer, got: ${page}`);
+  }
+
+  // Use shorter cache TTL for now playing (2 hours) since it updates frequently
+  const response = await request<TMDBSearchResponse>(
+    "/movie/now_playing",
+    { page },
+    7200, // 2 hours cache TTL
+  );
+
+  return {
+    page: response.page,
+    total_pages: response.total_pages,
+    total_results: response.total_results,
+    results: response.results.map(mapTMDBMovieToContent),
+  };
+}
+
+/**
+ * Get on the air TV shows from TMDB API
+ * These are TV shows currently airing new episodes
+ *
+ * @param page Page number (default: 1)
+ * @returns Paginated results mapped to internal content model
+ * @throws Error if API request fails
+ */
+export async function getOnTheAirTv(
+  page: number = 1,
+): Promise<SearchResults> {
+  if (!Number.isInteger(page) || page < 1) {
+    throw new Error(`Page number must be a positive integer, got: ${page}`);
+  }
+
+  // Use shorter cache TTL for on the air (2 hours) since it updates frequently
+  const response = await request<TMDBSearchTVResponse>(
+    "/tv/on_the_air",
+    { page },
+    7200, // 2 hours cache TTL
+  );
+
+  return {
+    page: response.page,
+    total_pages: response.total_pages,
+    total_results: response.total_results,
+    results: response.results.map(mapTMDBTVToContent),
+  };
+}
+
+/**
  * Video from TMDB API
  */
 export interface Video {

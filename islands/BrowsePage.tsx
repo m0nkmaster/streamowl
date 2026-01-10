@@ -3,6 +3,7 @@ import type { Content } from "../lib/tmdb/client.ts";
 import ContentGrid from "../components/ContentGrid.tsx";
 import QuickActions from "./QuickActions.tsx";
 import { useToast } from "./Toast.tsx";
+import NewReleases from "./NewReleases.tsx";
 
 interface TrendingResponse {
   results: Content[];
@@ -125,6 +126,8 @@ export default function BrowsePage() {
   return (
     <div>
       <ToastContainer />
+      {/* New Releases Section */}
+      <NewReleases />
       {/* Trending Section */}
       <section class="mb-12">
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Trending</h2>
