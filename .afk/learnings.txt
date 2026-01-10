@@ -915,3 +915,21 @@
 - ARIA attributes: Modals should have `role="dialog"`, `aria-modal="true"`, and `aria-labelledby` pointing to modal title for screen reader compatibility
 - Navigation aria-expanded: Mobile menu button uses `aria-expanded={isMobileMenuOpen}` to reflect current state for screen readers
 - Focus restoration: When modals close, focus should return to the element that triggered the modal (stored in `previousActiveElement` before modal opens)
+
+
+## Accessibility - Screen Reader Implementation
+
+- ARIA labels: Added aria-label to all interactive buttons without descriptive text (MarkAsWatchedButton, AddToWatchlistButton, FavouriteButton, QuickActions) to provide screen reader context
+- ARIA live regions: Implemented aria-live="polite" for toast notifications container and search results, aria-live="assertive" for error messages to announce dynamic content updates
+- Form accessibility: Added proper label associations using id/for attributes, aria-describedby for help text, aria-invalid for validation errors, and aria-busy for loading states
+- Role attributes: Added role="navigation" to nav element, role="main" to main content area, role="contentinfo" to footer, role="menu" and role="menuitem" for dropdown menus
+- ARIA expanded: Added aria-expanded and aria-controls to mobile menu button and dropdown menus to indicate state
+- ARIA current: Added aria-current="page" to active navigation links to indicate current page location
+- ARIA hidden: Added aria-hidden="true" to decorative icons (emoji icons in navigation, SVG icons) to hide them from screen readers
+- Loading states: Added aria-busy="true" to buttons and containers during async operations to indicate loading state
+- Search input: Added aria-describedby with hidden description text explaining search functionality, aria-label for screen reader context
+- Filter buttons: Added aria-pressed to filter toggle buttons to indicate pressed/unpressed state
+- Toast notifications: Added role="alert" for error toasts and role="region" with aria-label for toast container
+- Dynamic content: Added role="status" with aria-live="polite" for search result counts and loading messages
+- Image alt text: Verified all images have descriptive alt text (poster images use content title, cast images use actor name)
+- Form field associations: All form inputs have associated labels using id/for attributes or aria-label for screen reader compatibility

@@ -1038,7 +1038,7 @@
         "Step 3: Verify form fields have labels",
         "Step 4: Verify dynamic content updates are announced"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "accessibility-wcag-compliance",
