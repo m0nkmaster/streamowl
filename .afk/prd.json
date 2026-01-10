@@ -531,7 +531,7 @@
         "Step 3: Verify upgrade prompt displays instead of creation",
         "Step 4: Verify existing lists remain accessible"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "tags-create-apply",

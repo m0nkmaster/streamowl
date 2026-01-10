@@ -657,3 +657,15 @@
 - Visual feedback: Dragged item shows reduced opacity (50%), drop target shows scale-up effect and border highlight, cursor changes to grab/grabbing during drag operations
 - Link interaction: Prevents link clicks during drag by disabling pointer events on anchor tags, re-enables after drag ends, prevents navigation when dragging or reordering
 - Position persistence: Positions stored in database and persist across page refreshes, list page query orders by position ASC, position field included in list items API response
+
+## Custom Lists - Free Tier Limit Implementation
+
+- List count checking: Before creating a new list, query database to count existing lists for the user using `COUNT(*)` with `WHERE user_id = $1` filter, compare against free tier limit (3 lists)
+- Free tier limit enforcement: Return 403 Forbidden response with `LIST_LIMIT_REACHED` error code when user attempts to create list beyond free tier limit, prevents creation without blocking access to existing lists
+- Error response helper: Created `createForbiddenResponse()` helper function in `lib/api/errors.ts` for 403 responses with optional error code parameter, follows same pattern as other error response helpers
+- Upgrade prompt UI: Updated `CreateListModal` component to detect `LIST_LIMIT_REACHED` error code and display upgrade prompt instead of generic error message, shows informative message about limit and upgrade benefits
+- Error code detection: Check `data.code === "LIST_LIMIT_REACHED"` in API error response to distinguish limit errors from other errors, allows specific UI handling for limit vs validation errors
+- Premium tier placeholder: Added TODO comment for checking user premium status when premium tier is implemented, allows easy extension to bypass limit for premium users
+- Existing list access: GET endpoints for lists remain unrestricted, ensuring users can always access and manage their existing lists even when at limit
+- Modal state management: Added `showUpgradePrompt` state to track when upgrade prompt should be displayed, separate from generic error state for better UX
+- Upgrade button: Upgrade prompt includes button that navigates to settings page (placeholder for future upgrade page), uses `globalThis.location.href` instead of `window.location.href` for Deno linting compliance
