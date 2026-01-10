@@ -997,3 +997,15 @@
 - Environment requirements: Integration tests require DATABASE_URL and optionally TMDB_API_KEY (tests skip gracefully if TMDB key not set)
 - Test task: Added `deno task test:integration` to run integration test suite
 - Database cleanup: Tests clean up test data (users, user_content records) after execution to avoid test pollution
+
+## CI/CD Pipeline
+
+- GitHub Actions workflow: Created `.github/workflows/ci.yml` for continuous integration with lint, test, and build stages
+- Workflow structure: Three jobs - lint (formatting, linting, type checking), test (unit and integration tests), and build (verification)
+- Job dependencies: Test job depends on lint passing, build job depends on test passing - ensures failed tests block deployment
+- Deno setup: Uses `denoland/setup-deno@v1` action with `deno-version: v1.x` for latest Deno version
+- Environment variables: Tests receive DATABASE_URL and TMDB_API_KEY from GitHub secrets (optional, tests skip gracefully if not set)
+- Build verification: Build job runs `deno task build` and verifies `_fresh` directory exists to ensure build succeeds
+- Workflow triggers: Runs on push to main branch and on pull requests to main branch
+- Quality gates: Formatting check (`deno fmt --check`), linting (`deno lint`), type checking (`deno task typecheck`), unit tests (`deno task test:unit`), and integration tests (`deno task test:integration`)
+- Deployment blocking: Failed tests in CI will prevent deployment since Deno Deploy auto-deploys on push to main (CI runs before deployment)
