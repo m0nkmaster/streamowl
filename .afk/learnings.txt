@@ -669,3 +669,16 @@
 - Existing list access: GET endpoints for lists remain unrestricted, ensuring users can always access and manage their existing lists even when at limit
 - Modal state management: Added `showUpgradePrompt` state to track when upgrade prompt should be displayed, separate from generic error state for better UX
 - Upgrade button: Upgrade prompt includes button that navigates to settings page (placeholder for future upgrade page), uses `globalThis.location.href` instead of `window.location.href` for Deno linting compliance
+
+## Tags - Create and Apply Implementation
+
+- Tags API endpoints: Created `/api/tags` endpoint with GET (list user tags) and POST (create tag) methods, `/api/content/[tmdb_id]/tags` endpoint with GET (fetch tags on content) and POST (apply tag) methods, and DELETE endpoint at `/api/content/[tmdb_id]/tags/[tag_id]` for removing tags
+- Tag creation: Tags require name (required, max 255 chars) and colour (optional, hex format #RRGGBB, defaults to #3B82F6), validated on server side with regex for hex colour format
+- Tag uniqueness: Tags use UNIQUE(user_id, name) constraint to prevent duplicate tag names per user, ON CONFLICT DO UPDATE handles duplicate creation gracefully by updating colour if tag already exists
+- Tag application: Tags applied to content via content_tags junction table, uses ON CONFLICT DO NOTHING to handle duplicate applications gracefully (idempotent operation)
+- Tags component: Created `islands/TagsComponent.tsx` island component for managing tags on content detail page, displays applied tags with colour-coded badges, allows creating new tags with colour picker, allows applying existing tags from dropdown
+- Tag colour picker: Component includes predefined colour palette (8 colours) with visual colour selector buttons, selected colour highlighted with border and scale effect
+- Tag removal: Tags can be removed via hover action (X button appears on hover), uses optimistic UI updates with revert on error
+- Tag fetching: Component fetches user's tags on mount to populate tag selector dropdown, filters out already-applied tags from available tags list
+- Content detail integration: Updated content detail page handler to fetch tags applied to content, passes initialTags prop to TagsComponent for server-side rendering
+- Tag display: Applied tags displayed as colour-coded badges with tag name, sorted alphabetically for consistent display, hover shows remove button for better UX
