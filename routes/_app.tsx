@@ -23,7 +23,7 @@ export default function App({ Component, data }: PageProps<AppProps>) {
   const { currentPath, isAuthenticated } = data;
 
   return (
-    <html>
+    <html class="h-full">
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -52,7 +52,7 @@ export default function App({ Component, data }: PageProps<AppProps>) {
         `}
         </style>
       </head>
-      <body class="flex flex-col min-h-screen">
+      <body class="flex flex-col min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
         <Navigation
           currentPath={currentPath}
           isAuthenticated={isAuthenticated}
@@ -61,9 +61,42 @@ export default function App({ Component, data }: PageProps<AppProps>) {
           <Component />
         </main>
         <Footer />
+        {/* deno-lint-ignore react-no-danger */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
+              // Theme detection and application
+              (function() {
+                function getThemePreference() {
+                  const stored = localStorage.getItem('theme');
+                  if (stored) {
+                    return stored;
+                  }
+                  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                }
+                
+                function applyTheme(theme) {
+                  const root = document.documentElement;
+                  if (theme === 'dark') {
+                    root.classList.add('dark');
+                  } else {
+                    root.classList.remove('dark');
+                  }
+                }
+                
+                // Apply theme immediately to prevent flash
+                const theme = getThemePreference();
+                applyTheme(theme);
+                
+                // Listen for system theme changes
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                  const stored = localStorage.getItem('theme');
+                  if (!stored) {
+                    applyTheme(e.matches ? 'dark' : 'light');
+                  }
+                });
+              })();
+              
               if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                   navigator.serviceWorker.register('/sw.js')

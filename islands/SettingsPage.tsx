@@ -2,6 +2,7 @@ import { useEffect, useState } from "preact/hooks";
 import { SUPPORTED_REGIONS } from "../lib/tmdb/client.ts";
 import type { SupportedRegion } from "../lib/tmdb/client.ts";
 import { getRegionName } from "../lib/region.ts";
+import ThemeToggle from "./ThemeToggle.tsx";
 
 interface SettingsPageProps {
   isAuthenticated: boolean;
@@ -143,19 +144,23 @@ export default function SettingsPage({
   };
 
   return (
-    <div class="min-h-screen bg-gray-50 py-8">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white shadow rounded-lg">
-          <div class="px-6 py-5 border-b border-gray-200">
-            <h1 class="text-2xl font-bold text-gray-900">Settings</h1>
-            <p class="mt-1 text-sm text-gray-500">
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+          <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+              Settings
+            </h1>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
               Manage your account preferences
             </p>
           </div>
 
           <div class="px-6 py-5">
+            <ThemeToggle />
+
             {checkoutSuccess && (
-              <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-md">
+              <div class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
                 <div class="flex">
                   <div class="flex-shrink-0">
                     <svg
@@ -187,7 +192,7 @@ export default function SettingsPage({
             )}
 
             {checkoutCanceled && (
-              <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+              <div class="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
                 <div class="flex">
                   <div class="flex-shrink-0">
                     <svg
@@ -222,11 +227,11 @@ export default function SettingsPage({
             )}
 
             {isPremium && subscriptionDetails && (
-              <div class="mb-6 pb-6 border-b border-gray-200">
-                <h2 class="text-lg font-medium text-gray-900 mb-2">
+              <div class="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                   Subscription
                 </h2>
-                <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg p-4">
                   <div class="flex items-start justify-between">
                     <div>
                       <h3 class="text-sm font-medium text-indigo-900">
@@ -260,12 +265,12 @@ export default function SettingsPage({
             )}
 
             {!isPremium && (
-              <div class="mb-6 pb-6 border-b border-gray-200">
-                <h2 class="text-lg font-medium text-gray-900 mb-2">
+              <div class="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                   Subscription
                 </h2>
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                  <p class="text-sm text-gray-700 mb-4">
+                <div class="bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <p class="text-sm text-gray-700 dark:text-gray-300 mb-4">
                     Upgrade to Premium to unlock unlimited custom lists, more AI
                     recommendations, and exclusive features.
                   </p>
@@ -280,10 +285,10 @@ export default function SettingsPage({
             )}
 
             <div class="mb-6">
-              <h2 class="text-lg font-medium text-gray-900 mb-2">
+              <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                 Region Preference
               </h2>
-              <p class="text-sm text-gray-500 mb-4">
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Set your preferred region to see streaming availability for that
                 location. Your detected region is{" "}
                 <span class="font-medium">
@@ -292,16 +297,16 @@ export default function SettingsPage({
               </p>
 
               {success && (
-                <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
-                  <p class="text-sm text-green-800">
+                <div class="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
+                  <p class="text-sm text-green-800 dark:text-green-200">
                     Region preference updated successfully!
                   </p>
                 </div>
               )}
 
               {error && (
-                <div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-                  <p class="text-sm text-red-800">{error}</p>
+                <div class="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+                  <p class="text-sm text-red-800 dark:text-red-200">{error}</p>
                 </div>
               )}
 
@@ -314,14 +319,16 @@ export default function SettingsPage({
                     disabled={loading}
                     class={`px-4 py-3 rounded-lg border-2 text-left transition-colors ${
                       selectedRegion === region
-                        ? "border-indigo-500 bg-indigo-50 text-indigo-900"
-                        : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
+                        ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-900 dark:text-indigo-100"
+                        : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600"
                     } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <div class="font-medium">{getRegionName(region)}</div>
-                    <div class="text-xs text-gray-500 mt-1">{region}</div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {region}
+                    </div>
                     {selectedRegion === region && (
-                      <div class="mt-2 text-xs text-indigo-600">
+                      <div class="mt-2 text-xs text-indigo-600 dark:text-indigo-400">
                         ✓ Current selection
                       </div>
                     )}
@@ -330,8 +337,8 @@ export default function SettingsPage({
               </div>
 
               {selectedRegion !== detectedRegion && (
-                <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                  <p class="text-sm text-blue-800">
+                <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+                  <p class="text-sm text-blue-800 dark:text-blue-200">
                     Your manual selection ({getRegionName(selectedRegion)}) is
                     different from your detected region (
                     {getRegionName(detectedRegion as SupportedRegion)}). This
@@ -341,11 +348,11 @@ export default function SettingsPage({
               )}
             </div>
 
-            <div class="mb-6 pt-6 border-t border-gray-200">
-              <h2 class="text-lg font-medium text-gray-900 mb-2">
+            <div class="mb-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                 Public Profile
               </h2>
-              <p class="text-sm text-gray-500 mb-4">
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Enable your public profile to share your stats and favourites
                 with others. Your profile will be accessible at{" "}
                 <span class="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
@@ -402,7 +409,9 @@ export default function SettingsPage({
                   />
                   <div
                     class={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      publicProfile ? "bg-indigo-600" : "bg-gray-300"
+                      publicProfile
+                        ? "bg-indigo-600"
+                        : "bg-gray-300 dark:bg-gray-600"
                     } ${profileLoading ? "opacity-50" : ""}`}
                   >
                     <span
@@ -411,7 +420,7 @@ export default function SettingsPage({
                       }`}
                     />
                   </div>
-                  <span class="ml-3 text-sm font-medium text-gray-700">
+                  <span class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
                     {publicProfile
                       ? "Public Profile Enabled"
                       : "Public Profile Disabled"}
@@ -420,8 +429,8 @@ export default function SettingsPage({
               </div>
 
               {publicProfile && (
-                <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-                  <p class="text-sm text-blue-800">
+                <div class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+                  <p class="text-sm text-blue-800 dark:text-blue-200">
                     Your public profile is live! Share it at:{" "}
                     <a
                       href={`/profile/${userId}`}

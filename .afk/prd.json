@@ -1012,7 +1012,7 @@
         "Step 3: Toggle theme in settings",
         "Step 4: Verify preference persists across sessions"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "accessibility-keyboard-nav",

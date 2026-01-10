@@ -888,3 +888,17 @@
 - Revert logic: On error, components restore previous state using stored previousState value (e.g., setIsInWatchlist(previousState)), ensuring UI accurately reflects server state even when requests fail
 - Components with optimistic updates: AddToWatchlistButton, FavouriteButton, MarkAsWatchedButton, RatingComponent, and QuickActions all implement optimistic updates with proper error handling and revert logic
 - Network failure handling: Catch blocks handle network failures (e.g., offline, timeout) by reverting optimistic update and showing error toast, ensuring consistent UI state regardless of failure type
+
+## UI Dark/Light Theme Implementation
+
+- Theme detection: Implemented system preference detection using `matchMedia('(prefers-color-scheme: dark)')` to automatically apply dark theme when system is set to dark mode
+- Theme storage: Theme preference stored in localStorage with keys 'dark', 'light', or removed for 'system' preference
+- Theme application: Theme applied immediately on page load via inline script in `_app.tsx` to prevent flash of wrong theme (FOUC - Flash of Unstyled Content)
+- Dark mode class: Tailwind dark mode uses class-based strategy - adding 'dark' class to `<html>` element enables dark: variants throughout the app
+- Theme toggle component: Created ThemeToggle island component with three options: Light (always light), Dark (always dark), System (follows system preference)
+- System preference listener: Added event listener for system theme changes that updates theme when user has 'system' preference selected
+- Component dark mode styles: Updated Navigation, Footer, SettingsPage, and _app.tsx with dark: variants for all colour classes (backgrounds, text, borders)
+- Theme persistence: Theme preference persists across sessions via localStorage, automatically applied on page load before React hydration
+- Settings integration: Theme toggle added to Settings page as first setting, allowing users to change theme preference from account settings
+- Tailwind dark mode: Uses Tailwind's built-in dark mode support with `dark:` prefix for all dark mode styles, no additional configuration needed
+- GlobalThis usage: Used `globalThis` instead of `window` in client-side code to satisfy Deno lint rules while maintaining browser compatibility
