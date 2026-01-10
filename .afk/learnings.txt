@@ -60,3 +60,12 @@
 - Content_tags unique constraint: Use UNIQUE(tag_id, content_id) to prevent duplicate tag applications to the same content
 - Tag colour default: Use VARCHAR(7) for hex colour codes (e.g., #3B82F6) with default value for consistent styling
 - Multiple tags on content: Test applying multiple tags to a single content item to verify many-to-many relationship works correctly
+- Streaming services tables: Created streaming_services table for service metadata and content_streaming junction table for availability tracking
+- Streaming services table structure: Includes name (unique), logo_url, deep_link_template for generating deep links to streaming apps
+- Content_streaming table structure: Includes service_id (FK to streaming_services), content_id (FK to content), region (VARCHAR(10)), type (enum: subscription/rent/buy), price (NUMERIC), available_from/until dates, with cascade delete from both parent tables
+- Streaming type enum: Created streaming_type enum with values: subscription, rent, buy for categorising availability types
+- Composite unique constraint: Use UNIQUE(service_id, content_id, region, type) to prevent duplicate availability entries for the same service/content/region/type combination
+- Region-based availability: Store region as VARCHAR(10) to support ISO country codes (US, GB, CA, AU, DE, FR, etc.) for region-specific streaming availability
+- Service seeding: Seed common streaming services (Netflix, Disney+, Amazon Prime Video, Apple TV+, HBO Max, Hulu, Paramount+, Peacock, BBC iPlayer, ITV Hub) in migration using ON CONFLICT DO NOTHING to allow re-running migrations
+- Deep link templates: Store template strings in streaming_services.deep_link_template for generating deep links to content on streaming platforms
+- Availability dates: Include available_from and available_until DATE columns for tracking time-limited availability (e.g., content leaving soon)
