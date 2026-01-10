@@ -28,8 +28,9 @@ export const SESSION_COOKIE_OPTIONS = {
  * @param token JWT token string
  */
 export function setSessionCookie(headers: Headers, token: string): void {
-  const cookieValue = `${SESSION_COOKIE_NAME}=${token}; Path=${SESSION_COOKIE_OPTIONS.path}; HttpOnly; SameSite=${SESSION_COOKIE_OPTIONS.sameSite}; Max-Age=${SESSION_COOKIE_OPTIONS.maxAge}`;
-  
+  const cookieValue =
+    `${SESSION_COOKIE_NAME}=${token}; Path=${SESSION_COOKIE_OPTIONS.path}; HttpOnly; SameSite=${SESSION_COOKIE_OPTIONS.sameSite}; Max-Age=${SESSION_COOKIE_OPTIONS.maxAge}`;
+
   if (SESSION_COOKIE_OPTIONS.secure) {
     headers.set("Set-Cookie", `${cookieValue}; Secure`);
   } else {
@@ -62,7 +63,9 @@ export function getSessionToken(request: Request): string | undefined {
   }
 
   const cookies = cookieHeader.split(";").map((c) => c.trim());
-  const sessionCookie = cookies.find((c) => c.startsWith(`${SESSION_COOKIE_NAME}=`));
+  const sessionCookie = cookies.find((c) =>
+    c.startsWith(`${SESSION_COOKIE_NAME}=`)
+  );
 
   if (!sessionCookie) {
     return undefined;

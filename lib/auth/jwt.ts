@@ -5,7 +5,11 @@
  * Uses HS256 algorithm for signing tokens.
  */
 
-import { create, verify, getNumericDate } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
+import {
+  create,
+  getNumericDate,
+  verify,
+} from "https://deno.land/x/djwt@v3.0.2/mod.ts";
 
 /**
  * Get JWT secret from environment variable

@@ -8,15 +8,12 @@
  * 4. Cookie setting and reading
  */
 
+import { createSessionToken, verifySessionToken } from "../lib/auth/jwt.ts";
 import {
-  createSessionToken,
-  verifySessionToken,
-} from "../lib/auth/jwt.ts";
-import {
-  setSessionCookie,
   clearSessionCookie,
   getSessionToken,
   SESSION_COOKIE_NAME,
+  setSessionCookie,
 } from "../lib/auth/cookies.ts";
 import { getSessionFromRequest } from "../lib/auth/middleware.ts";
 
@@ -46,7 +43,9 @@ function test(name: string, fn: () => Promise<void> | void) {
     }
   } catch (error) {
     console.error(`❌ ${name}`);
-    console.error(`   Error: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(
+      `   Error: ${error instanceof Error ? error.message : String(error)}`,
+    );
     failed++;
   }
 }
@@ -57,11 +56,11 @@ async function runTests() {
     const userId = "123e4567-e89b-12d3-a456-426614174000";
     const email = "test@example.com";
     const token = await createSessionToken(userId, email, 3600);
-    
+
     if (!token || typeof token !== "string") {
       throw new Error("Token creation failed");
     }
-    
+
     const payload = await verifySessionToken(token);
     if (payload.userId !== userId || payload.email !== email) {
       throw new Error("Token payload mismatch");
@@ -89,10 +88,10 @@ async function runTests() {
     const email = "test@example.com";
     // Create token that expires immediately
     const token = await createSessionToken(userId, email, -1);
-    
+
     // Wait a moment to ensure expiration
     await new Promise((resolve) => setTimeout(resolve, 100));
-    
+
     try {
       await verifySessionToken(token);
       throw new Error("Should have rejected expired token");
@@ -108,7 +107,7 @@ async function runTests() {
     const headers = new Headers();
     const token = "test-token-123";
     setSessionCookie(headers, token);
-    
+
     const cookieHeader = headers.get("Set-Cookie");
     if (!cookieHeader || !cookieHeader.includes(SESSION_COOKIE_NAME)) {
       throw new Error("Cookie not set correctly");
@@ -128,7 +127,7 @@ async function runTests() {
         Cookie: `${SESSION_COOKIE_NAME}=test-token-123; other=value`,
       },
     });
-    
+
     const token = getSessionToken(request);
     if (token !== "test-token-123") {
       throw new Error("Failed to read session token from cookies");
@@ -139,7 +138,7 @@ async function runTests() {
   test("Clear session cookie", () => {
     const headers = new Headers();
     clearSessionCookie(headers);
-    
+
     const cookieHeader = headers.get("Set-Cookie");
     if (!cookieHeader || !cookieHeader.includes("Max-Age=0")) {
       throw new Error("Cookie not cleared correctly");
@@ -151,13 +150,13 @@ async function runTests() {
     const userId = "123e4567-e89b-12d3-a456-426614174000";
     const email = "test@example.com";
     const token = await createSessionToken(userId, email, 3600);
-    
+
     const request = new Request("https://example.com", {
       headers: {
         Cookie: `${SESSION_COOKIE_NAME}=${token}`,
       },
     });
-    
+
     const session = await getSessionFromRequest(request);
     if (!session || session.userId !== userId || session.email !== email) {
       throw new Error("Failed to extract session from request");
@@ -171,7 +170,7 @@ async function runTests() {
         Cookie: `${SESSION_COOKIE_NAME}=invalid.token.here`,
       },
     });
-    
+
     const session = await getSessionFromRequest(request);
     if (session !== null) {
       throw new Error("Should have rejected invalid token");
@@ -188,7 +187,7 @@ async function runTests() {
   });
 
   console.log(`\n📊 Test Results: ${passed} passed, ${failed} failed`);
-  
+
   if (failed > 0) {
     Deno.exit(1);
   }

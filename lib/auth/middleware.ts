@@ -7,7 +7,7 @@
 
 import type { HandlerContext } from "$fresh/server.ts";
 import { getSessionToken } from "./cookies.ts";
-import { verifySessionToken, type SessionPayload } from "./jwt.ts";
+import { type SessionPayload, verifySessionToken } from "./jwt.ts";
 
 /**
  * Session data attached to Fresh context
@@ -60,7 +60,7 @@ export async function withSession(
   ctx: HandlerContext,
 ): Promise<HandlerContext & { state: SessionContext }> {
   const session = await getSessionFromRequest(req);
-  
+
   return {
     ...ctx,
     state: {
