@@ -44,19 +44,21 @@ export default function PublicProfilePage({
         <div class="bg-white shadow rounded-lg mb-8">
           <div class="px-6 py-8">
             <div class="flex items-center space-x-6">
-              {avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt={displayNameText}
-                  class="w-24 h-24 rounded-full object-cover"
-                />
-              ) : (
-                <div class="w-24 h-24 rounded-full bg-indigo-100 flex items-center justify-center">
-                  <span class="text-3xl font-bold text-indigo-600">
-                    {displayNameText.charAt(0).toUpperCase()}
-                  </span>
-                </div>
-              )}
+              {avatarUrl
+                ? (
+                  <img
+                    src={avatarUrl}
+                    alt={displayNameText}
+                    class="w-24 h-24 rounded-full object-cover"
+                  />
+                )
+                : (
+                  <div class="w-24 h-24 rounded-full bg-indigo-100 flex items-center justify-center">
+                    <span class="text-3xl font-bold text-indigo-600">
+                      {displayNameText.charAt(0).toUpperCase()}
+                    </span>
+                  </div>
+                )}
               <div>
                 <h1 class="text-3xl font-bold text-gray-900">
                   {displayNameText}
@@ -108,45 +110,47 @@ export default function PublicProfilePage({
             )}
           </h2>
 
-          {favourites.length === 0 ? (
-            <div class="text-center py-12">
-              <p class="text-gray-500">No favourites yet</p>
-            </div>
-          ) : (
-            <ContentGrid>
-              {favourites.map((item) => (
-                <a
-                  key={item.tmdb_id}
-                  href={`/content/${item.tmdb_id}`}
-                  class="group"
-                >
-                  <div class="bg-white rounded-lg shadow-md overflow-hidden relative">
-                    <img
-                      src={getPosterUrl(item.poster_path)}
-                      alt={item.title}
-                      class="w-full aspect-[2/3] object-cover"
-                      loading="lazy"
-                    />
-                    <div class="p-3">
-                      <h3 class="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-indigo-600">
-                        {item.title}
-                      </h3>
-                      <div class="flex items-center justify-between mt-2">
-                        <span class="text-xs text-gray-500 uppercase">
-                          {item.type}
-                        </span>
-                        {item.release_date && (
-                          <span class="text-xs text-gray-500">
-                            {new Date(item.release_date).getFullYear()}
+          {favourites.length === 0
+            ? (
+              <div class="text-center py-12">
+                <p class="text-gray-500">No favourites yet</p>
+              </div>
+            )
+            : (
+              <ContentGrid>
+                {favourites.map((item) => (
+                  <a
+                    key={item.tmdb_id}
+                    href={`/content/${item.tmdb_id}`}
+                    class="group"
+                  >
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden relative">
+                      <img
+                        src={getPosterUrl(item.poster_path)}
+                        alt={item.title}
+                        class="w-full aspect-[2/3] object-cover"
+                        loading="lazy"
+                      />
+                      <div class="p-3">
+                        <h3 class="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-indigo-600">
+                          {item.title}
+                        </h3>
+                        <div class="flex items-center justify-between mt-2">
+                          <span class="text-xs text-gray-500 uppercase">
+                            {item.type}
                           </span>
-                        )}
+                          {item.release_date && (
+                            <span class="text-xs text-gray-500">
+                              {new Date(item.release_date).getFullYear()}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </a>
-              ))}
-            </ContentGrid>
-          )}
+                  </a>
+                ))}
+              </ContentGrid>
+            )}
         </div>
       </div>
     </div>

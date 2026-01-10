@@ -11,7 +11,10 @@
  */
 
 import { type Handlers } from "$fresh/server.ts";
-import { getStripeClient, getStripeWebhookSecret } from "../../../lib/stripe/client.ts";
+import {
+  getStripeClient,
+  getStripeWebhookSecret,
+} from "../../../lib/stripe/client.ts";
 import { query } from "../../../lib/db.ts";
 import { createInternalServerErrorResponse } from "../../../lib/api/errors.ts";
 import Stripe from "stripe";

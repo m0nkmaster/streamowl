@@ -9,6 +9,8 @@ interface SettingsPageProps {
   detectedRegion: string;
   publicProfileEnabled: boolean;
   userId: string;
+  checkoutSuccess: boolean;
+  checkoutCanceled: boolean;
 }
 
 /**
@@ -48,12 +50,19 @@ export const handler: Handlers<SettingsPageProps> = {
     const preferences = userResult[0]?.preferences || {};
     const publicProfileEnabled = preferences.public_profile_enabled === true;
 
+    // Check for Stripe checkout redirect parameters
+    const url = new URL(req.url);
+    const checkoutSuccess = url.searchParams.has("session_id");
+    const checkoutCanceled = url.searchParams.get("canceled") === "true";
+
     return ctx.render({
       isAuthenticated: true,
       currentRegion,
       detectedRegion,
       publicProfileEnabled,
       userId: session.userId,
+      checkoutSuccess,
+      checkoutCanceled,
     });
   },
 };

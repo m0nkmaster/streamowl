@@ -26,6 +26,8 @@ import * as $api_lists_list_id_items from "./routes/api/lists/[list_id]/items.ts
 import * as $api_login from "./routes/api/login.ts";
 import * as $api_logout from "./routes/api/logout.ts";
 import * as $api_new_releases from "./routes/api/new-releases.ts";
+import * as $api_premium_checkout from "./routes/api/premium/checkout.ts";
+import * as $api_premium_webhook from "./routes/api/premium/webhook.ts";
 import * as $api_recommendations from "./routes/api/recommendations.ts";
 import * as $api_recommendations_tmdb_id_chat from "./routes/api/recommendations/[tmdb_id]/chat.ts";
 import * as $api_recommendations_tmdb_id_dismiss from "./routes/api/recommendations/[tmdb_id]/dismiss.ts";
@@ -106,6 +108,8 @@ const manifest = {
     "./routes/api/login.ts": $api_login,
     "./routes/api/logout.ts": $api_logout,
     "./routes/api/new-releases.ts": $api_new_releases,
+    "./routes/api/premium/checkout.ts": $api_premium_checkout,
+    "./routes/api/premium/webhook.ts": $api_premium_webhook,
     "./routes/api/recommendations.ts": $api_recommendations,
     "./routes/api/recommendations/[tmdb_id]/chat.ts":
       $api_recommendations_tmdb_id_chat,

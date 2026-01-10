@@ -7,7 +7,7 @@
 
 import { type Handlers } from "$fresh/server.ts";
 import { requireAuthForApi } from "../../../lib/auth/middleware.ts";
-import { getStripeClient, getAppBaseUrl } from "../../../lib/stripe/client.ts";
+import { getAppBaseUrl, getStripeClient } from "../../../lib/stripe/client.ts";
 import {
   createBadRequestResponse,
   createInternalServerErrorResponse,

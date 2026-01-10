@@ -1,62 +1,62 @@
 // Service Worker for Stream Owl PWA
 // Version 1.0.0
 
-const CACHE_NAME = 'stream-owl-v1';
-const STATIC_CACHE_NAME = 'stream-owl-static-v1';
-const LIBRARY_CACHE_NAME = 'stream-owl-library-v1';
+const CACHE_NAME = "stream-owl-v1";
+const STATIC_CACHE_NAME = "stream-owl-static-v1";
+const LIBRARY_CACHE_NAME = "stream-owl-library-v1";
 
 // Static assets to cache on install
 const STATIC_ASSETS = [
-  '/',
-  '/manifest.json',
-  '/logo.svg',
+  "/",
+  "/manifest.json",
+  "/logo.svg",
 ];
 
 // Library API endpoints to cache
 const LIBRARY_ENDPOINTS = [
-  '/api/library/watched',
-  '/api/library/watchlist',
-  '/api/library/favourites',
-  '/api/library/lists',
+  "/api/library/watched",
+  "/api/library/watchlist",
+  "/api/library/favourites",
+  "/api/library/lists",
 ];
 
 // Install event - cache static assets
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(STATIC_CACHE_NAME).then((cache) => {
       return cache.addAll(STATIC_ASSETS);
-    })
+    }),
   );
   // Activate immediately to replace old service worker
   self.skipWaiting();
 });
 
 // Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
+self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames
           .filter((name) => {
-            return name !== STATIC_CACHE_NAME && 
-                   name !== LIBRARY_CACHE_NAME &&
-                   name !== CACHE_NAME;
+            return name !== STATIC_CACHE_NAME &&
+              name !== LIBRARY_CACHE_NAME &&
+              name !== CACHE_NAME;
           })
-          .map((name) => caches.delete(name))
+          .map((name) => caches.delete(name)),
       );
-    })
+    }),
   );
   // Take control of all pages immediately
   self.clients.claim();
 });
 
 // Fetch event - implement caching strategies
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
   // Skip non-GET requests
-  if (request.method !== 'GET') {
+  if (request.method !== "GET") {
     return;
   }
 
@@ -67,15 +67,15 @@ self.addEventListener('fetch', (event) => {
 
   // Cache-first strategy for static assets
   if (
-    url.pathname.startsWith('/static/') ||
-    url.pathname.endsWith('.js') ||
-    url.pathname.endsWith('.css') ||
-    url.pathname.endsWith('.svg') ||
-    url.pathname.endsWith('.png') ||
-    url.pathname.endsWith('.jpg') ||
-    url.pathname.endsWith('.webp') ||
-    url.pathname === '/manifest.json' ||
-    url.pathname === '/logo.svg'
+    url.pathname.startsWith("/static/") ||
+    url.pathname.endsWith(".js") ||
+    url.pathname.endsWith(".css") ||
+    url.pathname.endsWith(".svg") ||
+    url.pathname.endsWith(".png") ||
+    url.pathname.endsWith(".jpg") ||
+    url.pathname.endsWith(".webp") ||
+    url.pathname === "/manifest.json" ||
+    url.pathname === "/logo.svg"
   ) {
     event.respondWith(
       caches.match(request).then((cachedResponse) => {
@@ -93,7 +93,7 @@ self.addEventListener('fetch', (event) => {
           });
           return response;
         });
-      })
+      }),
     );
     return;
   }
@@ -120,14 +120,14 @@ self.addEventListener('fetch', (event) => {
             }
             // Return offline response if no cache
             return new Response(
-              JSON.stringify({ error: 'Offline - no cached data available' }),
+              JSON.stringify({ error: "Offline - no cached data available" }),
               {
                 status: 503,
-                headers: { 'Content-Type': 'application/json' },
-              }
+                headers: { "Content-Type": "application/json" },
+              },
             );
           });
-        })
+        }),
     );
     return;
   }
@@ -136,13 +136,13 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(request).catch(() => {
       // If network fails and it's a navigation request, return cached index
-      if (request.mode === 'navigate') {
-        return caches.match('/');
+      if (request.mode === "navigate") {
+        return caches.match("/");
       }
-      return new Response('Offline', {
+      return new Response("Offline", {
         status: 503,
-        headers: { 'Content-Type': 'text/plain' },
+        headers: { "Content-Type": "text/plain" },
       });
-    })
+    }),
   );
 });
