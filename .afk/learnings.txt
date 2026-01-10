@@ -756,3 +756,12 @@
 - Conversation history: Chat component maintains conversation history in state, sends history with each message to API for context continuity, filters out system messages when sending history (only user and assistant messages)
 - Premium feature gating: "Tell me more" button only appears for premium users (checked via `isPremium` state), button positioned alongside watchlist button in recommendation card hover overlay, opens chat modal with recommendation context
 - Content type detection: Chat endpoint tries fetching as movie first, falls back to TV show if movie fetch fails, uses detected type to correctly format content details (title vs name, release_date vs first_air_date)
+
+## AI - Mood-Based Recommendations Implementation
+
+- Mood detection: Chat interface detects mood requests using regex patterns (e.g., "I want something", "recommend me", "something light and funny") to identify when users are requesting mood-based recommendations rather than asking about specific content
+- General chat endpoint: Created /api/recommendations/chat endpoint that doesn't require a specific tmdb_id, enabling general AI chat for mood-based recommendation requests, separate from content-specific chat at /api/recommendations/[tmdb_id]/chat
+- Mood-based recommendation generation: Created generateMoodBasedRecommendations() function that uses GPT-4 to understand mood requests and generate search queries, then searches TMDB for matching content, filters out watched/dismissed content, and generates explanations referencing the mood context
+- Search query generation: Uses GPT-4 to convert mood requests (e.g., "light and funny") into multiple TMDB search queries (e.g., ["comedy", "funny movies", "lighthearted"]), then searches both movies and TV shows to find matching content
+- Recommendation display in chat: Chat interface displays mood-based recommendations in a dedicated section below the conversation when recommendations are returned, showing poster images, titles, types, and explanations that reference the mood request
+- General chat button: Added "Ask for Recommendations" button in RecommendationFeed component (premium users only) that opens general chat interface for mood-based requests without requiring a specific recommendation context
