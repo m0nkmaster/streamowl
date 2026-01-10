@@ -999,7 +999,7 @@
         "Step 3: Simulate network failure",
         "Step 4: Verify UI reverts if request fails"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "ui-dark-light-theme",

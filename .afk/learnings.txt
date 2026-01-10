@@ -879,3 +879,12 @@
 - Toast positioning: Toasts render in fixed position at top-right (top-4 right-4) with z-50 to appear above other content
 - Animation: Toasts use slide-in animation (animate-slide-in) for smooth appearance from the right
 - Multiple containers: Multiple ToastContainers can coexist on same page (each island has its own state), all render in same location visually
+
+## UI Optimistic Updates Implementation
+
+- Optimistic updates pattern: All user action components (watchlist, favourite, watched, rating) implement optimistic UI updates - UI state changes immediately when user clicks, before API call completes, providing instant feedback
+- Previous state storage: Components store previous state before optimistic update (e.g., previousState = isInWatchlist) to enable clean revert on error, making revert logic explicit and easier to understand
+- Error handling: All optimistic update implementations include try/catch blocks to handle both HTTP errors (!response.ok) and network failures (catch block), ensuring UI reverts in all error scenarios
+- Revert logic: On error, components restore previous state using stored previousState value (e.g., setIsInWatchlist(previousState)), ensuring UI accurately reflects server state even when requests fail
+- Components with optimistic updates: AddToWatchlistButton, FavouriteButton, MarkAsWatchedButton, RatingComponent, and QuickActions all implement optimistic updates with proper error handling and revert logic
+- Network failure handling: Catch blocks handle network failures (e.g., offline, timeout) by reverting optimistic update and showing error toast, ensuring consistent UI state regardless of failure type
