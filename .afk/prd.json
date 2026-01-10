@@ -401,7 +401,7 @@
         "Step 3: Verify IMDb rating displays (if available via OMDb)",
         "Step 4: Verify Rotten Tomatoes score displays (if available)"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "library-watched-list",
@@ -1504,6 +1504,17 @@
         "Step 1: Complete the README.md file with the project description and instructions, getting started guide, and project overview",
         "Step 2: Complete developer documentation page in ./documentation/developers.md, including API documentation, database schema, and configuration",
         "Step 3: Complete user documentation page in ./documentation/users.md, including how to use the project, features, and troubleshooting"
+      ],
+      "passes": true
+    },
+    {
+      "id": "ui-verifications",
+      "category": "functional",
+      "description": "Verify the app is up and running and serving pages as expected.",
+      "priority": 1,
+      "steps": [
+        "Step 1: Run the app and verify the home page is serving the expected content",
+        "Ensure all CSS is loading and pages display correctly"
       ],
       "passes": true
     }

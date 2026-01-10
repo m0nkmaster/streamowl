@@ -1058,3 +1058,27 @@
 - User column added: email_verified_at TIMESTAMP WITH TIME ZONE DEFAULT NULL (NULL means unverified)
 - Email logging: sendVerificationEmail() logs to console in development (replace with email provider in production)
 - URL generation: generateVerificationUrl() creates full verification URL with token as query parameter
+
+## Aggregate Ratings (OMDb Integration)
+
+- OMDb API provides IMDb ratings, Rotten Tomatoes scores, and Metacritic scores
+- OMDb requires an API key (get from omdbapi.com), but is optional - feature gracefully degrades without it
+- TMDB external_ids endpoint provides IMDb ID: /movie/{id}/external_ids or /tv/{id}/external_ids
+- IMDb IDs start with "tt" prefix (e.g., tt0111161)
+- OMDb cache TTL: 7 days (ratings rarely change)
+- AggregateRatings component displays multiple rating sources with distinct visual styling
+- Rotten Tomatoes scores: Fresh (60%+) vs Rotten (<60%)
+- Metacritic colour coding: Green (61+), Yellow (40-60), Red (0-39)
+
+## Tailwind CSS Configuration in Fresh 1.7
+
+- Fresh 1.7.3 requires explicit Tailwind CSS configuration - it's not enabled by default
+- Required files for Tailwind CSS:
+  - `tailwind.config.ts`: Configuration file specifying content paths and options
+  - `static/styles.css`: CSS file with @tailwind directives (base, components, utilities)
+  - Update `fresh.config.ts` to import and use the tailwind plugin: `import tailwind from "$fresh/plugins/tailwind.ts";`
+  - Add `<link rel="stylesheet" href="/styles.css" />` to the `<head>` in `_app.tsx`
+- Without these files, Tailwind utility classes render as plain text with no styling
+- The Fresh tailwind plugin handles CSS compilation automatically during development
+- Content paths in tailwind.config.ts should include: `"{routes,islands,components}/**/*.{ts,tsx}"`
+- Dark mode can be set to "class" for manual theme toggling
