@@ -560,3 +560,17 @@
 - Result count display: Display filtered result count with total count shown in parentheses when filter is active (e.g., "Found 5 results (12 total)"), provides context about filtered vs total results
 - Empty state handling: Show appropriate empty state message when filtered results are empty but total results exist, includes "Show all results" button to reset filter
 - Filter persistence: Filter state persists during search (doesn't reset when new search is performed), allowing users to maintain filter preference while searching
+
+## Search - Filter by Genre Implementation
+
+- Genre IDs in search results: TMDB search API includes `genre_ids` array in search results (both movies and TV shows), which can be used for client-side filtering without additional API calls
+- Genre mapping: Created static GENRE_MAP constant mapping TMDB genre IDs to human-readable names, includes common genres for both movies and TV shows (Action, Comedy, Drama, Horror, etc.)
+- Genre extraction: Extract unique genres from search results by iterating through all results and collecting genre IDs, filter out genres not in GENRE_MAP to handle unknown genres gracefully
+- Genre filter dropdown: Added genre filter dropdown that appears when search results contain genres, displays sorted list of available genres from current results, includes "All Genres" option to clear filter
+- Client-side genre filtering: Filter results by checking if content's genre_ids array includes selected genre ID, works in combination with content type filter (both filters apply simultaneously)
+- Filter state management: Added `genreFilter` state (number | null) to track selected genre ID, defaults to null (no filter), can be cleared via dropdown or "Clear" button
+- Genre filter UI: Genre dropdown appears below content type filter buttons, includes label and clear button when filter is active, styled consistently with other filter controls
+- Filter combination: Content type and genre filters work together - results must match both selected type (if not "all") and selected genre (if not null) to be displayed
+- Result count display: Updated result count to show total count in parentheses when either filter is active, provides context about filtered vs total results
+- Empty state handling: Updated empty state message to include genre information when genre filter is active, provides "Show all genres" button to clear genre filter
+- Genre data structure: Genre IDs stored in Content.metadata.genre_ids as number array, accessed via type assertion (content.metadata.genre_ids as number[]) with fallback to empty array if missing
