@@ -337,3 +337,6 @@
 - List detail route: Created `/routes/lists/[list_id].tsx` route for viewing individual lists, handles public/private list access control (public lists viewable by anyone, private lists only by owner), displays list items in responsive grid layout
 - Shareable URLs: Lists have unique shareable URLs at `/lists/[list_id]` format using UUID from database, accessible to anyone for public lists, requires authentication and ownership for private lists
 - List sidebar integration: Sidebar displays lists with name and item count, links to list detail pages, shows empty state when no lists exist, "Create List" button opens modal for creating new lists
+- Add content to list API: Created `/api/lists/[list_id]/items` endpoint with POST method to add content to a list, validates list ownership, creates content record if needed, prevents duplicates (idempotent), sets position to end of list
+- Add to list button: Created `islands/AddToListButton.tsx` island component with dropdown menu showing user's lists, fetches lists on mount, handles adding content to selected list with success/error feedback, shows loading states and empty state when no lists exist
+- List item position: When adding content to list, position is calculated as MAX(position) + 1 to append to end of list, ensuring proper ordering for future reorder functionality

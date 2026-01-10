@@ -12,6 +12,7 @@ import {
 import MarkAsWatchedButton from "../../islands/MarkAsWatchedButton.tsx";
 import AddToWatchlistButton from "../../islands/AddToWatchlistButton.tsx";
 import FavouriteButton from "../../islands/FavouriteButton.tsx";
+import AddToListButton from "../../islands/AddToListButton.tsx";
 import RatingComponent from "../../islands/RatingComponent.tsx";
 
 interface ContentDetailPageProps {
@@ -301,6 +302,7 @@ export default function ContentDetailPage(
                     tmdbId={tmdbId}
                     initialStatus={userStatus}
                   />
+                  <AddToListButton tmdbId={tmdbId} />
                 </div>
                 {/* Rating Component */}
                 <div class="border-t pt-4">

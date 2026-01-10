@@ -505,7 +505,7 @@
         "Step 3: Verify content added to list",
         "Step 4: Navigate to list and verify content appears"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "custom-lists-reorder",
