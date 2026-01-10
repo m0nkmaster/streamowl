@@ -746,3 +746,13 @@
 - Optimistic updates: Watchlist toggle uses optimistic UI updates (immediately updates button state), reverts on API failure to maintain consistency, shows loading state during API calls
 - Status tracking: Component tracks watchlist statuses in state (`watchlistStatuses` Record<number, boolean>) and loading states per recommendation (`loadingWatchlist` Record<number, boolean>) for independent state management
 - Button styling: Button uses indigo background when in watchlist, white background when not, includes proper aria-label and title attributes for accessibility, prevents navigation when clicked using stopPropagation
+
+## AI - Recommendation Conversation Chat Implementation
+
+- Premium status checking: Premium status stored in `users.preferences.premium` JSONB field (boolean), checked via `/api/user/premium` endpoint, premium status fetched on RecommendationFeed mount to conditionally show chat button
+- Chat API endpoint: Created `/api/recommendations/[tmdb_id]/chat` endpoint that requires authentication and premium status, accepts message and conversation history, returns AI-generated response using GPT-4 Turbo
+- Chat context building: Chat endpoint fetches TMDB content details (tries movie first, then TV show), gets user's watched content history (top 10 most recent), builds system message with recommendation context and user history for personalised responses
+- Chat interface component: Created `RecommendationChat` island component with modal overlay, message history display, input field with Enter key support (Shift+Enter for new line), loading states with animated dots, error handling with user-friendly messages
+- Conversation history: Chat component maintains conversation history in state, sends history with each message to API for context continuity, filters out system messages when sending history (only user and assistant messages)
+- Premium feature gating: "Tell me more" button only appears for premium users (checked via `isPremium` state), button positioned alongside watchlist button in recommendation card hover overlay, opens chat modal with recommendation context
+- Content type detection: Chat endpoint tries fetching as movie first, falls back to TV show if movie fetch fails, uses detected type to correctly format content details (title vs name, release_date vs first_air_date)
