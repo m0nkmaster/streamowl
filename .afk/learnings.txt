@@ -277,6 +277,18 @@
 - Graceful degradation: Handle watch provider fetch failures gracefully - log error but don't fail the page if providers are unavailable
 - Provider categorisation: TMDB categorises providers into subscription (flatrate), rent, buy, ads, and free arrays - display each category separately for clarity
 
+## Region Detection Implementation
+
+- Region detection utility: Created `lib/region.ts` module with functions to detect user region from Accept-Language header, parse language codes, and map to supported regions (US, GB, CA, AU, DE, FR)
+- Accept-Language parsing: Parse Accept-Language header format ("en-GB,en-US;q=0.9") by splitting on commas, extracting language codes before semicolons, and matching against language-to-region mapping
+- Language-to-region mapping: Map language codes to regions (en-GB -> GB, en-US -> US, en-CA -> CA, en-AU -> AU, de/de-DE -> DE, fr/fr-FR -> FR) with fallback to default region (US) if no match found
+- Region detection from request: Created `detectRegionFromRequest()` function that extracts Accept-Language header and calls detection function, can be extended for IP geolocation or user preferences in future
+- Region display utilities: Created `getRegionName()` function to convert region codes to human-readable names (GB -> "United Kingdom") and `isSupportedRegion()` type guard for validation
+- Content detail page integration: Updated content detail page handler to detect region from request headers and use detected region when fetching watch providers instead of hardcoded "US"
+- Region indicator UI: Added region badge next to "Where to Watch" heading showing detected region code (e.g., "GB") with tooltip showing full region name for user clarity
+- Default region fallback: If Accept-Language header is missing or no match found, default to "US" region to ensure watch providers always display
+- Region prop passing: Added region to ContentDetailPageProps interface and pass through to component for display in UI
+
 ## Library - Watched List Implementation
 
 - Content helper module: Created `lib/content.ts` with functions to get or create content records from TMDB data, ensuring content exists in database before creating user_content relationships
