@@ -1272,7 +1272,7 @@
         "Step 3: Test running pending migrations",
         "Step 4: Test rolling back a migration"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "documentation-api",

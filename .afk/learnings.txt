@@ -35,6 +35,11 @@
 - Migration execution: Migrations run in transactions with rollback on failure
 - File operations: Use Deno built-in APIs (`Deno.readDir`, `Deno.readTextFile`) instead of std library for file operations
 - Migration tasks: Added `deno task migrate` for running migrations, `deno task test:users` for testing users table
+- Migration rollback support: Added up/down migration support using `-- down` marker to separate up and down SQL sections in migration files
+- Rollback functionality: Implemented `rollbackMigration()` function to execute down migrations and remove migration from tracking table
+- Rollback commands: Added `deno task migrate:rollback` to rollback last migration, or `deno task migrate:rollback <name>` to rollback specific migration
+- Migration parsing: Migration files can contain both up and down sections separated by `-- down` marker, or just up section (backward compatible with existing migrations)
+- Rollback validation: Rollback fails if migration doesn't have a down section, preventing partial rollbacks
 - Users table: Includes id (UUID), email (unique), display_name, avatar_url, preferences (JSONB), created_at, updated_at with automatic timestamp triggers
 - Content table: Uses PostgreSQL enum type (content_type) for type safety with values: movie, tv, documentary
 - Content table structure: Includes tmdb_id (unique integer), type (enum), title, overview, release_date, poster_path, backdrop_path, metadata (JSONB), and timestamps
