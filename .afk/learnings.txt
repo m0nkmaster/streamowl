@@ -160,3 +160,13 @@
 - Test script: Created `scripts/test-sql-injection-protection.ts` to verify SQL injection payloads are safely handled as literal strings, added `deno task test:sql-injection` to deno.json
 - Documentation: Added security documentation to `query()` function with examples of correct (parameterised) and incorrect (concatenated) usage patterns
 - Best practice: Never concatenate user input directly into SQL strings - always use parameterised queries with placeholders
+
+## Security - XSS Prevention
+
+- HTML escaping utility: Created `lib/security/xss.ts` with `escapeHtml()`, `escapeHtmlAttribute()`, and `escapeJsString()` functions to sanitise user input
+- HTML escaping: Escapes HTML special characters (< > & " ') to their HTML entity equivalents (&lt; &gt; &amp; &quot; &#x27;) to prevent XSS attacks
+- Preact automatic escaping: Preact/React automatically escapes content in JSX, but utilities should be used when working with raw HTML strings or setting HTML attributes from user input
+- Test script: Created `scripts/test-xss-prevention.ts` to verify XSS attack vectors (script tags, event handlers, JavaScript protocols) are neutralised, added `deno task test:xss` to deno.json
+- XSS attack vectors tested: Script tags, event handlers (onerror, onload, onfocus), JavaScript protocol injection, iframe injection, and various HTML injection techniques
+- Edge cases: Functions handle null, undefined, and empty strings gracefully by returning empty string
+- Best practice: Always escape user-generated content before displaying in HTML, especially when using dangerouslySetInnerHTML or setting HTML attributes dynamically

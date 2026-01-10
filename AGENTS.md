@@ -41,3 +41,24 @@ complete until `git push` succeeds.
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
+
+## Security Best Practices
+
+### XSS Prevention
+
+- **Always escape user input**: Use `escapeHtml()` from `lib/security/xss.ts`
+  when displaying user-generated content
+- **Preact automatic escaping**: Preact/React automatically escapes JSX content,
+  but use utilities for raw HTML strings or HTML attributes
+- **Test XSS prevention**: Run `deno task test:xss` to verify XSS attack vectors
+  are neutralised
+- **Never use dangerouslySetInnerHTML**: Avoid `dangerouslySetInnerHTML` unless
+  absolutely necessary, and always sanitise content first
+
+### SQL Injection Prevention
+
+- **Parameterised queries**: Always use parameterised queries with $1, $2, etc.
+  placeholders
+- **Never concatenate**: Never concatenate user input directly into SQL strings
+- **Test SQL injection protection**: Run `deno task test:sql-injection` to
+  verify protection
