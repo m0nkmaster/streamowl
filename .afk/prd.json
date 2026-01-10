@@ -297,7 +297,7 @@
         "Step 3: Verify only movie results are displayed",
         "Step 4: Click 'TV Shows' filter and verify only TV shows display"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "search-filter-by-genre",
