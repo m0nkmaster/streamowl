@@ -4,7 +4,10 @@
  */
 export default function Footer() {
   return (
-    <footer class="bg-gray-800 dark:bg-gray-950 text-gray-300 dark:text-gray-400 mt-auto">
+    <footer
+      class="bg-gray-800 dark:bg-gray-950 text-gray-300 dark:text-gray-400 mt-auto"
+      role="contentinfo"
+    >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3">

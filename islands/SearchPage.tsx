@@ -367,26 +367,41 @@ export default function SearchPage() {
       <ToastContainer />
       {/* Search Input */}
       <div class="mb-8">
+        <label for="search-input" class="sr-only">
+          Search for movies and TV shows
+        </label>
         <input
           type="text"
+          id="search-input"
           value={query}
           onInput={(e) => setQuery((e.target as HTMLInputElement).value)}
           placeholder="Search for movies and TV shows..."
+          aria-label="Search for movies and TV shows"
+          aria-describedby="search-description"
           class="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           autofocus
         />
+        <p id="search-description" class="sr-only">
+          Enter a search term to find movies and TV shows. Results will appear
+          as you type.
+        </p>
       </div>
 
       {/* Loading State */}
       {loading && (
-        <div class="text-center py-8">
+        <div
+          class="text-center py-8"
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+        >
           <p class="text-gray-600">Searching...</p>
         </div>
       )}
 
       {/* Error State */}
       {error && !loading && (
-        <div class="text-center py-8">
+        <div class="text-center py-8" role="alert" aria-live="assertive">
           <p class="text-red-600">Error: {error}</p>
         </div>
       )}
@@ -399,6 +414,8 @@ export default function SearchPage() {
             <button
               type="button"
               onClick={() => setTypeFilter("all")}
+              aria-pressed={typeFilter === "all"}
+              aria-label="Show all content types"
               class={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 typeFilter === "all"
                   ? "bg-indigo-600 text-white"
@@ -410,6 +427,8 @@ export default function SearchPage() {
             <button
               type="button"
               onClick={() => setTypeFilter("movie")}
+              aria-pressed={typeFilter === "movie"}
+              aria-label="Show only movies"
               class={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 typeFilter === "movie"
                   ? "bg-indigo-600 text-white"
@@ -421,6 +440,8 @@ export default function SearchPage() {
             <button
               type="button"
               onClick={() => setTypeFilter("tv")}
+              aria-pressed={typeFilter === "tv"}
+              aria-label="Show only TV shows"
               class={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 typeFilter === "tv"
                   ? "bg-indigo-600 text-white"
@@ -460,6 +481,7 @@ export default function SearchPage() {
                 <button
                   type="button"
                   onClick={() => setGenreFilter(null)}
+                  aria-label="Clear genre filter"
                   class="px-3 py-2 text-sm text-indigo-600 hover:text-indigo-700 underline"
                 >
                   Clear
@@ -521,6 +543,7 @@ export default function SearchPage() {
                     setMinYear(null);
                     setMaxYear(null);
                   }}
+                  aria-label="Clear year range filter"
                   class="px-3 py-2 text-sm text-indigo-600 hover:text-indigo-700 underline"
                 >
                   Clear
@@ -569,13 +592,19 @@ export default function SearchPage() {
                     setProviderAvailability({});
                   }}
                   disabled={loadingProviders}
+                  aria-label="Clear streaming service filter"
+                  aria-busy={loadingProviders}
                   class="px-3 py-2 text-sm text-indigo-600 hover:text-indigo-700 underline disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Clear
                 </button>
               )}
               {loadingProviders && (
-                <span class="text-sm text-gray-500">
+                <span
+                  class="text-sm text-gray-500"
+                  role="status"
+                  aria-live="polite"
+                >
                   Loading availability...
                 </span>
               )}
@@ -586,15 +615,22 @@ export default function SearchPage() {
 
       {/* Loading State - Skeleton Cards */}
       {loading && (
-        <ContentGrid>
-          {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
-        </ContentGrid>
+        <div
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+          aria-label="Loading search results"
+        >
+          <ContentGrid>
+            {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
+          </ContentGrid>
+        </div>
       )}
 
       {/* Results */}
       {!loading && !error && filteredResults.length > 0 && (
-        <div>
-          <p class="text-gray-600 mb-4">
+        <div role="region" aria-live="polite" aria-label="Search results">
+          <p class="text-gray-600 mb-4" role="status">
             Found {filteredResults.length}{" "}
             result{filteredResults.length !== 1 ? "s" : ""}
             {(typeFilter !== "all" || genreFilter !== null ||

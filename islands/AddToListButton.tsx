@@ -118,6 +118,10 @@ export default function AddToListButton({ tmdbId }: AddToListButtonProps) {
         type="button"
         onClick={() => setShowDropdown(!showDropdown)}
         disabled={isLoading}
+        aria-label="Add to list"
+        aria-expanded={showDropdown}
+        aria-haspopup="true"
+        aria-busy={isLoading}
         class={`px-4 py-2 rounded-lg font-medium transition-colors ${
           showDropdown
             ? "bg-indigo-600 text-white hover:bg-indigo-700"
@@ -135,7 +139,11 @@ export default function AddToListButton({ tmdbId }: AddToListButtonProps) {
             onClick={() => setShowDropdown(false)}
           />
           {/* Dropdown menu */}
-          <div class="absolute left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-20 max-h-96 overflow-y-auto">
+          <div
+            role="menu"
+            aria-label="Select a list to add content to"
+            class="absolute left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-20 max-h-96 overflow-y-auto"
+          >
             <div class="p-2">
               <div class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase">
                 Select a list
@@ -144,8 +152,10 @@ export default function AddToListButton({ tmdbId }: AddToListButtonProps) {
                 <button
                   key={list.id}
                   type="button"
+                  role="menuitem"
                   onClick={() => handleAddToList(list.id)}
                   disabled={isLoading}
+                  aria-label={`Add to ${list.name}`}
                   class="w-full text-left px-3 py-2 rounded hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <div class="font-medium text-gray-900">{list.name}</div>
@@ -166,14 +176,22 @@ export default function AddToListButton({ tmdbId }: AddToListButtonProps) {
 
       {/* Success message */}
       {success && (
-        <div class="absolute left-0 mt-2 px-3 py-2 bg-green-100 text-green-800 rounded-lg text-sm whitespace-nowrap z-30">
+        <div
+          role="status"
+          aria-live="polite"
+          class="absolute left-0 mt-2 px-3 py-2 bg-green-100 text-green-800 rounded-lg text-sm whitespace-nowrap z-30"
+        >
           {success}
         </div>
       )}
 
       {/* Error message */}
       {error && (
-        <div class="absolute left-0 mt-2 px-3 py-2 bg-red-100 text-red-800 rounded-lg text-sm whitespace-nowrap z-30">
+        <div
+          role="alert"
+          aria-live="assertive"
+          class="absolute left-0 mt-2 px-3 py-2 bg-red-100 text-red-800 rounded-lg text-sm whitespace-nowrap z-30"
+        >
           {error}
         </div>
       )}

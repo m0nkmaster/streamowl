@@ -129,9 +129,12 @@ export default function QuickActions({
             ? "bg-indigo-600 text-white hover:bg-indigo-700"
             : "bg-white text-gray-800 hover:bg-gray-100"
         } ${isLoading === "watchlist" ? "opacity-50 cursor-not-allowed" : ""}`}
-        aria-label={isInWatchlist
+        aria-label={isLoading === "watchlist"
+          ? "Loading watchlist status"
+          : isInWatchlist
           ? "Remove from watchlist"
           : "Add to watchlist"}
+        aria-busy={isLoading === "watchlist"}
         title={isInWatchlist ? "Remove from watchlist" : "Add to watchlist"}
       >
         <svg
@@ -163,9 +166,12 @@ export default function QuickActions({
             ? "bg-red-600 text-white hover:bg-red-700"
             : "bg-white text-gray-800 hover:bg-gray-100"
         } ${isLoading === "favourite" ? "opacity-50 cursor-not-allowed" : ""}`}
-        aria-label={isFavourite
+        aria-label={isLoading === "favourite"
+          ? "Loading favourite status"
+          : isFavourite
           ? "Remove from favourites"
           : "Add to favourites"}
+        aria-busy={isLoading === "favourite"}
         title={isFavourite ? "Remove from favourites" : "Add to favourites"}
       >
         <svg
@@ -197,7 +203,12 @@ export default function QuickActions({
             ? "bg-green-600 text-white hover:bg-green-700"
             : "bg-white text-gray-800 hover:bg-gray-100"
         } ${isLoading === "watched" ? "opacity-50 cursor-not-allowed" : ""}`}
-        aria-label={isWatched ? "Remove from watched" : "Mark as watched"}
+        aria-label={isLoading === "watched"
+          ? "Loading watched status"
+          : isWatched
+          ? "Remove from watched"
+          : "Mark as watched"}
+        aria-busy={isLoading === "watched"}
         title={isWatched ? "Remove from watched" : "Mark as watched"}
       >
         <svg

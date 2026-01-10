@@ -22,10 +22,17 @@ function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
   if (!IS_BROWSER || toasts.length === 0) return null;
 
   return (
-    <div class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm">
+    <div
+      class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm"
+      role="region"
+      aria-live="polite"
+      aria-label="Notifications"
+    >
       {toasts.map((toast) => (
         <div
           key={toast.id}
+          role="alert"
+          aria-live={toast.type === "error" ? "assertive" : "polite"}
           class={`px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 animate-slide-in ${
             toast.type === "success"
               ? "bg-green-100 text-green-800 border border-green-200"

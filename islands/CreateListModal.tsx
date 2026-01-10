@@ -115,6 +115,7 @@ export default function CreateListModal({
                 viewBox="0 0 24 24"
                 stroke-width="1.5"
                 stroke="currentColor"
+                aria-hidden="true"
               >
                 <path
                   stroke-linecap="round"

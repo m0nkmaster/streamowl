@@ -91,6 +91,12 @@ export default function MarkAsWatchedButton(
         type="button"
         onClick={handleToggle}
         disabled={isLoading}
+        aria-label={isLoading
+          ? "Loading watched status"
+          : isWatched
+          ? "Remove from watched"
+          : "Mark as watched"}
+        aria-busy={isLoading}
         class={`px-4 py-2 rounded-lg font-medium transition-colors ${
           isWatched
             ? "bg-green-600 text-white hover:bg-green-700"

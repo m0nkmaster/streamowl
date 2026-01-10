@@ -95,6 +95,7 @@ export default function NotesComponent(
             type="button"
             onClick={() => setIsEditing(true)}
             disabled={isLoading}
+            aria-label={notes ? "Edit notes" : "Add note"}
             class="text-sm text-indigo-600 hover:text-indigo-700 underline disabled:opacity-50"
           >
             {notes ? "Edit" : "Add Note"}
@@ -117,16 +118,21 @@ export default function NotesComponent(
 
   return (
     <div class="flex flex-col gap-3">
-      <label class="text-sm font-medium text-gray-700">Your Notes</label>
+      <label for="notes-textarea" class="text-sm font-medium text-gray-700">
+        Your Notes
+      </label>
       <textarea
+        id="notes-textarea"
         value={notes || ""}
         onChange={(e) => setNotes(e.currentTarget.value)}
         disabled={isLoading}
         rows={6}
         maxLength={10000}
         placeholder="Add your private notes about this content..."
+        aria-describedby="notes-help notes-error"
+        aria-invalid={error !== null}
+        aria-busy={isLoading}
         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed resize-y"
-        aria-label="Notes text area"
       />
       <div class="flex items-center justify-between">
         <div class="flex gap-2">
@@ -134,6 +140,8 @@ export default function NotesComponent(
             type="button"
             onClick={() => handleSave(notes || "")}
             disabled={isLoading}
+            aria-label="Save notes"
+            aria-busy={isLoading}
             class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? "Saving..." : "Save"}
@@ -142,17 +150,23 @@ export default function NotesComponent(
             type="button"
             onClick={handleCancel}
             disabled={isLoading}
+            aria-label="Cancel editing notes"
             class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Cancel
           </button>
         </div>
-        <span class="text-xs text-gray-500">
+        <span id="notes-help" class="text-xs text-gray-500">
           {notes ? notes.length : 0} / 10,000 characters
         </span>
       </div>
       {error && (
-        <div class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-2">
+        <div
+          id="notes-error"
+          role="alert"
+          aria-live="assertive"
+          class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-2"
+        >
           {error}
         </div>
       )}

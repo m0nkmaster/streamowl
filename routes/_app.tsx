@@ -73,7 +73,7 @@ export default function App({ Component, data }: PageProps<AppProps>) {
           currentPath={currentPath}
           isAuthenticated={isAuthenticated}
         />
-        <main class="flex-1">
+        <main class="flex-1" role="main">
           <Component />
         </main>
         <Footer />

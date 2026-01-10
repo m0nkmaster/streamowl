@@ -91,6 +91,12 @@ export default function AddToWatchlistButton(
         type="button"
         onClick={handleToggle}
         disabled={isLoading}
+        aria-label={isLoading
+          ? "Loading watchlist status"
+          : isInWatchlist
+          ? "Remove from watchlist"
+          : "Add to watchlist"}
+        aria-busy={isLoading}
         class={`px-4 py-2 rounded-lg font-medium transition-colors ${
           isInWatchlist
             ? "bg-indigo-600 text-white hover:bg-indigo-700"

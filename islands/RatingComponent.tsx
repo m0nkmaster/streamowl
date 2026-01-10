@@ -154,12 +154,13 @@ export default function RatingComponent(
       <ToastContainer />
       <div class="flex flex-col gap-3">
         <div class="flex flex-col gap-2">
-          <label class="text-sm font-medium text-gray-700">
+          <label for="rating-slider" class="text-sm font-medium text-gray-700">
             Your Rating
           </label>
           <div class="flex items-center gap-3">
             <input
               type="range"
+              id="rating-slider"
               min="1"
               max="10"
               step="0.5"
@@ -171,11 +172,15 @@ export default function RatingComponent(
               onTouchEnd={(e) =>
                 handleSliderRelease(parseFloat(e.currentTarget.value))}
               disabled={isLoading}
+              aria-describedby="rating-value"
+              aria-busy={isLoading}
               class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed accent-indigo-600"
-              aria-label="Rating slider"
             />
-            <div class="flex items-center gap-2 min-w-[80px]">
-              <span class="text-lg font-semibold text-gray-900">
+            <div id="rating-value" class="flex items-center gap-2 min-w-[80px]">
+              <span
+                class="text-lg font-semibold text-gray-900"
+                aria-live="polite"
+              >
                 {displayRating.toFixed(1)}
               </span>
               <span class="text-sm text-gray-500">/ 10</span>
@@ -208,6 +213,8 @@ export default function RatingComponent(
             type="button"
             onClick={handleRemoveRating}
             disabled={isLoading}
+            aria-label="Remove rating"
+            aria-busy={isLoading}
             class="text-sm text-gray-500 hover:text-gray-700 underline self-start disabled:opacity-50"
           >
             Remove rating
