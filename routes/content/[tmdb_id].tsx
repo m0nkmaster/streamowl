@@ -1,7 +1,10 @@
 import { type Handlers, type PageProps } from "$fresh/server.ts";
 import {
+  type CategorisedWatchProviders,
   getMovieDetails,
+  getMovieWatchProvidersByRegion,
   getTvDetails,
+  getTvWatchProvidersByRegion,
   type MovieDetails,
   type TvDetails,
 } from "../../lib/tmdb/client.ts";
@@ -9,6 +12,7 @@ import {
 interface ContentDetailPageProps {
   content: MovieDetails | TvDetails;
   contentType: "movie" | "tv";
+  watchProviders: CategorisedWatchProviders | null;
 }
 
 /**
@@ -32,18 +36,31 @@ export const handler: Handlers<ContentDetailPageProps> = {
     try {
       content = await getMovieDetails(contentId);
       contentType = "movie";
-    } catch (movieError) {
+    } catch (_movieError) {
       // If movie fetch fails, try as TV show
       try {
         content = await getTvDetails(contentId);
         contentType = "tv";
-      } catch (tvError) {
+      } catch (_tvError) {
         // Both failed, return 404
         return new Response("Content not found", { status: 404 });
       }
     }
 
-    return ctx.render({ content, contentType });
+    // Fetch watch providers (default to US region for now)
+    let watchProviders: CategorisedWatchProviders | null = null;
+    try {
+      if (contentType === "movie") {
+        watchProviders = await getMovieWatchProvidersByRegion(contentId, "US");
+      } else {
+        watchProviders = await getTvWatchProvidersByRegion(contentId, "US");
+      }
+    } catch (error) {
+      // Log error but don't fail the page if watch providers fail
+      console.error("Failed to fetch watch providers:", error);
+    }
+
+    return ctx.render({ content, contentType, watchProviders });
   },
 };
 
@@ -125,10 +142,20 @@ function formatRating(voteAverage: number): string {
   return voteAverage.toFixed(1);
 }
 
+/**
+ * Helper function to get provider logo URL
+ */
+function getProviderLogoUrl(logoPath: string | null): string {
+  if (!logoPath) {
+    return "https://via.placeholder.com/50x50?text=Logo";
+  }
+  return `https://image.tmdb.org/t/p/w45${logoPath}`;
+}
+
 export default function ContentDetailPage(
   { data }: PageProps<ContentDetailPageProps>,
 ) {
-  const { content, contentType } = data;
+  const { content, contentType, watchProviders } = data;
   const isMovie = contentType === "movie";
   const title = isMovie
     ? (content as MovieDetails).title
@@ -218,7 +245,7 @@ export default function ContentDetailPage(
 
             {/* Cast */}
             {cast.length > 0 && (
-              <div>
+              <div class="mb-8">
                 <h2 class="text-2xl font-semibold text-gray-900 mb-4">
                   Cast
                 </h2>
@@ -246,6 +273,139 @@ export default function ContentDetailPage(
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Where to Watch */}
+            {watchProviders && (
+              <div class="mb-8">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">
+                  Where to Watch
+                </h2>
+                <div class="space-y-6">
+                  {/* Subscription Services */}
+                  {watchProviders.subscription.length > 0 && (
+                    <div>
+                      <h3 class="text-lg font-medium text-gray-800 mb-3">
+                        Stream
+                      </h3>
+                      <div class="flex flex-wrap gap-4">
+                        {watchProviders.subscription.map((provider) => (
+                          <a
+                            key={provider.provider_id}
+                            href={watchProviders.link || "#"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex items-center gap-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-3 border border-gray-200 hover:border-indigo-300"
+                          >
+                            <img
+                              src={getProviderLogoUrl(provider.logo_path)}
+                              alt={provider.provider_name}
+                              class="w-10 h-10 object-contain"
+                              loading="lazy"
+                            />
+                            <span class="text-sm font-medium text-gray-900">
+                              {provider.provider_name}
+                            </span>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Rent Options */}
+                  {watchProviders.rent.length > 0 && (
+                    <div>
+                      <h3 class="text-lg font-medium text-gray-800 mb-3">
+                        Rent
+                      </h3>
+                      <div class="flex flex-wrap gap-4">
+                        {watchProviders.rent.map((provider) => (
+                          <a
+                            key={provider.provider_id}
+                            href={watchProviders.link || "#"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex items-center gap-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-3 border border-gray-200 hover:border-indigo-300"
+                          >
+                            <img
+                              src={getProviderLogoUrl(provider.logo_path)}
+                              alt={provider.provider_name}
+                              class="w-10 h-10 object-contain"
+                              loading="lazy"
+                            />
+                            <span class="text-sm font-medium text-gray-900">
+                              {provider.provider_name}
+                            </span>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Buy Options */}
+                  {watchProviders.buy.length > 0 && (
+                    <div>
+                      <h3 class="text-lg font-medium text-gray-800 mb-3">
+                        Buy
+                      </h3>
+                      <div class="flex flex-wrap gap-4">
+                        {watchProviders.buy.map((provider) => (
+                          <a
+                            key={provider.provider_id}
+                            href={watchProviders.link || "#"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="flex items-center gap-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-3 border border-gray-200 hover:border-indigo-300"
+                          >
+                            <img
+                              src={getProviderLogoUrl(provider.logo_path)}
+                              alt={provider.provider_name}
+                              class="w-10 h-10 object-contain"
+                              loading="lazy"
+                            />
+                            <span class="text-sm font-medium text-gray-900">
+                              {provider.provider_name}
+                            </span>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Free/Ad-supported Services */}
+                  {(watchProviders.free.length > 0 ||
+                    watchProviders.ads.length > 0) && (
+                    <div>
+                      <h3 class="text-lg font-medium text-gray-800 mb-3">
+                        Free
+                      </h3>
+                      <div class="flex flex-wrap gap-4">
+                        {[...watchProviders.free, ...watchProviders.ads].map(
+                          (provider) => (
+                            <a
+                              key={provider.provider_id}
+                              href={watchProviders.link || "#"}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="flex items-center gap-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-3 border border-gray-200 hover:border-indigo-300"
+                            >
+                              <img
+                                src={getProviderLogoUrl(provider.logo_path)}
+                                alt={provider.provider_name}
+                                class="w-10 h-10 object-contain"
+                                loading="lazy"
+                              />
+                              <span class="text-sm font-medium text-gray-900">
+                                {provider.provider_name}
+                              </span>
+                            </a>
+                          ),
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
