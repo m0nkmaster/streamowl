@@ -16,7 +16,8 @@
     "test:user-content": "deno run -A scripts/test-user-content-table.ts",
     "test:lists": "deno run -A scripts/test-lists-tables.ts",
     "test:tags": "deno run -A scripts/test-tags-tables.ts",
-    "test:streaming": "deno run -A scripts/test-streaming-services-tables.ts"
+    "test:streaming": "deno run -A scripts/test-streaming-services-tables.ts",
+    "test:auth": "deno run -A scripts/test-auth-session.ts"
   },
   "lint": {
     "rules": {

@@ -115,7 +115,7 @@
         "Step 3: Create middleware to extract and validate session from requests",
         "Step 4: Test that invalid/expired tokens are rejected"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-email-password-signup",
