@@ -167,7 +167,7 @@
         "Step 3: Verify session cookie is cleared",
         "Step 4: Attempt to access protected route and verify redirect to login"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-protected-routes",

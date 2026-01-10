@@ -175,3 +175,34 @@
 - XSS attack vectors tested: Script tags, event handlers (onerror, onload, onfocus), JavaScript protocol injection, iframe injection, and various HTML injection techniques
 - Edge cases: Functions handle null, undefined, and empty strings gracefully by returning empty string
 - Best practice: Always escape user-generated content before displaying in HTML, especially when using dangerouslySetInnerHTML or setting HTML attributes dynamically
+
+## Authentication - Google OAuth
+
+- OAuth flow: Implemented OAuth 2.0 authorization code flow with Google (initiation endpoint redirects to Google, callback endpoint handles response)
+- OAuth configuration: Store GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET in environment variables
+- OAuth initiation endpoint: Created `/api/auth/google` endpoint that generates Google OAuth URL with client ID, redirect URI, scopes (openid email profile), and state parameter
+- OAuth callback endpoint: Created `/api/auth/google/callback` endpoint that exchanges authorization code for access token, fetches user profile, and creates/logs in user
+- State parameter: Use base64-encoded JSON to store returnTo URL in state parameter for CSRF protection and redirect handling
+- Redirect URI: Construct redirect URI dynamically from request origin to support different environments (localhost, staging, production)
+- Token exchange: Exchange authorization code for access token using POST request to `https://oauth2.googleapis.com/token` with client credentials
+- User profile fetching: Fetch user profile from `https://www.googleapis.com/oauth2/v2/userinfo` using access token to get email, name, picture
+- Email verification: Verify `verified_email` field from Google profile before creating/logging in user
+- User lookup: Check for existing users by google_id or email to handle both new signups and existing user logins
+- User creation: Create new user with Google profile data (email, google_id, display_name, avatar_url) when user doesn't exist
+- User linking: Update existing users with google_id if they sign in with Google but already have an account with that email
+- Profile updates: Update display_name and avatar_url from Google profile if available and not already set
+- Database migration: Added google_id column (VARCHAR(255)) to users table with index for OAuth user lookup
+- UI integration: Added "Continue with Google" buttons to login and signup pages with Google logo SVG icon and divider styling
+- OAuth button styling: Use Tailwind classes for consistent styling with white background, gray border, and hover states matching existing form buttons
+- Error handling: Handle OAuth errors (missing code, email not verified, token exchange failures) with redirects to login page with error query parameters
+- Session creation: Create JWT session token and set secure cookie after successful OAuth authentication, same as email/password flow
+
+## Authentication - Logout
+
+- Logout endpoint: Created `/api/logout` endpoint that clears session cookie and redirects to homepage
+- Logout methods: Support both POST (form submission) and GET (link navigation) requests for logout
+- Cookie clearing: Use `clearSessionCookie()` function to set session cookie with Max-Age=0, matching same security flags (HttpOnly, SameSite, Secure) as session cookie creation
+- Secure flag consistency: Ensure logout cookie clearing includes Secure flag when in production environment, matching the pattern used in `setSessionCookie()`
+- Logout UI: Add logout button to dashboard page with form POST to `/api/logout` endpoint
+- Redirect after logout: Redirect to homepage ("/") after clearing session cookie
+- Session validation: After logout, protected routes will redirect to login since session cookie is cleared
