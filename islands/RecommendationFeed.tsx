@@ -54,6 +54,38 @@ export default function RecommendationFeed() {
     return `https://image.tmdb.org/t/p/w300${posterPath}`;
   };
 
+  // Handle dismissing a recommendation
+  const handleDismiss = async (
+    e: Event,
+    tmdbId: number,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Optimistic update - remove from UI immediately
+    const originalRecommendations = [...recommendations];
+    setRecommendations((prev) =>
+      prev.filter((rec) => rec.tmdb_id !== tmdbId)
+    );
+
+    try {
+      const response = await fetch(`/api/recommendations/${tmdbId}/dismiss`, {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        // Revert on error
+        setRecommendations(originalRecommendations);
+        throw new Error("Failed to dismiss recommendation");
+      }
+    } catch (err) {
+      // Revert on error
+      setRecommendations(originalRecommendations);
+      console.error("Error dismissing recommendation:", err);
+      alert("Failed to dismiss recommendation. Please try again.");
+    }
+  };
+
   return (
     <section class="mb-12">
       <div class="flex items-center justify-between mb-6">
@@ -89,12 +121,11 @@ export default function RecommendationFeed() {
       {!loading && !error && recommendations.length > 0 && (
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {recommendations.map((rec) => (
-            <a
-              href={`/content/${rec.tmdb_id}`}
-              class="block group"
+            <div
+              class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow relative group"
               key={`${rec.type}-${rec.tmdb_id}`}
             >
-              <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <a href={`/content/${rec.tmdb_id}`} class="block">
                 <div class="relative">
                   <img
                     src={getPosterUrl(rec.poster_path)}
@@ -102,7 +133,7 @@ export default function RecommendationFeed() {
                     class="w-full aspect-[2/3] object-cover"
                     loading="lazy"
                   />
-                  <div class="absolute top-2 right-2">
+                  <div class="absolute top-2 right-2 flex gap-2">
                     <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-indigo-600 text-white uppercase">
                       {rec.type}
                     </span>
@@ -133,8 +164,30 @@ export default function RecommendationFeed() {
                     )}
                   </div>
                 </div>
-              </div>
-            </a>
+              </a>
+              <button
+                type="button"
+                onClick={(e) => handleDismiss(e, rec.tmdb_id)}
+                class="absolute top-2 left-2 bg-gray-800 bg-opacity-75 hover:bg-opacity-90 text-white rounded-full p-2 transition-opacity opacity-0 group-hover:opacity-100"
+                aria-label="Not interested"
+                title="Not interested"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
           ))}
         </div>
       )}

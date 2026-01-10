@@ -69,6 +69,11 @@ export async function generateRecommendationCandidates(
         WHERE user_id = $2 
           AND status = 'watched'
       )
+      AND c.id NOT IN (
+        SELECT content_id
+        FROM dismissed_recommendations
+        WHERE user_id = $2
+      )
     ORDER BY c.content_embedding <=> $1::vector(1536)
     LIMIT $3`,
     [embeddingString, userId, limit * 2], // Fetch more for diversity filtering

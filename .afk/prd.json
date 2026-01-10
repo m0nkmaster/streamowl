@@ -726,7 +726,7 @@
         "Step 3: Verify recommendation removed from feed",
         "Step 4: Verify dismissed content not recommended again"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "ai-recommendation-add-to-watchlist",
