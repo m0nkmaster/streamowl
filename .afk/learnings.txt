@@ -14,3 +14,14 @@
 - The dev server starts on localhost:8000 by default
 - Fresh uses Preact for components and supports TypeScript out of the box
 - The `deno task start` command runs the development server with hot reload
+
+## Database Configuration
+
+- PostgreSQL client library: Use `deno.land/x/postgres@v0.17.0` for PostgreSQL connections in Deno
+- Connection pooling: The postgres library provides a Pool class that handles connection pooling automatically
+- Environment variables: Access via `Deno.env.get()` - no need for dotenv library in Deno
+- Database module location: Created `lib/db.ts` for database utilities following common project structure
+- Type safety: Use generic types with `query<T>()` for type-safe query results
+- Error handling: Always check if errors are instances of Error before accessing `.message` property
+- Connection pool: Singleton pattern used for pool instance to ensure single pool per application
+- Test script: Created `scripts/test-db.ts` for verifying database connectivity and pooling

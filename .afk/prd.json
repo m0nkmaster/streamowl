@@ -24,7 +24,7 @@
         "Step 3: Verify connection by running a simple SELECT query",
         "Step 4: Confirm connection pool handles concurrent requests"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "database-schema-users",
