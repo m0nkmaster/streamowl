@@ -1,6 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
 import { useToast } from "./Toast.tsx";
+import { trackRateContent } from "../lib/analytics/client.ts";
 
 interface RatingComponentProps {
   tmdbId: number;
@@ -68,6 +69,9 @@ export default function RatingComponent(
           : "Failed to set rating. Please try again.";
         showToast(errorMessage, "error");
       } else {
+        // Track analytics for successful rating
+        trackRateContent(tmdbId, roundedValue);
+
         // Show success toast with undo
         showToast(
           `Rated ${roundedValue.toFixed(1)}/10`,

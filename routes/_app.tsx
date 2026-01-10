@@ -2,6 +2,7 @@ import { type PageProps } from "$fresh/server.ts";
 import Navigation from "../islands/Navigation.tsx";
 import Footer from "../components/Footer.tsx";
 import NotificationPrompt from "../islands/NotificationPrompt.tsx";
+import Analytics from "../islands/Analytics.tsx";
 
 export default function App({ Component, url, data }: PageProps) {
   // Get currentPath from Fresh's url prop (always available)
@@ -89,6 +90,7 @@ export default function App({ Component, url, data }: PageProps) {
         </main>
         <Footer />
         <NotificationPrompt isAuthenticated={isAuthenticated} />
+        <Analytics pagePath={currentPath} />
         {/* deno-lint-ignore react-no-danger */}
         <script
           dangerouslySetInnerHTML={{

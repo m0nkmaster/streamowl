@@ -1,5 +1,10 @@
 import { useEffect, useState } from "preact/hooks";
 import { IS_BROWSER } from "$fresh/runtime.ts";
+import {
+  trackAddToFavourites,
+  trackAddToWatchlist,
+  trackMarkAsWatched,
+} from "../lib/analytics/client.ts";
 
 interface QuickActionsProps {
   tmdbId: number;
@@ -101,6 +106,20 @@ export default function QuickActions({
         console.error(`${errorMessage}:`, finalErrorMessage);
         onAction?.(action, false);
       } else {
+        // Track analytics for successful actions
+        if (newState) {
+          switch (action) {
+            case "watchlist":
+              trackAddToWatchlist(tmdbId);
+              break;
+            case "favourite":
+              trackAddToFavourites(tmdbId);
+              break;
+            case "watched":
+              trackMarkAsWatched(tmdbId);
+              break;
+          }
+        }
         onAction?.(action, true);
       }
     } catch (error) {

@@ -10,6 +10,7 @@ import QuickActions from "./QuickActions.tsx";
 import { useToast } from "./Toast.tsx";
 import SkeletonCard from "../components/SkeletonCard.tsx";
 import ErrorDisplay from "../components/ErrorDisplay.tsx";
+import { trackSearch } from "../lib/analytics/client.ts";
 
 interface SearchResponse {
   results: Content[];
@@ -134,6 +135,9 @@ export default function SearchPage() {
         setProviderAvailability({});
         // Clear content statuses for new search
         setContentStatuses({});
+
+        // Track search event
+        trackSearch(query.trim(), data.results.length);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
         setResults([]);
