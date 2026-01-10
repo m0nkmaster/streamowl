@@ -1,0 +1,41 @@
+{
+  "scriptId": "368",
+  "url": "file:///Users/rob.macdonald/Documents/code/misc/demo/lib/security/rate-limit.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 5062, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 663, "endOffset": 1156, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getClientIp",
+      "ranges": [{ "startOffset": 1255, "endOffset": 1850, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "checkRateLimit",
+      "ranges": [{ "startOffset": 2055, "endOffset": 3254, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "recordFailedAttempt",
+      "ranges": [{ "startOffset": 3376, "endOffset": 4073, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "clearFailedAttempts",
+      "ranges": [{ "startOffset": 4227, "endOffset": 4308, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getRateLimitStatus",
+      "ranges": [{ "startOffset": 4488, "endOffset": 5061, "count": 0 }],
+      "isBlockCoverage": false
+    }
+  ]
+}

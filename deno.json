@@ -34,7 +34,10 @@
     "test:content-embeddings": "deno run -A scripts/test-content-embeddings.ts",
     "test:taste-profile": "deno run -A scripts/test-taste-profile.ts",
     "test:recommendation-candidates": "deno run -A scripts/test-recommendation-candidates.ts",
-    "process:embeddings": "deno run -A scripts/process-embedding-queue.ts"
+    "process:embeddings": "deno run -A scripts/process-embedding-queue.ts",
+    "test:unit": "deno test lib/**/*.test.ts --allow-env",
+    "test:coverage": "deno test --coverage=coverage lib/**/*.test.ts --allow-env",
+    "test:coverage:report": "deno coverage coverage --lcov > coverage.lcov && deno coverage coverage"
   },
   "lint": {
     "rules": {

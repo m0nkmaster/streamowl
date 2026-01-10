@@ -1,0 +1,39 @@
+{
+  "scriptId": "334",
+  "url": "file:///Users/rob.macdonald/Documents/code/misc/demo/lib/security/xss.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 2343, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "escapeHtml",
+      "ranges": [
+        { "startOffset": 953, "endOffset": 1208, "count": 13 },
+        { "startOffset": 1003, "endOffset": 1023, "count": 3 },
+        { "startOffset": 1023, "endOffset": 1207, "count": 10 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 1177, "endOffset": 1204, "count": 20 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "escapeHtmlAttribute",
+      "ranges": [{ "startOffset": 1641, "endOffset": 1708, "count": 3 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "escapeJsString",
+      "ranges": [
+        { "startOffset": 2119, "endOffset": 2342, "count": 10 },
+        { "startOffset": 2173, "endOffset": 2193, "count": 2 },
+        { "startOffset": 2193, "endOffset": 2341, "count": 8 }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

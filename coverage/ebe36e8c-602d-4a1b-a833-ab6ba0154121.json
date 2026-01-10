@@ -1,0 +1,70 @@
+{
+  "scriptId": "334",
+  "url": "file:///Users/rob.macdonald/Documents/code/misc/demo/lib/api/errors.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 3581, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "createErrorResponse",
+      "ranges": [
+        { "startOffset": 367, "endOffset": 713, "count": 15 },
+        { "startOffset": 521, "endOffset": 545, "count": 4 },
+        { "startOffset": 559, "endOffset": 580, "count": 2 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "createValidationErrorResponse",
+      "ranges": [{ "startOffset": 788, "endOffset": 944, "count": 3 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "createBadRequestResponse",
+      "ranges": [
+        { "startOffset": 1027, "endOffset": 1232, "count": 2 },
+        { "startOffset": 1092, "endOffset": 1231, "count": 1 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "createUnauthorizedResponse",
+      "ranges": [{ "startOffset": 1286, "endOffset": 1411, "count": 2 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "createNotFoundResponse",
+      "ranges": [{ "startOffset": 1462, "endOffset": 1586, "count": 2 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "createInternalServerErrorResponse",
+      "ranges": [
+        { "startOffset": 1944, "endOffset": 2948, "count": 2 },
+        { "startOffset": 2181, "endOffset": 2314, "count": 0 },
+        { "startOffset": 2485, "endOffset": 2877, "count": 1 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 2561, "endOffset": 2871, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "createForbiddenResponse",
+      "ranges": [{ "startOffset": 2999, "endOffset": 3124, "count": 2 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "createTooManyRequestsResponse",
+      "ranges": [
+        { "startOffset": 3183, "endOffset": 3580, "count": 2 },
+        { "startOffset": 3409, "endOffset": 3442, "count": 1 }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

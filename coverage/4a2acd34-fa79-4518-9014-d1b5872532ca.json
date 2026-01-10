@@ -1,0 +1,44 @@
+{
+  "scriptId": "334",
+  "url": "file:///Users/rob.macdonald/Documents/code/misc/demo/lib/auth/jwt.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 2344, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getJwtSecret",
+      "ranges": [
+        { "startOffset": 403, "endOffset": 629, "count": 9 },
+        { "startOffset": 489, "endOffset": 610, "count": 1 },
+        { "startOffset": 610, "endOffset": 628, "count": 8 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "createSessionToken",
+      "ranges": [
+        { "startOffset": 870, "endOffset": 1396, "count": 5 },
+        { "startOffset": 1160, "endOffset": 1395, "count": 4 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "verifySessionToken",
+      "ranges": [
+        { "startOffset": 1586, "endOffset": 2343, "count": 4 },
+        { "startOffset": 1885, "endOffset": 1973, "count": 2 },
+        { "startOffset": 1974, "endOffset": 1996, "count": 2 },
+        { "startOffset": 1997, "endOffset": 2018, "count": 2 },
+        { "startOffset": 2019, "endOffset": 2056, "count": 2 },
+        { "startOffset": 2057, "endOffset": 2093, "count": 2 },
+        { "startOffset": 2095, "endOffset": 2124, "count": 2 },
+        { "startOffset": 2124, "endOffset": 2185, "count": 0 },
+        { "startOffset": 2185, "endOffset": 2341, "count": 2 },
+        { "startOffset": 2260, "endOffset": 2275, "count": 0 }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

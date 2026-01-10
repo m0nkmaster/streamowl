@@ -1,0 +1,51 @@
+{
+  "scriptId": "363",
+  "url": "file:///Users/rob.macdonald/Documents/code/misc/demo/lib/db.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 3683, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getDatabaseUrl",
+      "ranges": [{ "startOffset": 389, "endOffset": 612, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "createPool",
+      "ranges": [{ "startOffset": 863, "endOffset": 1042, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getPool",
+      "ranges": [{ "startOffset": 1197, "endOffset": 1278, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "query",
+      "ranges": [{ "startOffset": 2003, "endOffset": 2270, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getClient",
+      "ranges": [{ "startOffset": 2456, "endOffset": 2543, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "transaction",
+      "ranges": [{ "startOffset": 2718, "endOffset": 3061, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "closePool",
+      "ranges": [{ "startOffset": 3163, "endOffset": 3250, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "testConnection",
+      "ranges": [{ "startOffset": 3363, "endOffset": 3682, "count": 0 }],
+      "isBlockCoverage": false
+    }
+  ]
+}

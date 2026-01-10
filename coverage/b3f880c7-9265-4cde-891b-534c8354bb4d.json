@@ -1,0 +1,104 @@
+{
+  "scriptId": "334",
+  "url": "file:///Users/rob.macdonald/Documents/code/misc/demo/lib/security/csrf.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 5445, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "generateCsrfToken",
+      "ranges": [{ "startOffset": 696, "endOffset": 919, "count": 16 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "setCsrfCookie",
+      "ranges": [
+        { "startOffset": 1059, "endOffset": 1429, "count": 1 },
+        { "startOffset": 1310, "endOffset": 1372, "count": 0 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getCsrfTokenFromCookie",
+      "ranges": [
+        { "startOffset": 1579, "endOffset": 1973, "count": 10 },
+        { "startOffset": 1697, "endOffset": 1724, "count": 2 },
+        { "startOffset": 1724, "endOffset": 1884, "count": 8 },
+        { "startOffset": 1884, "endOffset": 1911, "count": 0 },
+        { "startOffset": 1911, "endOffset": 1972, "count": 8 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 1771, "endOffset": 1784, "count": 9 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 1821, "endOffset": 1862, "count": 8 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getCsrfTokenFromForm",
+      "ranges": [
+        { "startOffset": 2119, "endOffset": 2250, "count": 4 },
+        { "startOffset": 2206, "endOffset": 2216, "count": 3 },
+        { "startOffset": 2235, "endOffset": 2247, "count": 1 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getCsrfTokenFromJson",
+      "ranges": [
+        { "startOffset": 2393, "endOffset": 2527, "count": 8 },
+        { "startOffset": 2505, "endOffset": 2512, "count": 5 },
+        { "startOffset": 2513, "endOffset": 2524, "count": 3 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "validateCsrfToken",
+      "ranges": [
+        { "startOffset": 2915, "endOffset": 3977, "count": 4 },
+        { "startOffset": 3081, "endOffset": 3104, "count": 0 },
+        { "startOffset": 3176, "endOffset": 3229, "count": 1 },
+        { "startOffset": 3229, "endOffset": 3803, "count": 3 },
+        { "startOffset": 3249, "endOffset": 3302, "count": 1 },
+        { "startOffset": 3302, "endOffset": 3803, "count": 2 },
+        { "startOffset": 3438, "endOffset": 3443, "count": 0 },
+        { "startOffset": 3511, "endOffset": 3557, "count": 1 },
+        { "startOffset": 3559, "endOffset": 3799, "count": 1 },
+        { "startOffset": 3822, "endOffset": 3845, "count": 0 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "validateCsrfTokenFromJson",
+      "ranges": [
+        { "startOffset": 4329, "endOffset": 4766, "count": 4 },
+        { "startOffset": 4487, "endOffset": 4510, "count": 1 },
+        { "startOffset": 4510, "endOffset": 4611, "count": 3 },
+        { "startOffset": 4611, "endOffset": 4634, "count": 1 },
+        { "startOffset": 4634, "endOffset": 4765, "count": 2 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "constantTimeEquals",
+      "ranges": [
+        { "startOffset": 4945, "endOffset": 5166, "count": 6 },
+        { "startOffset": 5010, "endOffset": 5033, "count": 0 },
+        { "startOffset": 5087, "endOffset": 5141, "count": 258 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "createCsrfErrorResponse",
+      "ranges": [{ "startOffset": 5336, "endOffset": 5444, "count": 1 }],
+      "isBlockCoverage": true
+    }
+  ]
+}

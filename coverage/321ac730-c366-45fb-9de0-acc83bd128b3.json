@@ -1,0 +1,21 @@
+{
+  "scriptId": "334",
+  "url": "file:///Users/rob.macdonald/Documents/code/misc/demo/lib/auth/password.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 746, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "hashPassword",
+      "ranges": [{ "startOffset": 368, "endOffset": 440, "count": 8 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "verifyPassword",
+      "ranges": [{ "startOffset": 656, "endOffset": 745, "count": 5 }],
+      "isBlockCoverage": true
+    }
+  ]
+}

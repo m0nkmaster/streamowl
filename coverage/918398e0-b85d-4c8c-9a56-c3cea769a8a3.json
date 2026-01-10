@@ -1,0 +1,26 @@
+{
+  "scriptId": "370",
+  "url": "file:///Users/rob.macdonald/Documents/code/misc/demo/lib/auth/jwt.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 2344, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getJwtSecret",
+      "ranges": [{ "startOffset": 403, "endOffset": 629, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "createSessionToken",
+      "ranges": [{ "startOffset": 870, "endOffset": 1396, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "verifySessionToken",
+      "ranges": [{ "startOffset": 1586, "endOffset": 2343, "count": 0 }],
+      "isBlockCoverage": false
+    }
+  ]
+}

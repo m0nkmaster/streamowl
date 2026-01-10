@@ -1,0 +1,80 @@
+{
+  "scriptId": "334",
+  "url": "file:///Users/rob.macdonald/Documents/code/misc/demo/lib/security/rate-limit.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 5062, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 663, "endOffset": 1156, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getClientIp",
+      "ranges": [
+        { "startOffset": 1255, "endOffset": 1850, "count": 4 },
+        { "startOffset": 1425, "endOffset": 1661, "count": 2 },
+        { "startOffset": 1661, "endOffset": 1849, "count": 1 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "checkRateLimit",
+      "ranges": [
+        { "startOffset": 2055, "endOffset": 3254, "count": 5 },
+        { "startOffset": 2222, "endOffset": 2300, "count": 2 },
+        { "startOffset": 2300, "endOffset": 2358, "count": 3 },
+        { "startOffset": 2358, "endOffset": 2385, "count": 1 },
+        { "startOffset": 2387, "endOffset": 2533, "count": 1 },
+        { "startOffset": 2533, "endOffset": 2781, "count": 2 },
+        { "startOffset": 2781, "endOffset": 3115, "count": 0 },
+        { "startOffset": 3115, "endOffset": 3253, "count": 2 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 2671, "endOffset": 2697, "count": 7 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "recordFailedAttempt",
+      "ranges": [
+        { "startOffset": 3376, "endOffset": 4073, "count": 31 },
+        { "startOffset": 3505, "endOffset": 3619, "count": 7 },
+        { "startOffset": 3948, "endOffset": 4071, "count": 2 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 3824, "endOffset": 3850, "count": 137 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "clearFailedAttempts",
+      "ranges": [{ "startOffset": 4227, "endOffset": 4308, "count": 9 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getRateLimitStatus",
+      "ranges": [
+        { "startOffset": 4488, "endOffset": 5061, "count": 5 },
+        { "startOffset": 4592, "endOffset": 4669, "count": 1 },
+        { "startOffset": 4669, "endOffset": 4878, "count": 4 },
+        { "startOffset": 4878, "endOffset": 4905, "count": 1 },
+        { "startOffset": 4907, "endOffset": 4981, "count": 1 },
+        { "startOffset": 4981, "endOffset": 5060, "count": 4 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 4793, "endOffset": 4819, "count": 14 }],
+      "isBlockCoverage": true
+    }
+  ]
+}

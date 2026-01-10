@@ -1,0 +1,71 @@
+{
+  "scriptId": "362",
+  "url": "file:///Users/rob.macdonald/Documents/code/misc/demo/lib/logging/logger.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 3834, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 382, "endOffset": 543, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "extractRequestContext",
+      "ranges": [{ "startOffset": 613, "endOffset": 1215, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "formatLogEntry",
+      "ranges": [{ "startOffset": 1259, "endOffset": 1325, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "writeLog",
+      "ranges": [
+        { "startOffset": 1396, "endOffset": 1811, "count": 1 },
+        { "startOffset": 1542, "endOffset": 1605, "count": 0 },
+        { "startOffset": 1610, "endOffset": 1671, "count": 0 },
+        { "startOffset": 1676, "endOffset": 1737, "count": 0 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "createLogEntry",
+      "ranges": [
+        { "startOffset": 1872, "endOffset": 2721, "count": 1 },
+        { "startOffset": 2041, "endOffset": 2066, "count": 0 },
+        { "startOffset": 2281, "endOffset": 2386, "count": 0 },
+        { "startOffset": 2443, "endOffset": 2703, "count": 0 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "logDebug",
+      "ranges": [{ "startOffset": 2760, "endOffset": 2919, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "logInfo",
+      "ranges": [{ "startOffset": 2958, "endOffset": 3115, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "logWarn",
+      "ranges": [{ "startOffset": 3156, "endOffset": 3316, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "logError",
+      "ranges": [{ "startOffset": 3373, "endOffset": 3535, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "logRouteError",
+      "ranges": [{ "startOffset": 3659, "endOffset": 3833, "count": 0 }],
+      "isBlockCoverage": false
+    }
+  ]
+}

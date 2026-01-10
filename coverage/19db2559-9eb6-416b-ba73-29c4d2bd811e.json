@@ -1,0 +1,58 @@
+{
+  "scriptId": "334",
+  "url": "file:///Users/rob.macdonald/Documents/code/misc/demo/lib/region.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 4147, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "detectRegionFromAcceptLanguage",
+      "ranges": [
+        { "startOffset": 894, "endOffset": 1779, "count": 13 },
+        { "startOffset": 975, "endOffset": 1007, "count": 2 },
+        { "startOffset": 1007, "endOffset": 1372, "count": 11 },
+        { "startOffset": 1372, "endOffset": 1716, "count": 12 },
+        { "startOffset": 1455, "endOffset": 1501, "count": 8 },
+        { "startOffset": 1501, "endOffset": 1662, "count": 4 },
+        { "startOffset": 1662, "endOffset": 1712, "count": 0 },
+        { "startOffset": 1716, "endOffset": 1778, "count": 3 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 1134, "endOffset": 1290, "count": 18 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "detectRegionFromRequest",
+      "ranges": [{ "startOffset": 2044, "endOffset": 2211, "count": 2 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getUserRegionPreference",
+      "ranges": [{ "startOffset": 2440, "endOffset": 2947, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getUserRegion",
+      "ranges": [{ "startOffset": 3245, "endOffset": 3574, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getRegionName",
+      "ranges": [
+        { "startOffset": 3692, "endOffset": 3921, "count": 12 },
+        { "startOffset": 3909, "endOffset": 3918, "count": 0 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "isSupportedRegion",
+      "ranges": [{ "startOffset": 4063, "endOffset": 4146, "count": 10 }],
+      "isBlockCoverage": true
+    }
+  ]
+}

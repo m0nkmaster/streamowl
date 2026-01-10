@@ -1,0 +1,26 @@
+{
+  "scriptId": "369",
+  "url": "file:///Users/rob.macdonald/Documents/code/misc/demo/lib/auth/cookies.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 2069, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "setSessionCookie",
+      "ranges": [{ "startOffset": 674, "endOffset": 1065, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "clearSessionCookie",
+      "ranges": [{ "startOffset": 1163, "endOffset": 1510, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getSessionToken",
+      "ranges": [{ "startOffset": 1666, "endOffset": 2068, "count": 0 }],
+      "isBlockCoverage": false
+    }
+  ]
+}

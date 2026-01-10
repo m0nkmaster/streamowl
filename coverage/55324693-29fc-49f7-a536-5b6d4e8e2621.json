@@ -1,0 +1,54 @@
+{
+  "scriptId": "334",
+  "url": "file:///Users/rob.macdonald/Documents/code/misc/demo/lib/images.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 1966, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getPosterUrl",
+      "ranges": [
+        { "startOffset": 219, "endOffset": 413, "count": 4 },
+        { "startOffset": 289, "endOffset": 412, "count": 2 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getPosterSrcSet",
+      "ranges": [
+        { "startOffset": 564, "endOffset": 964, "count": 2 },
+        { "startOffset": 622, "endOffset": 963, "count": 1 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getBackdropUrl",
+      "ranges": [
+        { "startOffset": 1026, "endOffset": 1179, "count": 3 },
+        { "startOffset": 1103, "endOffset": 1123, "count": 1 },
+        { "startOffset": 1123, "endOffset": 1178, "count": 2 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getBackdropSrcSet",
+      "ranges": [
+        { "startOffset": 1235, "endOffset": 1542, "count": 2 },
+        { "startOffset": 1299, "endOffset": 1541, "count": 1 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getGridPosterSize",
+      "ranges": [{ "startOffset": 1720, "endOffset": 1812, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getDetailPosterSize",
+      "ranges": [{ "startOffset": 1876, "endOffset": 1965, "count": 1 }],
+      "isBlockCoverage": true
+    }
+  ]
+}

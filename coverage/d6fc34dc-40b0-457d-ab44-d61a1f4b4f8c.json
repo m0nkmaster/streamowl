@@ -1,0 +1,50 @@
+{
+  "scriptId": "332",
+  "url": "file:///Users/rob.macdonald/Documents/code/misc/demo/lib/auth/jwt.test.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 3374, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 369, "endOffset": 740, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 801, "endOffset": 1202, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        { "startOffset": 1265, "endOffset": 1579, "count": 1 },
+        { "startOffset": 1420, "endOffset": 1475, "count": 0 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        { "startOffset": 1663, "endOffset": 2213, "count": 1 },
+        { "startOffset": 1961, "endOffset": 2016, "count": 0 }
+      ],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 2277, "endOffset": 2897, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "",
+      "ranges": [
+        { "startOffset": 2975, "endOffset": 3371, "count": 1 },
+        { "startOffset": 3116, "endOffset": 3171, "count": 0 }
+      ],
+      "isBlockCoverage": true
+    }
+  ]
+}

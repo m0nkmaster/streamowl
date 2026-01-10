@@ -1,0 +1,136 @@
+{
+  "scriptId": "362",
+  "url": "file:///Users/rob.macdonald/Documents/code/misc/demo/lib/tmdb/client.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 17610, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "<instance_members_initializer>",
+      "ranges": [{ "startOffset": 632, "endOffset": 645, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "canMakeRequest",
+      "ranges": [{ "startOffset": 786, "endOffset": 1185, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "waitForAvailability",
+      "ranges": [{ "startOffset": 1297, "endOffset": 1606, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getApiKey",
+      "ranges": [{ "startOffset": 1737, "endOffset": 1964, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "request",
+      "ranges": [{ "startOffset": 2267, "endOffset": 4119, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getMovieById",
+      "ranges": [{ "startOffset": 4287, "endOffset": 4504, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getMovieDetails",
+      "ranges": [{ "startOffset": 4723, "endOffset": 4991, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getTvDetails",
+      "ranges": [{ "startOffset": 5215, "endOffset": 5458, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "mapTMDBMovieToContent",
+      "ranges": [{ "startOffset": 5608, "endOffset": 6084, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "mapTMDBTVToContent",
+      "ranges": [{ "startOffset": 6235, "endOffset": 6676, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "searchMovies",
+      "ranges": [{ "startOffset": 6931, "endOffset": 7519, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "searchTv",
+      "ranges": [{ "startOffset": 7776, "endOffset": 8354, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getMovieWatchProviders",
+      "ranges": [{ "startOffset": 8681, "endOffset": 8932, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getTvWatchProviders",
+      "ranges": [{ "startOffset": 9128, "endOffset": 9360, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "filterWatchProvidersByRegion",
+      "ranges": [{ "startOffset": 9679, "endOffset": 10062, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getMovieWatchProvidersByRegion",
+      "ranges": [{ "startOffset": 10372, "endOffset": 10562, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getTvWatchProvidersByRegion",
+      "ranges": [{ "startOffset": 10875, "endOffset": 11053, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getTrending",
+      "ranges": [{ "startOffset": 11371, "endOffset": 12484, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getNowPlayingMovies",
+      "ranges": [{ "startOffset": 12726, "endOffset": 13239, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getOnTheAirTv",
+      "ranges": [{ "startOffset": 13492, "endOffset": 13991, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getMovieVideos",
+      "ranges": [{ "startOffset": 14166, "endOffset": 14394, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getTvVideos",
+      "ranges": [{ "startOffset": 14572, "endOffset": 14781, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "extractTrailerKey",
+      "ranges": [{ "startOffset": 15041, "endOffset": 15594, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getMovieSimilar",
+      "ranges": [{ "startOffset": 15859, "endOffset": 16406, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "getTvSimilar",
+      "ranges": [{ "startOffset": 16678, "endOffset": 17203, "count": 0 }],
+      "isBlockCoverage": false
+    }
+  ]
+}

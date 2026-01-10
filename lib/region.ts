@@ -7,7 +7,7 @@
 
 import { SUPPORTED_REGIONS } from "./tmdb/client.ts";
 import type { SupportedRegion } from "./tmdb/client.ts";
-import type { SessionPayload } from "./auth/middleware.ts";
+import type { SessionPayload } from "./auth/jwt.ts";
 import { query } from "./db.ts";
 
 /**
@@ -15,14 +15,14 @@ import { query } from "./db.ts";
  * Based on Accept-Language header parsing
  */
 const LANGUAGE_TO_REGION: Record<string, SupportedRegion> = {
-  "en-GB": "GB", // United Kingdom
-  "en-US": "US", // United States
-  "en-CA": "CA", // Canada
-  "en-AU": "AU", // Australia
+  "en-gb": "GB", // United Kingdom
+  "en-us": "US", // United States
+  "en-ca": "CA", // Canada
+  "en-au": "AU", // Australia
   "de": "DE", // Germany
-  "de-DE": "DE",
+  "de-de": "DE",
   "fr": "FR", // France
-  "fr-FR": "FR",
+  "fr-fr": "FR",
 };
 
 /**
@@ -106,11 +106,11 @@ export async function getUserRegionPreference(
       [userId],
     );
 
-    if (result.rows.length === 0) {
+    if (result.length === 0) {
       return null;
     }
 
-    const preferences = result.rows[0].preferences || {};
+    const preferences = result[0].preferences || {};
     const region = preferences.region as SupportedRegion | undefined;
 
     if (region && isSupportedRegion(region)) {

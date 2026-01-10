@@ -1,0 +1,31 @@
+{
+  "scriptId": "368",
+  "url": "file:///Users/rob.macdonald/Documents/code/misc/demo/lib/auth/middleware.ts",
+  "functions": [
+    {
+      "functionName": "",
+      "ranges": [{ "startOffset": 0, "endOffset": 2386, "count": 1 }],
+      "isBlockCoverage": true
+    },
+    {
+      "functionName": "getSessionFromRequest",
+      "ranges": [{ "startOffset": 478, "endOffset": 727, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "withSession",
+      "ranges": [{ "startOffset": 1114, "endOffset": 1328, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "requireAuth",
+      "ranges": [{ "startOffset": 1552, "endOffset": 1738, "count": 0 }],
+      "isBlockCoverage": false
+    },
+    {
+      "functionName": "requireAuthForApi",
+      "ranges": [{ "startOffset": 2071, "endOffset": 2385, "count": 0 }],
+      "isBlockCoverage": false
+    }
+  ]
+}
