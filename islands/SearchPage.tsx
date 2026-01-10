@@ -13,11 +13,14 @@ interface SearchResponse {
  * Search page island component
  * Handles search input with debouncing and displays results
  */
+type ContentTypeFilter = "all" | "movie" | "tv";
+
 export default function SearchPage() {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Content[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [typeFilter, setTypeFilter] = useState<ContentTypeFilter>("all");
   const [debounceTimer, setDebounceTimer] = useState<
     ReturnType<typeof setTimeout> | null
   >(null);
@@ -73,6 +76,14 @@ export default function SearchPage() {
     };
   }, [query]);
 
+  // Filter results by content type
+  const filteredResults = results.filter((content) => {
+    if (typeFilter === "all") {
+      return true;
+    }
+    return content.type === typeFilter;
+  });
+
   // Helper function to get poster image URL
   const getPosterUrl = (posterPath: string | null): string => {
     if (!posterPath) {
@@ -109,14 +120,55 @@ export default function SearchPage() {
         </div>
       )}
 
-      {/* Results */}
+      {/* Filter Buttons */}
       {!loading && !error && results.length > 0 && (
+        <div class="mb-6 flex gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => setTypeFilter("all")}
+            class={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              typeFilter === "all"
+                ? "bg-indigo-600 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            All
+          </button>
+          <button
+            type="button"
+            onClick={() => setTypeFilter("movie")}
+            class={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              typeFilter === "movie"
+                ? "bg-indigo-600 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            Movies
+          </button>
+          <button
+            type="button"
+            onClick={() => setTypeFilter("tv")}
+            class={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              typeFilter === "tv"
+                ? "bg-indigo-600 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            TV Shows
+          </button>
+        </div>
+      )}
+
+      {/* Results */}
+      {!loading && !error && filteredResults.length > 0 && (
         <div>
           <p class="text-gray-600 mb-4">
-            Found {results.length} result{results.length !== 1 ? "s" : ""}
+            Found {filteredResults.length}{" "}
+            result{filteredResults.length !== 1 ? "s" : ""}
+            {typeFilter !== "all" && ` (${results.length} total)`}
           </p>
           <ContentGrid>
-            {results.map((content) => (
+            {filteredResults.map((content) => (
               <a
                 href={`/content/${content.tmdb_id}`}
                 class="block group hover:scale-105 transition-transform"
@@ -152,10 +204,26 @@ export default function SearchPage() {
       )}
 
       {/* No Results */}
-      {!loading && !error && query.trim().length > 0 && results.length === 0 &&
+      {!loading && !error && query.trim().length > 0 &&
+        filteredResults.length === 0 &&
         (
           <div class="text-center py-8">
-            <p class="text-gray-600">No results found for "{query}"</p>
+            <p class="text-gray-600">
+              {results.length === 0
+                ? `No results found for "${query}"`
+                : `No ${
+                  typeFilter === "movie" ? "movies" : "TV shows"
+                } found for "${query}"`}
+            </p>
+            {results.length > 0 && typeFilter !== "all" && (
+              <button
+                type="button"
+                onClick={() => setTypeFilter("all")}
+                class="mt-4 text-indigo-600 hover:text-indigo-700 underline"
+              >
+                Show all results
+              </button>
+            )}
           </div>
         )}
 
