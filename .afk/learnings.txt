@@ -492,3 +492,15 @@
 - Error response format: Rate limit errors return 429 status with JSON body containing error message, rateLimitExceeded flag, and remainingSeconds countdown
 - Authentication endpoint integration: Integrated rate limiting into login and signup endpoints, checks rate limit before processing, records failures, clears on success
 - Test script: Created `scripts/test-rate-limiting.ts` to verify rate limiting works correctly (10 failed attempts trigger limit, error message indicates rate limiting, cooldown restores access)
+
+## API Error Handling Implementation
+
+- Error response utilities: Created `lib/api/errors.ts` module with standardised error response functions for consistent API error handling across all endpoints
+- Error response format: Standardised error responses include `error` (error type), `message` (human-readable message), `details` (field-specific validation errors), and optional `code` (error code) fields
+- HTTP status code helpers: Created helper functions for common status codes: `createBadRequestResponse()` (400), `createUnauthorizedResponse()` (401), `createNotFoundResponse()` (404), `createInternalServerErrorResponse()` (500), `createTooManyRequestsResponse()` (429)
+- Validation error format: Validation errors use `createBadRequestResponse()` with optional field name parameter to create structured error responses with field-specific error messages in `details` object
+- Catch-all 404 handler: Created `routes/api/[...path].ts` catch-all route handler that returns JSON 404 responses for any unmatched API endpoints, ensuring all API routes return consistent JSON error format
+- Error response consistency: Updated all API endpoints (login, signup, search, trending, lists, rating, etc.) to use consistent error response utilities, replacing ad-hoc error response creation
+- CSRF error integration: Updated CSRF error response function to use standardised error utilities for consistency with other API errors
+- Error logging: Internal server error responses log errors to console for debugging while returning user-friendly error messages to clients
+- Type safety: Error response functions use TypeScript interfaces (`ApiErrorResponse`, `ValidationErrorResponse`) for type-safe error response creation

@@ -1168,7 +1168,7 @@
         "Step 3: Make request with invalid data",
         "Step 4: Verify 400 response with validation errors"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "error-handling-ui",
