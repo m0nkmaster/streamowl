@@ -866,3 +866,16 @@
 - Integration points: Added skeleton loading to SearchPage (12 cards), BrowsePage (12 cards), NewReleases (12 cards), ContinueWatching (6 cards), LibraryTabs (12 cards per tab), and RecommendationFeed (3 cards)
 - Grid consistency: Skeleton cards use same `ContentGrid` component as actual content to ensure consistent spacing and responsive layout
 - Loading state management: Skeleton displays when `loading` state is true, replaced by actual content when loading completes, maintains existing error handling
+
+## Toast Notification System
+
+- Toast component: Created reusable Toast component with useToast hook for managing toast notifications across the app
+- Auto-dismiss: Toasts automatically dismiss after 3 seconds (configurable duration parameter)
+- Undo functionality: Added optional onUndo callback to Toast interface, displays 'Undo' button when provided for reversible actions
+- Toast types: Supports success, error, and info types with appropriate styling (green for success, red for error, blue for info)
+- Component integration: Each island component that uses toasts includes its own ToastContainer to render notifications
+- Replacement pattern: Replaced all alert() calls with toast notifications for better UX - alerts block interaction, toasts are non-blocking
+- Undo implementation: Watchlist, favourite, watched, and rating actions include undo functionality that reverses the action via API call
+- Toast positioning: Toasts render in fixed position at top-right (top-4 right-4) with z-50 to appear above other content
+- Animation: Toasts use slide-in animation (animate-slide-in) for smooth appearance from the right
+- Multiple containers: Multiple ToastContainers can coexist on same page (each island has its own state), all render in same location visually

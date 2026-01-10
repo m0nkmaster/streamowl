@@ -986,7 +986,7 @@
         "Step 3: Verify toast auto-dismisses after 3 seconds",
         "Step 4: Verify toast has undo action where appropriate"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "ui-optimistic-updates",
