@@ -843,7 +843,7 @@
         "Step 3: Test app loads while offline",
         "Step 4: Verify cached library data displays offline"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "pwa-push-notifications",

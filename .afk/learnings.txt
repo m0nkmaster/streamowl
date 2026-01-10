@@ -802,3 +802,18 @@
 - Icon configuration: Manifest references SVG icon (`/logo.svg`) for any size, plus PNG icons (`/icon-192.png`, `/icon-512.png`) for better mobile support - PNG icons should be generated from SVG for production
 - PWA shortcuts: Added shortcuts for Search and Library pages to allow quick navigation from home screen
 - Display mode: Set to "standalone" for app-like experience without browser UI when installed
+
+## PWA Service Worker Implementation
+
+- Service worker location: Created `static/sw.js` for service worker - static assets in Fresh are served from the `static/` directory and service workers must be served from root scope
+- Service worker registration: Added registration script in `routes/_app.tsx` body using `dangerouslySetInnerHTML` to inject inline script, registers service worker on page load if browser supports it
+- Cache strategy: Implemented cache-first strategy for static assets (CSS, JS, images, SVG, PNG, JPG, WebP, manifest.json) - checks cache first, falls back to network, caches successful responses
+- Library data caching: Implemented network-first with cache fallback for library API endpoints (`/api/library/watched`, `/api/library/watchlist`, `/api/library/favourites`, `/api/library/lists`) - tries network first, caches successful responses, serves from cache when offline
+- Cache separation: Uses separate cache names for static assets (`stream-owl-static-v1`) and library data (`stream-owl-library-v1`) to allow independent cache management and versioning
+- Cache versioning: Cache names include version suffix (`-v1`) to enable cache invalidation when service worker updates - increment version to force cache refresh
+- Offline fallback: Library endpoints return 503 error response with JSON message when network fails and no cached data available, provides user feedback about offline state
+- Navigation fallback: HTML page requests (navigation mode) fall back to cached index page (`/`) when network fails, ensures app shell loads offline
+- Service worker lifecycle: Service worker uses `skipWaiting()` on install and `clients.claim()` on activate to immediately take control of pages, ensures updates apply quickly
+- Cache cleanup: Activate event deletes old caches when service worker updates, prevents cache accumulation and ensures only current caches are used
+- Cross-origin protection: Service worker only handles same-origin requests, skips cross-origin requests to prevent caching external resources inappropriately
+- Request method filtering: Service worker only handles GET requests, skips POST/PUT/DELETE requests to prevent caching state-changing operations
