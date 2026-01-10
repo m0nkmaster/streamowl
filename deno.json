@@ -33,7 +33,8 @@
     "test:migration-runner": "deno run -A scripts/test-migration-runner.ts",
     "test:content-embeddings": "deno run -A scripts/test-content-embeddings.ts",
     "test:taste-profile": "deno run -A scripts/test-taste-profile.ts",
-    "test:recommendation-candidates": "deno run -A scripts/test-recommendation-candidates.ts"
+    "test:recommendation-candidates": "deno run -A scripts/test-recommendation-candidates.ts",
+    "process:embeddings": "deno run -A scripts/process-embedding-queue.ts"
   },
   "lint": {
     "rules": {

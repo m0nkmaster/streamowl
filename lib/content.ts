@@ -6,6 +6,7 @@
 
 import { query, transaction } from "./db.ts";
 import type { MovieDetails, TvDetails } from "./tmdb/client.ts";
+import { enqueueEmbeddingJob } from "./ai/embedding-queue.ts";
 
 /**
  * Database content record
@@ -88,7 +89,16 @@ export async function getOrCreateContent(
       throw new Error("Failed to create content record");
     }
 
-    return result.rows[0].id;
+    const contentId = result.rows[0].id;
+
+    // Queue embedding generation job for new content
+    // Don't await - let it process in background
+    enqueueEmbeddingJob(contentId).catch((error) => {
+      console.error("Failed to enqueue embedding job:", error);
+      // Non-critical error - content was created successfully
+    });
+
+    return contentId;
   });
 }
 
