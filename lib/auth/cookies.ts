@@ -44,10 +44,14 @@ export function setSessionCookie(headers: Headers, token: string): void {
  * @param headers Response headers object
  */
 export function clearSessionCookie(headers: Headers): void {
-  headers.set(
-    "Set-Cookie",
-    `${SESSION_COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`,
-  );
+  const cookieValue =
+    `${SESSION_COOKIE_NAME}=; Path=${SESSION_COOKIE_OPTIONS.path}; HttpOnly; SameSite=${SESSION_COOKIE_OPTIONS.sameSite}; Max-Age=0`;
+
+  if (SESSION_COOKIE_OPTIONS.secure) {
+    headers.set("Set-Cookie", `${cookieValue}; Secure`);
+  } else {
+    headers.set("Set-Cookie", cookieValue);
+  }
 }
 
 /**
