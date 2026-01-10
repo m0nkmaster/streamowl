@@ -1051,7 +1051,7 @@
         "Step 3: Verify interactive elements have 3:1 contrast",
         "Step 4: Fix any flagged issues"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "performance-image-optimisation",

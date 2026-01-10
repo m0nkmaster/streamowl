@@ -933,3 +933,15 @@
 - Dynamic content: Added role="status" with aria-live="polite" for search result counts and loading messages
 - Image alt text: Verified all images have descriptive alt text (poster images use content title, cast images use actor name)
 - Form field associations: All form inputs have associated labels using id/for attributes or aria-label for screen reader compatibility
+
+## Accessibility - WCAG 2.1 AA Colour Contrast Compliance
+
+- Text contrast: Changed text-gray-500 to text-gray-600 for light mode (improves contrast from ~4.6:1 to ~7:1 on white backgrounds) to meet WCAG AA 4.5:1 requirement
+- Dark mode text contrast: Changed text-gray-400 to text-gray-300 for dark mode (improves contrast on dark backgrounds) to meet WCAG AA requirements
+- Placeholder text: Changed placeholder-gray-500 to placeholder-gray-600 for light mode and placeholder-gray-400 for dark mode to ensure sufficient contrast
+- Disabled states: Updated disabled button styles from bg-gray-200 text-gray-500 to bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 for better contrast
+- Footer contrast: Updated footer text from text-gray-300/text-gray-400 to text-gray-200/text-gray-300 for better contrast on dark backgrounds
+- Interactive elements: Ensured all buttons, links, and form controls meet 3:1 contrast ratio requirement for WCAG AA compliance
+- Form inputs: Added dark mode support with proper background colours (bg-white dark:bg-gray-800) and text colours (text-gray-900 dark:text-gray-100) for all input fields
+- Secondary text: Updated all secondary/helper text to use text-gray-600 dark:text-gray-400 or text-gray-600 dark:text-gray-300 for sufficient contrast
+- Tailwind colour scale: Used gray-600 instead of gray-500 for normal text (provides ~7:1 contrast vs ~4.6:1), gray-300 instead of gray-400 for dark mode text
