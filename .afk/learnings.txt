@@ -515,3 +515,14 @@
 - Deployment verification: After deployment, verify production URL loads, environment variables are set correctly, and key functionality works (authentication, search, database connections)
 - Rollback capability: Deno Deploy allows promoting previous deployments to rollback if issues occur
 - Configuration files: `main.ts` and `fresh.config.ts` are sufficient for Deno Deploy - no additional deployment configuration files needed beyond standard Fresh setup
+
+## UI - Mobile-Responsive Navigation Implementation
+
+- Navigation component: Created `islands/Navigation.tsx` as an island component (requires hooks for mobile menu state) with responsive design for mobile and desktop viewports
+- Mobile navigation pattern: Implemented hamburger menu for mobile viewports (below md breakpoint) with collapsible dropdown menu, desktop shows horizontal top navigation bar
+- App wrapper integration: Updated `routes/_app.tsx` to include handler that extracts current path and authentication status, passes to Navigation component for conditional rendering of authenticated links
+- Touch target sizing: All interactive elements (hamburger button, mobile menu links, desktop nav links) use `min-h-[44px]` and `min-w-[44px]` classes to meet 44x44px minimum touch target requirement for mobile accessibility
+- Responsive breakpoints: Uses Tailwind `md:` breakpoint (768px) to switch between mobile hamburger menu and desktop horizontal navigation, ensuring optimal UX across all device sizes
+- Active state indication: Navigation highlights active route using `isActive()` function that checks if current path matches or starts with link href, provides visual feedback for current page
+- Conditional navigation links: Navigation shows different links based on authentication status - authenticated users see Library and Dashboard links, guests only see Home, Browse, and Search
+- Mobile menu state: Uses Preact `useState` hook to manage mobile menu open/closed state, closes menu when navigation link is clicked for better UX
