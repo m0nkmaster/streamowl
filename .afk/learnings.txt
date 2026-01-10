@@ -1101,3 +1101,15 @@
 - Generates proper share URLs with encoded title, description, and URL parameters
 - Integrated into content detail page for both authenticated and non-authenticated users
 - Uses the existing Toast system for "copied to clipboard" feedback
+
+## Push Notification Feature
+
+- NotificationPrompt island at `islands/NotificationPrompt.tsx` prompts authenticated users for notification permission
+- Push library at `lib/notifications/push.ts` implements full Web Push protocol with VAPID authentication
+- API endpoints: `/api/notifications/subscribe`, `/api/notifications/test`, `/api/notifications/vapid-key`
+- Database table `push_subscriptions` stores endpoint, p256dh, auth keys per user
+- Service worker at `static/sw.js` handles push and notificationclick events
+- VAPID keys required: VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT in .env
+- Generate VAPID keys with: `deno run -A scripts/generate-vapid-keys.ts`
+- Fresh manifest (`fresh.gen.ts`) must be updated when adding new routes/islands
+

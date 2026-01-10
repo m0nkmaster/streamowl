@@ -856,7 +856,7 @@
         "Step 3: Verify notification appears on device",
         "Step 4: Click notification and verify deep link to content"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "premium-stripe-integration",
