@@ -151,7 +151,7 @@ export default function SettingsPage({
             <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
               Settings
             </h1>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
               Manage your account preferences
             </p>
           </div>
@@ -288,7 +288,7 @@ export default function SettingsPage({
               <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
                 Region Preference
               </h2>
-              <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
                 Set your preferred region to see streaming availability for that
                 location. Your detected region is{" "}
                 <span class="font-medium">
@@ -324,7 +324,7 @@ export default function SettingsPage({
                     } ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <div class="font-medium">{getRegionName(region)}</div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <div class="text-xs text-gray-600 dark:text-gray-400 mt-1">
                       {region}
                     </div>
                     {selectedRegion === region && (

@@ -61,7 +61,7 @@ export default function ThemeToggle() {
       <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
         Theme Preference
       </h2>
-      <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+      <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
         Choose your preferred colour scheme. Select "System" to follow your
         device settings.
       </p>
@@ -92,11 +92,11 @@ export default function ThemeToggle() {
             </svg>
             <div>
               <div class="font-medium">Light</div>
-              <div class="text-xs opacity-70">Always light</div>
+              <div class="text-xs opacity-75">Always light</div>
             </div>
           </div>
           {theme === "light" && (
-            <div class="mt-2 text-xs text-indigo-600 dark:text-indigo-400">
+            <div class="mt-2 text-xs text-indigo-700 dark:text-indigo-300">
               ✓ Current selection
             </div>
           )}
@@ -127,11 +127,11 @@ export default function ThemeToggle() {
             </svg>
             <div>
               <div class="font-medium">Dark</div>
-              <div class="text-xs opacity-70">Always dark</div>
+              <div class="text-xs opacity-75">Always dark</div>
             </div>
           </div>
           {theme === "dark" && (
-            <div class="mt-2 text-xs text-indigo-600 dark:text-indigo-400">
+            <div class="mt-2 text-xs text-indigo-700 dark:text-indigo-300">
               ✓ Current selection
             </div>
           )}
@@ -162,13 +162,13 @@ export default function ThemeToggle() {
             </svg>
             <div>
               <div class="font-medium">System</div>
-              <div class="text-xs opacity-70">
+              <div class="text-xs opacity-75">
                 {currentDisplayTheme === "dark" ? "Dark" : "Light"} (system)
               </div>
             </div>
           </div>
           {theme === "system" && (
-            <div class="mt-2 text-xs text-indigo-600 dark:text-indigo-400">
+            <div class="mt-2 text-xs text-indigo-700 dark:text-indigo-300">
               ✓ Current selection
             </div>
           )}

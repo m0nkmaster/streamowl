@@ -106,7 +106,7 @@ export default function CreateListModal({
               type="button"
               onClick={handleClose}
               aria-label="Close modal"
-              class="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              class="rounded-md bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
             >
               <span class="sr-only">Close</span>
               <svg

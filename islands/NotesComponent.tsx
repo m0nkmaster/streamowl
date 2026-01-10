@@ -81,7 +81,9 @@ export default function NotesComponent(
               <p class="text-gray-700 whitespace-pre-wrap">{notes}</p>
             </div>
           )
-          : <p class="text-sm text-gray-500">No notes yet</p>}
+          : (
+            <p class="text-sm text-gray-600 dark:text-gray-400">No notes yet</p>
+          )}
       </div>
     );
   }
@@ -108,7 +110,7 @@ export default function NotesComponent(
             </div>
           )
           : (
-            <p class="text-sm text-gray-500 italic">
+            <p class="text-sm text-gray-600 dark:text-gray-400 italic">
               Add your private notes about this content
             </p>
           )}
@@ -132,7 +134,7 @@ export default function NotesComponent(
         aria-describedby="notes-help notes-error"
         aria-invalid={error !== null}
         aria-busy={isLoading}
-        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed resize-y"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed resize-y bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-600 dark:placeholder-gray-400"
       />
       <div class="flex items-center justify-between">
         <div class="flex gap-2">
@@ -156,7 +158,7 @@ export default function NotesComponent(
             Cancel
           </button>
         </div>
-        <span id="notes-help" class="text-xs text-gray-500">
+        <span id="notes-help" class="text-xs text-gray-600 dark:text-gray-400">
           {notes ? notes.length : 0} / 10,000 characters
         </span>
       </div>

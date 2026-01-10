@@ -61,7 +61,7 @@ function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
             <button
               type="button"
               onClick={() => onRemove(toast.id)}
-              class="text-gray-500 hover:text-gray-700"
+              class="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300"
               aria-label="Close notification"
             >
               <svg

@@ -225,7 +225,7 @@ export default function TagsComponent(
               ))}
             </div>
           )
-          : <p class="text-sm text-gray-500">No tags yet</p>}
+          : <p class="text-sm text-gray-600 dark:text-gray-400">No tags yet</p>}
       </div>
     );
   }
@@ -299,7 +299,11 @@ export default function TagsComponent(
       {showTagSelector && !isCreating && (
         <div class="bg-white border border-gray-200 rounded-lg p-3 shadow-md">
           {isLoadingTags
-            ? <p class="text-sm text-gray-500">Loading tags...</p>
+            ? (
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                Loading tags...
+              </p>
+            )
             : availableTags.length > 0
             ? (
               <div class="flex flex-col gap-2">
@@ -321,7 +325,7 @@ export default function TagsComponent(
                 <button
                   type="button"
                   onClick={() => setShowTagSelector(false)}
-                  class="text-xs text-gray-500 hover:text-gray-700 mt-2"
+                  class="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 mt-2"
                 >
                   Cancel
                 </button>
@@ -352,7 +356,7 @@ export default function TagsComponent(
         <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-md">
           <div class="flex flex-col gap-3">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Tag Name
               </label>
               <input
@@ -362,7 +366,7 @@ export default function TagsComponent(
                 disabled={isLoading}
                 maxLength={255}
                 placeholder="e.g., Comfort Watch"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-600 dark:placeholder-gray-400"
                 aria-label="Tag name input"
               />
             </div>
@@ -417,7 +421,7 @@ export default function TagsComponent(
 
       {/* Empty state */}
       {tags.length === 0 && !isCreating && !showTagSelector && (
-        <p class="text-sm text-gray-500 italic">
+        <p class="text-sm text-gray-600 dark:text-gray-400 italic">
           Add tags to organise your content
         </p>
       )}

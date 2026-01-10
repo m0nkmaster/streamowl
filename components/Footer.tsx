@@ -5,7 +5,7 @@
 export default function Footer() {
   return (
     <footer
-      class="bg-gray-800 dark:bg-gray-950 text-gray-300 dark:text-gray-400 mt-auto"
+      class="bg-gray-800 dark:bg-gray-950 text-gray-200 dark:text-gray-300 mt-auto"
       role="contentinfo"
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -15,7 +15,7 @@ export default function Footer() {
               href="https://www.themoviedb.org/"
               target="_blank"
               rel="noopener noreferrer"
-              class="flex items-center gap-2 hover:text-white dark:hover:text-gray-200 transition-colors"
+              class="flex items-center gap-2 hover:text-white dark:hover:text-gray-100 transition-colors"
               aria-label="Visit The Movie Database"
             >
               <img
@@ -29,7 +29,7 @@ export default function Footer() {
               TMDB.
             </p>
           </div>
-          <div class="text-sm text-gray-400 dark:text-gray-500">
+          <div class="text-sm text-gray-300 dark:text-gray-400">
             <p>&copy; {new Date().getFullYear()} Stream Owl</p>
           </div>
         </div>

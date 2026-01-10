@@ -78,7 +78,7 @@ export default function LoginPage(props: PageProps<LoginPageProps>) {
                 type="email"
                 autoComplete="email"
                 required
-                class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-600 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-white dark:bg-gray-800"
                 placeholder="Email address"
               />
             </div>
@@ -90,7 +90,7 @@ export default function LoginPage(props: PageProps<LoginPageProps>) {
                 type="password"
                 autoComplete="current-password"
                 required
-                class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-600 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-white dark:bg-gray-800"
                 placeholder="Password"
               />
             </div>
@@ -121,7 +121,7 @@ export default function LoginPage(props: PageProps<LoginPageProps>) {
               <div class="w-full border-t border-gray-300"></div>
             </div>
             <div class="relative flex justify-center text-sm">
-              <span class="px-2 bg-gray-50 text-gray-500">
+              <span class="px-2 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
                 Or continue with
               </span>
             </div>
@@ -130,7 +130,7 @@ export default function LoginPage(props: PageProps<LoginPageProps>) {
           <div class="mt-6">
             <a
               href={`/api/auth/google?returnTo=${encodeURIComponent(returnTo)}`}
-              class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+              class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               <svg class="h-5 w-5" viewBox="0 0 24 24">
                 <path

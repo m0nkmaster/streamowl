@@ -378,7 +378,7 @@ export default function SearchPage() {
           placeholder="Search for movies and TV shows..."
           aria-label="Search for movies and TV shows"
           aria-describedby="search-description"
-          class="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          class="w-full px-4 py-3 text-lg border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-600 dark:placeholder-gray-400"
           autofocus
         />
         <p id="search-description" class="sr-only">

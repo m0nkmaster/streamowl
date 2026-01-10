@@ -90,7 +90,7 @@ export default function AddToListButton({ tmdbId }: AddToListButtonProps) {
       <button
         type="button"
         disabled
-        class="px-4 py-2 rounded-lg font-medium bg-gray-200 text-gray-500 cursor-not-allowed"
+        class="px-4 py-2 rounded-lg font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed"
       >
         Loading lists...
       </button>
@@ -103,7 +103,7 @@ export default function AddToListButton({ tmdbId }: AddToListButtonProps) {
         <button
           type="button"
           disabled
-          class="px-4 py-2 rounded-lg font-medium bg-gray-200 text-gray-500 cursor-not-allowed"
+          class="px-4 py-2 rounded-lg font-medium bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed"
           title="Create a list first to add content"
         >
           Add to List (No lists)
@@ -145,7 +145,7 @@ export default function AddToListButton({ tmdbId }: AddToListButtonProps) {
             class="absolute left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-20 max-h-96 overflow-y-auto"
           >
             <div class="p-2">
-              <div class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase">
+              <div class="px-3 py-2 text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">
                 Select a list
               </div>
               {lists.map((list) => (
@@ -156,15 +156,17 @@ export default function AddToListButton({ tmdbId }: AddToListButtonProps) {
                   onClick={() => handleAddToList(list.id)}
                   disabled={isLoading}
                   aria-label={`Add to ${list.name}`}
-                  class="w-full text-left px-3 py-2 rounded hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="w-full text-left px-3 py-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <div class="font-medium text-gray-900">{list.name}</div>
+                  <div class="font-medium text-gray-900 dark:text-gray-100">
+                    {list.name}
+                  </div>
                   {list.description && (
-                    <div class="text-sm text-gray-500 line-clamp-1">
+                    <div class="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
                       {list.description}
                     </div>
                   )}
-                  <div class="text-xs text-gray-400 mt-1">
+                  <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {list.item_count} item{list.item_count !== 1 ? "s" : ""}
                   </div>
                 </button>

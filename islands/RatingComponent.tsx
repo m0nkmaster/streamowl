@@ -183,7 +183,7 @@ export default function RatingComponent(
               >
                 {displayRating.toFixed(1)}
               </span>
-              <span class="text-sm text-gray-500">/ 10</span>
+              <span class="text-sm text-gray-600 dark:text-gray-400">/ 10</span>
             </div>
           </div>
         </div>
@@ -215,7 +215,7 @@ export default function RatingComponent(
             disabled={isLoading}
             aria-label="Remove rating"
             aria-busy={isLoading}
-            class="text-sm text-gray-500 hover:text-gray-700 underline self-start disabled:opacity-50"
+            class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300 underline self-start disabled:opacity-50"
           >
             Remove rating
           </button>
