@@ -985,3 +985,15 @@
 - Session context: Logging attempts to extract user session from request using `getSessionFromRequest()` but gracefully handles failures (continues without user context)
 - Metadata support: All logging functions accept optional metadata parameter for additional context (e.g., candidateId, operation type)
 - Test script: Created `scripts/test-logging.ts` to verify logging functionality including JSON format, stack traces, and request context extraction
+
+## Integration Testing
+
+- Integration tests: Created `scripts/test-integration.ts` for testing critical user flows end-to-end
+- Test structure: Integration tests call Fresh handlers directly with Request objects and mock HandlerContext
+- HandlerContext creation: Created `createTestContext()` helper function to create minimal Fresh context for testing handlers
+- CSRF handling: Integration tests generate CSRF tokens and include them in form data and cookies for authenticated requests
+- Session handling: Tests create session tokens and set cookies for authenticated endpoints
+- Test flows: Tests cover signup flow (user creation, session cookie), content discovery (search API), and watchlist management (authenticated content operations)
+- Environment requirements: Integration tests require DATABASE_URL and optionally TMDB_API_KEY (tests skip gracefully if TMDB key not set)
+- Test task: Added `deno task test:integration` to run integration test suite
+- Database cleanup: Tests clean up test data (users, user_content records) after execution to avoid test pollution
