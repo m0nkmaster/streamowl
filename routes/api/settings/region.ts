@@ -24,11 +24,11 @@ export const handler: Handlers = {
         [session.userId],
       );
 
-      if (result.rows.length === 0) {
+      if (result.length === 0) {
         return createInternalServerErrorResponse("User not found");
       }
 
-      const preferences = result.rows[0].preferences || {};
+      const preferences = result[0].preferences || {};
       const region = preferences.region as SupportedRegion | undefined;
 
       return new Response(
@@ -82,14 +82,14 @@ export const handler: Handlers = {
         [JSON.stringify(region), session.userId],
       );
 
-      if (result.rows.length === 0) {
+      if (result.length === 0) {
         return createInternalServerErrorResponse("User not found");
       }
 
       return new Response(
         JSON.stringify({
           success: true,
-          region: result.rows[0].preferences.region as SupportedRegion,
+          region: result[0].preferences.region as SupportedRegion,
         }),
         {
           headers: { "Content-Type": "application/json" },

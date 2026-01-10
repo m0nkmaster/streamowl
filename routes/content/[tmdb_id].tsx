@@ -15,6 +15,7 @@ import {
   type SearchResults,
   type SupportedRegion,
   type TvDetails,
+  type WatchProvider,
 } from "../../lib/tmdb/client.ts";
 import { getRegionName, getUserRegion } from "../../lib/region.ts";
 import {
@@ -24,6 +25,10 @@ import {
   getPosterSrcSet,
   getPosterUrl,
 } from "../../lib/images.ts";
+import {
+  generateDeepLink,
+  hasDeepLinkSupport,
+} from "../../lib/streaming/deep-links.ts";
 import MarkAsWatchedButton from "../../islands/MarkAsWatchedButton.tsx";
 import AddToWatchlistButton from "../../islands/AddToWatchlistButton.tsx";
 import FavouriteButton from "../../islands/FavouriteButton.tsx";
@@ -275,6 +280,36 @@ function getProviderLogoUrl(logoPath: string | null): string {
     return "https://via.placeholder.com/50x50?text=Logo";
   }
   return `https://image.tmdb.org/t/p/w45${logoPath}`;
+}
+
+/**
+ * Helper function to get the best URL for a streaming provider
+ * Returns a deep link if available, otherwise falls back to TMDB link
+ */
+function getProviderUrl(
+  provider: WatchProvider,
+  title: string,
+  tmdbId: number,
+  contentType: "movie" | "tv",
+  fallbackLink: string,
+): string {
+  // Try to generate a deep link for this provider
+  const deepLink = generateDeepLink({
+    providerName: provider.provider_name,
+    title,
+    tmdbId,
+    contentType,
+  });
+
+  // Return the deep link if available, otherwise use the TMDB fallback
+  return deepLink || fallbackLink;
+}
+
+/**
+ * Helper function to check if provider has deep link support
+ */
+function providerHasDeepLink(providerName: string): boolean {
+  return hasDeepLinkSupport(providerName);
 }
 
 export default function ContentDetailPage(
@@ -553,25 +588,47 @@ export default function ContentDetailPage(
                         Stream
                       </h3>
                       <div class="flex flex-wrap gap-4">
-                        {watchProviders.subscription.map((provider) => (
-                          <a
-                            key={provider.provider_id}
-                            href={watchProviders.link || "#"}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="flex items-center gap-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-3 border border-gray-200 hover:border-indigo-300"
-                          >
-                            <img
-                              src={getProviderLogoUrl(provider.logo_path)}
-                              alt={provider.provider_name}
-                              class="w-10 h-10 object-contain"
-                              loading="lazy"
-                            />
-                            <span class="text-sm font-medium text-gray-900">
-                              {provider.provider_name}
-                            </span>
-                          </a>
-                        ))}
+                        {watchProviders.subscription.map((provider) => {
+                          const providerUrl = getProviderUrl(
+                            provider,
+                            title,
+                            tmdbId,
+                            contentType,
+                            watchProviders.link || "#",
+                          );
+                          const hasDirectLink = providerHasDeepLink(
+                            provider.provider_name,
+                          );
+                          return (
+                            <a
+                              key={provider.provider_id}
+                              href={providerUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="flex items-center gap-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-3 border border-gray-200 hover:border-indigo-300"
+                              title={hasDirectLink
+                                ? `Open in ${provider.provider_name}`
+                                : `View on ${provider.provider_name}`}
+                            >
+                              <img
+                                src={getProviderLogoUrl(provider.logo_path)}
+                                alt={provider.provider_name}
+                                class="w-10 h-10 object-contain"
+                                loading="lazy"
+                              />
+                              <div class="flex flex-col">
+                                <span class="text-sm font-medium text-gray-900">
+                                  {provider.provider_name}
+                                </span>
+                                {hasDirectLink && (
+                                  <span class="text-xs text-indigo-600">
+                                    Open in app →
+                                  </span>
+                                )}
+                              </div>
+                            </a>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
@@ -583,25 +640,47 @@ export default function ContentDetailPage(
                         Rent
                       </h3>
                       <div class="flex flex-wrap gap-4">
-                        {watchProviders.rent.map((provider) => (
-                          <a
-                            key={provider.provider_id}
-                            href={watchProviders.link || "#"}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="flex items-center gap-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-3 border border-gray-200 hover:border-indigo-300"
-                          >
-                            <img
-                              src={getProviderLogoUrl(provider.logo_path)}
-                              alt={provider.provider_name}
-                              class="w-10 h-10 object-contain"
-                              loading="lazy"
-                            />
-                            <span class="text-sm font-medium text-gray-900">
-                              {provider.provider_name}
-                            </span>
-                          </a>
-                        ))}
+                        {watchProviders.rent.map((provider) => {
+                          const providerUrl = getProviderUrl(
+                            provider,
+                            title,
+                            tmdbId,
+                            contentType,
+                            watchProviders.link || "#",
+                          );
+                          const hasDirectLink = providerHasDeepLink(
+                            provider.provider_name,
+                          );
+                          return (
+                            <a
+                              key={provider.provider_id}
+                              href={providerUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="flex items-center gap-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-3 border border-gray-200 hover:border-indigo-300"
+                              title={hasDirectLink
+                                ? `Open in ${provider.provider_name}`
+                                : `View on ${provider.provider_name}`}
+                            >
+                              <img
+                                src={getProviderLogoUrl(provider.logo_path)}
+                                alt={provider.provider_name}
+                                class="w-10 h-10 object-contain"
+                                loading="lazy"
+                              />
+                              <div class="flex flex-col">
+                                <span class="text-sm font-medium text-gray-900">
+                                  {provider.provider_name}
+                                </span>
+                                {hasDirectLink && (
+                                  <span class="text-xs text-indigo-600">
+                                    Open in app →
+                                  </span>
+                                )}
+                              </div>
+                            </a>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
@@ -613,25 +692,47 @@ export default function ContentDetailPage(
                         Buy
                       </h3>
                       <div class="flex flex-wrap gap-4">
-                        {watchProviders.buy.map((provider) => (
-                          <a
-                            key={provider.provider_id}
-                            href={watchProviders.link || "#"}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="flex items-center gap-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-3 border border-gray-200 hover:border-indigo-300"
-                          >
-                            <img
-                              src={getProviderLogoUrl(provider.logo_path)}
-                              alt={provider.provider_name}
-                              class="w-10 h-10 object-contain"
-                              loading="lazy"
-                            />
-                            <span class="text-sm font-medium text-gray-900">
-                              {provider.provider_name}
-                            </span>
-                          </a>
-                        ))}
+                        {watchProviders.buy.map((provider) => {
+                          const providerUrl = getProviderUrl(
+                            provider,
+                            title,
+                            tmdbId,
+                            contentType,
+                            watchProviders.link || "#",
+                          );
+                          const hasDirectLink = providerHasDeepLink(
+                            provider.provider_name,
+                          );
+                          return (
+                            <a
+                              key={provider.provider_id}
+                              href={providerUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              class="flex items-center gap-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-3 border border-gray-200 hover:border-indigo-300"
+                              title={hasDirectLink
+                                ? `Open in ${provider.provider_name}`
+                                : `View on ${provider.provider_name}`}
+                            >
+                              <img
+                                src={getProviderLogoUrl(provider.logo_path)}
+                                alt={provider.provider_name}
+                                class="w-10 h-10 object-contain"
+                                loading="lazy"
+                              />
+                              <div class="flex flex-col">
+                                <span class="text-sm font-medium text-gray-900">
+                                  {provider.provider_name}
+                                </span>
+                                {hasDirectLink && (
+                                  <span class="text-xs text-indigo-600">
+                                    Open in app →
+                                  </span>
+                                )}
+                              </div>
+                            </a>
+                          );
+                        })}
                       </div>
                     </div>
                   )}
@@ -645,25 +746,47 @@ export default function ContentDetailPage(
                       </h3>
                       <div class="flex flex-wrap gap-4">
                         {[...watchProviders.free, ...watchProviders.ads].map(
-                          (provider) => (
-                            <a
-                              key={provider.provider_id}
-                              href={watchProviders.link || "#"}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              class="flex items-center gap-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-3 border border-gray-200 hover:border-indigo-300"
-                            >
-                              <img
-                                src={getProviderLogoUrl(provider.logo_path)}
-                                alt={provider.provider_name}
-                                class="w-10 h-10 object-contain"
-                                loading="lazy"
-                              />
-                              <span class="text-sm font-medium text-gray-900">
-                                {provider.provider_name}
-                              </span>
-                            </a>
-                          ),
+                          (provider) => {
+                            const providerUrl = getProviderUrl(
+                              provider,
+                              title,
+                              tmdbId,
+                              contentType,
+                              watchProviders.link || "#",
+                            );
+                            const hasDirectLink = providerHasDeepLink(
+                              provider.provider_name,
+                            );
+                            return (
+                              <a
+                                key={provider.provider_id}
+                                href={providerUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="flex items-center gap-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-3 border border-gray-200 hover:border-indigo-300"
+                                title={hasDirectLink
+                                  ? `Open in ${provider.provider_name}`
+                                  : `View on ${provider.provider_name}`}
+                              >
+                                <img
+                                  src={getProviderLogoUrl(provider.logo_path)}
+                                  alt={provider.provider_name}
+                                  class="w-10 h-10 object-contain"
+                                  loading="lazy"
+                                />
+                                <div class="flex flex-col">
+                                  <span class="text-sm font-medium text-gray-900">
+                                    {provider.provider_name}
+                                  </span>
+                                  {hasDirectLink && (
+                                    <span class="text-xs text-indigo-600">
+                                      Open in app →
+                                    </span>
+                                  )}
+                                </div>
+                              </a>
+                            );
+                          },
                         )}
                       </div>
                     </div>
