@@ -778,7 +778,7 @@
         "Step 3: Verify limit message displays with upgrade prompt",
         "Step 4: Verify limit resets after 24 hours"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "sharing-public-profile",

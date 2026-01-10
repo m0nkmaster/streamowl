@@ -765,3 +765,16 @@
 - Search query generation: Uses GPT-4 to convert mood requests (e.g., "light and funny") into multiple TMDB search queries (e.g., ["comedy", "funny movies", "lighthearted"]), then searches both movies and TV shows to find matching content
 - Recommendation display in chat: Chat interface displays mood-based recommendations in a dedicated section below the conversation when recommendations are returned, showing poster images, titles, types, and explanations that reference the mood request
 - General chat button: Added "Ask for Recommendations" button in RecommendationFeed component (premium users only) that opens general chat interface for mood-based requests without requiring a specific recommendation context
+
+## AI Recommendations - Rate Limiting for Free Tier
+
+- Rate limiting implementation: Created `lib/ai/recommendation-rate-limit.ts` utility module to track daily recommendation usage for free tier users, limiting them to 3 AI recommendations per day
+- Redis counter tracking: Extended RedisCache class with `increment()` and `getInt()` methods to track daily usage counters with TTL that expires at midnight
+- Daily usage keys: Usage tracking uses keys formatted as `recommendation_usage:{userId}:{date}` with TTL set to expire at midnight, automatically resetting limits daily
+- Premium user bypass: Premium users (checked via `preferences.premium === true`) have unlimited recommendations and bypass all rate limiting checks
+- Rate limit enforcement: Recommendations API endpoint (`/api/recommendations`) checks usage before generating new recommendations and increments counter after successful generation
+- Rate limit response: When limit is reached, API returns 403 Forbidden with JSON response containing `rateLimitReached: true`, `remainingRecommendations: 0`, and `upgradePrompt` message
+- UI rate limit display: RecommendationFeed component displays prominent yellow warning banner when rate limit is reached, showing upgrade prompt and link to settings page for premium upgrade
+- Remaining recommendations display: UI shows remaining recommendation count when user has less than 3 remaining, providing clear feedback on usage
+- Cache integration: Rate limiting works alongside existing recommendation caching - cached recommendations don't count against limit, only new generations increment the counter
+- TTL calculation: Usage counter TTL is calculated as seconds until midnight to ensure daily reset, using `getSecondsUntilMidnight()` helper function
