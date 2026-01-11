@@ -28,6 +28,10 @@ interface SettingsPageProps {
     recommendations: boolean;
     watchlistAvailable: boolean;
   };
+  accountInfo: {
+    requiresPassword: boolean;
+    isOAuthOnly: boolean;
+  };
 }
 
 /**
@@ -100,6 +104,22 @@ export const handler: Handlers<SettingsPageProps> = {
       };
     }
 
+    // Get account info for deletion flow
+    const accountResult = await query<{
+      password_hash: string | null;
+      google_id: string | null;
+    }>(
+      "SELECT password_hash, google_id FROM users WHERE id = $1",
+      [session.userId],
+    );
+    const account = accountResult[0];
+    const hasPassword = !!account?.password_hash;
+    const isOAuthOnly = !hasPassword && !!account?.google_id;
+    const accountInfo = {
+      requiresPassword: hasPassword,
+      isOAuthOnly,
+    };
+
     // Check for Stripe checkout redirect parameters
     const url = new URL(req.url);
     const checkoutSuccess = url.searchParams.has("session_id");
@@ -117,6 +137,7 @@ export const handler: Handlers<SettingsPageProps> = {
       subscriptionDetails,
       userProfile,
       notificationPreferences,
+      accountInfo,
     });
   },
 };
