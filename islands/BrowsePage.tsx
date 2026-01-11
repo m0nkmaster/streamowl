@@ -165,6 +165,8 @@ export default function BrowsePage() {
                     alt={content.title}
                     class="w-full aspect-[2/3] object-cover"
                     loading="lazy"
+                    width="300"
+                    height="450"
                   />
                   {/* Quick Actions Overlay */}
                   <div

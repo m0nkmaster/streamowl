@@ -42,7 +42,7 @@ export default function LoginForm({ csrfToken, returnTo }: LoginFormProps) {
       if (response.ok) {
         // Redirect handled by server
         const redirectUrl = returnTo.startsWith("/") ? returnTo : "/dashboard";
-        window.location.href = redirectUrl;
+        globalThis.location.href = redirectUrl;
         return;
       }
 
@@ -74,7 +74,7 @@ export default function LoginForm({ csrfToken, returnTo }: LoginFormProps) {
           general: errorData.message || "Failed to log in. Please try again.",
         });
       }
-    } catch (error) {
+    } catch (_error) {
       setErrors({
         general: "Network error. Please check your connection and try again.",
       });

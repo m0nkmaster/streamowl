@@ -130,6 +130,8 @@ export default function PublicProfilePage({
                         alt={item.title}
                         class="w-full aspect-[2/3] object-cover"
                         loading="lazy"
+                        width="300"
+                        height="450"
                       />
                       <div class="p-3">
                         <h3 class="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-indigo-600">

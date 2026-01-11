@@ -420,6 +420,8 @@ export default function RecommendationFeed() {
                       alt={rec.title}
                       class="w-full aspect-[2/3] object-cover"
                       loading="lazy"
+                      width="300"
+                      height="450"
                     />
                     <div class="absolute top-2 right-2 flex gap-2">
                       <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-indigo-600 text-white uppercase">

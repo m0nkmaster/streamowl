@@ -16,7 +16,7 @@ export default function PremiumPricingPage({
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleCheckout = async (priceId: string, planName: string) => {
+  const handleCheckout = async (priceId: string, _planName: string) => {
     if (!IS_BROWSER) return;
 
     setLoading(priceId);

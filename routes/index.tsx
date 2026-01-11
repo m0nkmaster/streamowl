@@ -49,7 +49,7 @@ export default function Home({ data }: { data: HomePageProps }) {
           src="/logo.svg"
           width="128"
           height="128"
-          alt="the Fresh logo: a sliced lemon dripping with juice"
+          alt="Stream Owl logo"
         />
         <h1 class="text-4xl font-bold">Welcome to Stream Owl</h1>
         <p class="my-4">

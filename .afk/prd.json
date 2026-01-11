@@ -921,7 +921,7 @@
         "Step 3: Select format (CSV or JSON)",
         "Step 4: Verify download contains all user content and lists"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "ui-home-feed",
@@ -1077,7 +1077,7 @@
         "Step 3: Run audit on content detail page",
         "Step 4: Verify consistent scores across key pages"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "performance-api-caching",

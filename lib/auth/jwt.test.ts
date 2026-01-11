@@ -8,7 +8,7 @@ import {
 } from "https://deno.land/std@0.216.0/assert/mod.ts";
 import {
   createSessionToken,
-  type SessionPayload,
+  type SessionPayload as _SessionPayload,
   verifySessionToken,
 } from "./jwt.ts";
 

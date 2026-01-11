@@ -39,17 +39,17 @@ function createTestContext(
     basePath: "",
     route: "",
     state: {},
-    render: async () => new Response(),
-    renderNotFound: async () => new Response(),
-    renderError: async () => new Response(),
+    render: () => new Response(),
+    renderNotFound: () => new Response(),
+    renderError: () => new Response(),
     isPartial: false,
     destination: "route",
     pattern: "",
     name: "",
     data: undefined,
-    config: {} as any,
+    config: {} as unknown,
     Component: () => null,
-    next: async () => new Response(),
+    next: () => new Response(),
   } as unknown as HandlerContext;
 }
 
@@ -366,7 +366,7 @@ async function main() {
   // Check database connection
   try {
     await query("SELECT 1");
-  } catch (error) {
+  } catch (_error) {
     console.error(
       "✗ Database connection failed. Please ensure DATABASE_URL is set.",
     );

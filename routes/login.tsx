@@ -1,6 +1,6 @@
 import { type Handlers, type PageProps } from "$fresh/server.ts";
 import {
-  CSRF_FIELD_NAME,
+  CSRF_FIELD_NAME as _CSRF_FIELD_NAME,
   generateCsrfToken,
   setCsrfCookie,
 } from "../lib/security/csrf.ts";

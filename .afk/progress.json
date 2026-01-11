@@ -1,16 +1,41 @@
 {
-  "started_at": "2026-01-10T22:32:58.234784",
-  "iterations": 1,
+  "started_at": "2026-01-11T17:56:21.999778",
+  "iterations": 2,
   "tasks": {
-    "pwa-push-notifications": {
-      "id": "pwa-push-notifications",
+    "data-export": {
+      "id": "data-export",
       "source": "json:.afk/prd.json",
       "status": "completed",
-      "started_at": "2026-01-10T22:32:58.234787",
-      "completed_at": "2026-01-10T22:40:00.000000",
+      "started_at": "2026-01-11T17:56:21.999781",
+      "completed_at": "2026-01-11T18:03:18.136524",
       "failure_count": 0,
-      "commits": ["b0023f9", "c72b7d0"],
-      "message": "Implemented Web Push notifications with VAPID authentication"
+      "commits": [
+        "62f8c1a"
+      ],
+      "message": null,
+      "learnings": [
+        "Export API endpoint at /api/settings/export supports ?format=json|csv",
+        "Premium check uses preferences.premium from user record",
+        "CSV export creates sections for profile, content, lists, and tags"
+      ]
+    },
+    "performance-lighthouse-score": {
+      "id": "performance-lighthouse-score",
+      "source": "json:.afk/prd.json",
+      "status": "completed",
+      "started_at": "2026-01-11T18:03:19.144245",
+      "completed_at": "2026-01-11T18:21:00.000000",
+      "failure_count": 0,
+      "commits": [
+        "29e1d4f"
+      ],
+      "message": null,
+      "learnings": [
+        "Add preconnect/dns-prefetch hints for external domains (image.tmdb.org, themoviedb.org, youtube.com, esm.sh) in _app.tsx",
+        "All images need explicit width and height attributes to prevent CLS - poster images are 300x450, profile images 185x278, backdrop 1280x720",
+        "fetchpriority attribute is not yet typed in Preact's HTMLAttributes, use loading='eager' for above-the-fold images instead",
+        "Service worker already configured for cache-first strategy on static assets"
+      ]
     }
   }
 }

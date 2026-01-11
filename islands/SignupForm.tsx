@@ -39,7 +39,7 @@ export default function SignupForm({ csrfToken }: SignupFormProps) {
 
       if (response.ok) {
         // Redirect handled by server
-        window.location.href = "/dashboard";
+        globalThis.location.href = "/dashboard";
         return;
       }
 
@@ -70,7 +70,7 @@ export default function SignupForm({ csrfToken }: SignupFormProps) {
             "Failed to create account. Please try again.",
         });
       }
-    } catch (error) {
+    } catch (_error) {
       setErrors({
         general: "Network error. Please check your connection and try again.",
       });

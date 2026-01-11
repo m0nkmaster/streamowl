@@ -377,6 +377,8 @@ export default function ContentDetailPage(
             alt={`${title} backdrop`}
             class="absolute inset-0 w-full h-full object-cover"
             loading="eager"
+            width="1280"
+            height="720"
           />
           <div class="absolute inset-0 bg-black bg-opacity-50" />
         </div>
@@ -392,6 +394,9 @@ export default function ContentDetailPage(
               sizes="(max-width: 768px) 256px, 320px"
               alt={title}
               class="w-64 md:w-80 rounded-lg shadow-lg"
+              width="320"
+              height="480"
+              loading="eager"
             />
           </div>
 
@@ -547,6 +552,8 @@ export default function ContentDetailPage(
                         alt={member.name}
                         class="w-full aspect-[2/3] object-cover"
                         loading="lazy"
+                        width="185"
+                        height="278"
                       />
                       <div class="p-3">
                         <p class="font-semibold text-sm text-gray-900 line-clamp-2">
@@ -585,6 +592,8 @@ export default function ContentDetailPage(
                           alt={item.title}
                           class="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
                           loading="lazy"
+                          width="300"
+                          height="450"
                         />
                       </div>
                       <div class="p-3">
@@ -660,6 +669,8 @@ export default function ContentDetailPage(
                                 alt={provider.provider_name}
                                 class="w-10 h-10 object-contain"
                                 loading="lazy"
+                                width="45"
+                                height="45"
                               />
                               <div class="flex flex-col">
                                 <span class="text-sm font-medium text-gray-900">
@@ -712,6 +723,8 @@ export default function ContentDetailPage(
                                 alt={provider.provider_name}
                                 class="w-10 h-10 object-contain"
                                 loading="lazy"
+                                width="45"
+                                height="45"
                               />
                               <div class="flex flex-col">
                                 <span class="text-sm font-medium text-gray-900">
@@ -764,6 +777,8 @@ export default function ContentDetailPage(
                                 alt={provider.provider_name}
                                 class="w-10 h-10 object-contain"
                                 loading="lazy"
+                                width="45"
+                                height="45"
                               />
                               <div class="flex flex-col">
                                 <span class="text-sm font-medium text-gray-900">
@@ -818,6 +833,8 @@ export default function ContentDetailPage(
                                   alt={provider.provider_name}
                                   class="w-10 h-10 object-contain"
                                   loading="lazy"
+                                  width="45"
+                                  height="45"
                                 />
                                 <div class="flex flex-col">
                                   <span class="text-sm font-medium text-gray-900">

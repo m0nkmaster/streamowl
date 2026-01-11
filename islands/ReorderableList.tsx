@@ -200,6 +200,8 @@ export default function ReorderableList({
                     alt={item.title}
                     class="w-full aspect-[2/3] object-cover"
                     loading="lazy"
+                    width="300"
+                    height="450"
                     draggable={false}
                   />
                   <div class="p-3">

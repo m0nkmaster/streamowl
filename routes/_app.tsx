@@ -21,6 +21,15 @@ export default function App({ Component, url, data }: PageProps) {
           name="description"
           content="Wise recommendations, one stream at a time. Discover where movies, TV shows, and documentaries are available across streaming services."
         />
+        {/* Preconnect to external domains for faster resource loading */}
+        <link rel="preconnect" href="https://image.tmdb.org" />
+        <link rel="dns-prefetch" href="https://image.tmdb.org" />
+        <link rel="preconnect" href="https://www.themoviedb.org" />
+        <link rel="dns-prefetch" href="https://www.themoviedb.org" />
+        <link rel="preconnect" href="https://www.youtube.com" />
+        <link rel="dns-prefetch" href="https://www.youtube.com" />
+        <link rel="preconnect" href="https://esm.sh" />
+        <link rel="dns-prefetch" href="https://esm.sh" />
         <link rel="stylesheet" href="/styles.css" />
         <style>
           {`
