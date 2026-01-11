@@ -1,5 +1,5 @@
 /**
- * Footer component with TMDB attribution
+ * Footer component with TMDB attribution and legal links
  * Required by TMDB API terms of service
  */
 export default function Footer() {
@@ -9,8 +9,9 @@ export default function Footer() {
       role="contentinfo"
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-3">
+        <div class="flex flex-col gap-6">
+          {/* TMDB Attribution */}
+          <div class="flex flex-col sm:flex-row items-center gap-3">
             <a
               href="https://www.themoviedb.org/"
               target="_blank"
@@ -27,13 +28,31 @@ export default function Footer() {
                 loading="lazy"
               />
             </a>
-            <p class="text-sm">
+            <p class="text-sm text-center sm:text-left">
               This product uses the TMDB API but is not endorsed or certified by
               TMDB.
             </p>
           </div>
-          <div class="text-sm text-gray-300 dark:text-gray-400">
-            <p>&copy; {new Date().getFullYear()} Stream Owl</p>
+
+          {/* Legal Links and Copyright */}
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-gray-700 dark:border-gray-800">
+            <nav aria-label="Legal links" class="flex items-center gap-6">
+              <a
+                href="/privacy"
+                class="text-sm text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-gray-200 transition-colors"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="/terms"
+                class="text-sm text-gray-300 dark:text-gray-400 hover:text-white dark:hover:text-gray-200 transition-colors"
+              >
+                Terms of Service
+              </a>
+            </nav>
+            <p class="text-sm text-gray-300 dark:text-gray-400">
+              &copy; {new Date().getFullYear()} Stream Owl
+            </p>
           </div>
         </div>
       </div>

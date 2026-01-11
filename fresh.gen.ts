@@ -68,6 +68,7 @@ import * as $library from "./routes/library.tsx";
 import * as $lists_list_id_ from "./routes/lists/[list_id].tsx";
 import * as $login from "./routes/login.tsx";
 import * as $premium from "./routes/premium.tsx";
+import * as $privacy from "./routes/privacy.tsx";
 import * as $profile_user_id_ from "./routes/profile/[user_id].tsx";
 import * as $reset_password from "./routes/reset-password.tsx";
 import * as $robots_txt from "./routes/robots.txt.ts";
@@ -180,6 +181,7 @@ const manifest = {
     "./routes/lists/[list_id].tsx": $lists_list_id_,
     "./routes/login.tsx": $login,
     "./routes/premium.tsx": $premium,
+    "./routes/privacy.tsx": $privacy,
     "./routes/profile/[user_id].tsx": $profile_user_id_,
     "./routes/reset-password.tsx": $reset_password,
     "./routes/robots.txt.ts": $robots_txt,
