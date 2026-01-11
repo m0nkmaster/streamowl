@@ -173,6 +173,27 @@ export default function SignupForm({ csrfToken }: SignupFormProps) {
         </div>
       </div>
 
+      <p class="text-xs text-center text-gray-500 dark:text-gray-400">
+        By signing up, you agree to our{" "}
+        <a
+          href="/terms"
+          class="text-indigo-600 dark:text-indigo-400 hover:underline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Terms of Service
+        </a>{" "}
+        and{" "}
+        <a
+          href="/privacy"
+          class="text-indigo-600 dark:text-indigo-400 hover:underline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Privacy Policy
+        </a>.
+      </p>
+
       <div>
         <button
           type="submit"

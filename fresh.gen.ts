@@ -76,6 +76,7 @@ import * as $search from "./routes/search.tsx";
 import * as $settings from "./routes/settings.tsx";
 import * as $signup from "./routes/signup.tsx";
 import * as $sitemap_xml from "./routes/sitemap.xml.ts";
+import * as $terms from "./routes/terms.tsx";
 import * as $AddToListButton from "./islands/AddToListButton.tsx";
 import * as $AddToWatchlistButton from "./islands/AddToWatchlistButton.tsx";
 import * as $BrowsePage from "./islands/BrowsePage.tsx";
@@ -189,6 +190,7 @@ const manifest = {
     "./routes/settings.tsx": $settings,
     "./routes/signup.tsx": $signup,
     "./routes/sitemap.xml.ts": $sitemap_xml,
+    "./routes/terms.tsx": $terms,
   },
   islands: {
     "./islands/AddToListButton.tsx": $AddToListButton,
