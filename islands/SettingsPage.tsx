@@ -52,6 +52,10 @@ export default function SettingsPage({
   const [nameLoading, setNameLoading] = useState(false);
   const [nameSaved, setNameSaved] = useState(false);
 
+  // Data export state
+  const [exportLoading, setExportLoading] = useState(false);
+  const [exportFormat, setExportFormat] = useState<"json" | "csv">("json");
+
   // Fetch current region preference on mount
   useEffect(() => {
     async function fetchRegion() {
@@ -190,6 +194,53 @@ export default function SettingsPage({
   const handleCancelEdit = () => {
     setDisplayName(userProfile.displayName || "");
     setIsEditingName(false);
+  };
+
+  const handleExportData = async () => {
+    setExportLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `/api/settings/export?format=${exportFormat}`,
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to export data");
+      }
+
+      // Get filename from Content-Disposition header or generate one
+      const contentDisposition = response.headers.get("Content-Disposition");
+      let filename = `streamowl-export.${exportFormat}`;
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="(.+)"/);
+        if (match) {
+          filename = match[1];
+        }
+      }
+
+      // Create blob and trigger download
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to export data",
+      );
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setExportLoading(false);
+    }
   };
 
   return (
@@ -433,6 +484,93 @@ export default function SettingsPage({
                     Upgrade to Premium
                   </a>
                 </div>
+              </div>
+            )}
+
+            {isPremium && (
+              <div class="mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                  Export Data
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  Download all your data including your library, custom lists,
+                  tags, ratings, and notes.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                  <div class="flex items-center gap-3">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Format:
+                    </label>
+                    <select
+                      value={exportFormat}
+                      onChange={(e) =>
+                        setExportFormat(
+                          e.currentTarget.value as "json" | "csv",
+                        )}
+                      disabled={exportLoading}
+                      class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 text-sm"
+                    >
+                      <option value="json">JSON</option>
+                      <option value="csv">CSV</option>
+                    </select>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleExportData}
+                    disabled={exportLoading}
+                    class={`inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+                      exportLoading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    {exportLoading
+                      ? (
+                        <>
+                          <svg
+                            class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              class="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              stroke-width="4"
+                            />
+                            <path
+                              class="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            />
+                          </svg>
+                          Exporting...
+                        </>
+                      )
+                      : (
+                        <>
+                          <svg
+                            class="-ml-1 mr-2 h-4 w-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                            />
+                          </svg>
+                          Export Data
+                        </>
+                      )}
+                  </button>
+                </div>
+                <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                  JSON format is recommended for backups. CSV is useful for
+                  spreadsheet analysis.
+                </p>
               </div>
             )}
 
