@@ -1337,7 +1337,7 @@
         "Step 3: Confirm deletion with password",
         "Step 4: Verify account and all data removed from database"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "mobile-responsive-navigation",
@@ -1363,7 +1363,7 @@
         "Step 3: Tap action to add to watchlist",
         "Step 4: Verify action completes correctly"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "deep-links-streaming",
@@ -1402,7 +1402,7 @@
         "Step 3: Verify events recorded in analytics system",
         "Step 4: Create basic dashboard for key metrics"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "auth-email-verification",
@@ -1441,7 +1441,7 @@
         "Step 3: Test sharing URL to Twitter/Facebook",
         "Step 4: Verify rich preview displays correctly"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "seo-sitemap",
@@ -1454,7 +1454,7 @@
         "Step 3: Verify key pages included (home, popular content)",
         "Step 4: Submit sitemap to Google Search Console"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "legal-privacy-policy",
@@ -1467,7 +1467,7 @@
         "Step 3: Verify link accessible from footer",
         "Step 4: Verify policy covers data collection and third parties"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "legal-terms-of-service",
@@ -1480,7 +1480,7 @@
         "Step 3: Verify link accessible from footer",
         "Step 4: Verify terms referenced during signup"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "attribution-tmdb",

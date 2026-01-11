@@ -1,17 +1,135 @@
 {
   "started_at": "2026-01-11T21:43:04.949229",
-  "iterations": 1,
+  "iterations": 7,
   "tasks": {
     "user-delete-account": {
       "id": "user-delete-account",
       "source": "json:.afk/prd.json",
-      "status": "in_progress",
+      "status": "completed",
       "started_at": "2026-01-11T21:43:04.949232",
-      "completed_at": null,
+      "completed_at": "2026-01-11T21:48:37.889528",
       "failure_count": 0,
-      "commits": [],
+      "commits": [
+        "ec6dea4"
+      ],
       "message": null,
-      "learnings": []
+      "learnings": [
+        "Account deletion API already existed in routes/api/settings/account.ts",
+        "SettingsPage had state for delete modal but no UI - needed to add the button and modal",
+        "Must pass accountInfo prop from route handler to component for proper confirmation flow"
+      ]
+    },
+    "mobile-swipe-actions": {
+      "id": "mobile-swipe-actions",
+      "source": "json:.afk/prd.json",
+      "status": "completed",
+      "started_at": "2026-01-11T21:48:38.897422",
+      "completed_at": "2026-01-11T21:53:23.166375",
+      "failure_count": 0,
+      "commits": [
+        "aed6e2a"
+      ],
+      "message": null,
+      "learnings": [
+        "SwipeableListItem island created with touch event handlers for swipe gestures",
+        "Mobile detection uses globalThis.innerWidth (not window) for Deno compatibility",
+        "Library tabs show list view on mobile (<768px) with swipe actions, grid view on desktop",
+        "Context-aware actions based on current tab (watched/to_watch/favourites)",
+        "Existing QuickActions component has the API patterns for watchlist/favourite/watched actions"
+      ]
+    },
+    "analytics-basic-tracking": {
+      "id": "analytics-basic-tracking",
+      "source": "json:.afk/prd.json",
+      "status": "completed",
+      "started_at": "2026-01-11T21:53:24.171570",
+      "completed_at": "2026-01-11T21:59:49.216887",
+      "failure_count": 0,
+      "commits": [
+        "1990084"
+      ],
+      "message": null,
+      "learnings": [
+        "Created analytics_events table with JSONB properties for flexible event data",
+        "Client-side tracking uses navigator.sendBeacon for reliability during page unload",
+        "Session ID stored in httpOnly cookie for cross-page tracking without auth",
+        "Admin dashboard at /admin/analytics - restricted to first registered user",
+        "Analytics tracking is non-blocking to avoid impacting user experience"
+      ]
+    },
+    "seo-meta-tags": {
+      "id": "seo-meta-tags",
+      "source": "json:.afk/prd.json",
+      "status": "completed",
+      "started_at": "2026-01-11T21:59:50.223420",
+      "completed_at": "2026-01-11T22:07:32.275348",
+      "failure_count": 0,
+      "commits": [
+        "843d1a2"
+      ],
+      "message": null,
+      "learnings": [
+        "Fresh Head component from $fresh/runtime.ts injects into <head> from page components",
+        "Head title overrides _app.tsx title - page-specific titles work correctly",
+        "Content detail page uses TMDB poster for og:image (500px) and backdrop for twitter:image (1280px)",
+        "Open Graph type video.movie/video.tv_show for content pages, website for other pages",
+        "Description truncated to 160 chars for meta description best practice"
+      ]
+    },
+    "seo-sitemap": {
+      "id": "seo-sitemap",
+      "source": "json:.afk/prd.json",
+      "status": "completed",
+      "started_at": "2026-01-11T22:07:33.282526",
+      "completed_at": "2026-01-11T22:11:08.701935",
+      "failure_count": 0,
+      "commits": [
+        "c1221db"
+      ],
+      "message": null,
+      "learnings": [
+        "Fresh routes with .xml.ts or .txt.ts extensions correctly return non-HTML content types",
+        "sitemap.xml returns application/xml Content-Type for valid XML sitemap",
+        "robots.txt includes Sitemap directive pointing to sitemap.xml for crawlers",
+        "TMDB trending content can be included in sitemap for dynamic content URLs",
+        "Static pages (home, browse, search, premium, login, signup) have different priority/changefreq settings"
+      ]
+    },
+    "legal-privacy-policy": {
+      "id": "legal-privacy-policy",
+      "source": "json:.afk/prd.json",
+      "status": "completed",
+      "started_at": "2026-01-11T22:11:09.704573",
+      "completed_at": "2026-01-11T22:17:04.989511",
+      "failure_count": 0,
+      "commits": [
+        "b51f37f"
+      ],
+      "message": null,
+      "learnings": [
+        "Fresh requires manual fresh.gen.ts update or server restart to pick up new routes",
+        "Use 'deno task start' not 'deno task dev' for this project",
+        "Privacy policy covers: data collection, third-party services (TMDB, OpenAI, Stripe, Google OAuth), data security, user rights, cookies, data retention",
+        "Footer updated with legal links navigation section for both privacy and terms pages"
+      ]
+    },
+    "legal-terms-of-service": {
+      "id": "legal-terms-of-service",
+      "source": "json:.afk/prd.json",
+      "status": "completed",
+      "started_at": "2026-01-11T22:17:05.998141",
+      "completed_at": "2026-01-11T22:32:00.000000",
+      "failure_count": 0,
+      "commits": [
+        "eb9ff43"
+      ],
+      "message": null,
+      "learnings": [
+        "Terms of service follows same pattern as privacy policy - consistent styling",
+        "SignupForm island needs the terms reference (not signup.tsx route) since form is client-rendered",
+        "Footer already had the /terms link from privacy policy story - link ready before page existed",
+        "Fresh automatically updates fresh.gen.ts when new routes are added"
+      ]
     }
   }
 }
