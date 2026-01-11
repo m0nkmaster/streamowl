@@ -8,6 +8,7 @@ import {
   type MovieDetails,
   type TvDetails,
 } from "../../../../lib/tmdb/client.ts";
+import { trackContentAction } from "../../../../lib/analytics/tracker.ts";
 
 /**
  * API endpoint to add/remove content from watchlist
@@ -95,6 +96,10 @@ export const handler: Handlers = {
         }
       });
 
+      // Track analytics event (non-blocking)
+      const title = ("title" in tmdbDetails ? tmdbDetails.title : (tmdbDetails as TvDetails).name) as string;
+      trackContentAction("add_to_watchlist", tmdbId, contentType, title, { userId });
+
       return new Response(
         JSON.stringify({ success: true }),
         {
@@ -158,6 +163,9 @@ export const handler: Handlers = {
          WHERE user_id = $1 AND content_id = $2 AND status = 'to_watch'`,
         [userId, contentId],
       );
+
+      // Track analytics event (non-blocking)
+      trackContentAction("remove_from_watchlist", tmdbId, "movie", "Unknown", { userId });
 
       return new Response(
         JSON.stringify({ success: true }),

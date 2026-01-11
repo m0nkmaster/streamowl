@@ -14,6 +14,7 @@ import {
   createInternalServerErrorResponse,
   createNotFoundResponse,
 } from "../../../../lib/api/errors.ts";
+import { trackContentAction } from "../../../../lib/analytics/tracker.ts";
 
 /**
  * API endpoint to set user rating for content
@@ -106,6 +107,10 @@ export const handler: Handlers = {
         console.error("Error recalculating taste profile:", error);
         // Don't fail the request if taste profile calculation fails
       }
+
+      // Track analytics event (non-blocking)
+      const title = ("title" in tmdbDetails ? tmdbDetails.title : (tmdbDetails as TvDetails).name) as string;
+      trackContentAction("rate_content", tmdbId, contentType, title, { userId, rating: roundedRating });
 
       return new Response(
         JSON.stringify({ success: true, rating: roundedRating }),

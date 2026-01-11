@@ -31,6 +31,7 @@ export default function App({ Component, url, data }: PageProps) {
         <link rel="preconnect" href="https://esm.sh" />
         <link rel="dns-prefetch" href="https://esm.sh" />
         <link rel="stylesheet" href="/styles.css" />
+        <script src="/analytics.js" defer></script>
         <style>
           {`
           @keyframes slide-in {

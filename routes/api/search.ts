@@ -6,6 +6,8 @@ import {
   createBadRequestResponse,
   createInternalServerErrorResponse,
 } from "../../lib/api/errors.ts";
+import { trackSearch } from "../../lib/analytics/tracker.ts";
+import { getSessionFromRequest } from "../../lib/auth/middleware.ts";
 
 interface SearchResponse {
   results: Content[];
@@ -91,6 +93,17 @@ export const handler: Handlers = {
         page,
         total_pages,
       };
+
+      // Track search event (non-blocking)
+      try {
+        const session = await getSessionFromRequest(req).catch(() => null);
+        trackSearch(query.trim(), total_results, {
+          userId: session?.userId,
+          pagePath: "/search",
+        });
+      } catch {
+        // Analytics tracking should never fail the request
+      }
 
       return await handleConditionalRequest(
         req,
