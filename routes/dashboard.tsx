@@ -5,6 +5,7 @@ import {
   generateCsrfToken,
   setCsrfCookie,
 } from "../lib/security/csrf.ts";
+import SEO from "../components/SEO.tsx";
 
 interface DashboardPageProps {
   csrfToken: string;
@@ -46,26 +47,34 @@ export default function DashboardPage(props: PageProps<DashboardPageProps>) {
   const { csrfToken } = props.data;
 
   return (
-    <div class="min-h-screen bg-gray-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex justify-between items-center mb-6">
-          <div>
-            <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
-            <p class="mt-2 text-gray-600">
-              Welcome to your Stream Owl dashboard!
-            </p>
+    <>
+      <SEO
+        title="Dashboard"
+        description="Your Stream Owl dashboard. Access your personalised recommendations and account settings."
+        url="/dashboard"
+        noIndex={true}
+      />
+      <div class="min-h-screen bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div class="flex justify-between items-center mb-6">
+            <div>
+              <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+              <p class="mt-2 text-gray-600">
+                Welcome to your Stream Owl dashboard!
+              </p>
+            </div>
+            <form method="POST" action="/api/logout">
+              <input type="hidden" name={CSRF_FIELD_NAME} value={csrfToken} />
+              <button
+                type="submit"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                Logout
+              </button>
+            </form>
           </div>
-          <form method="POST" action="/api/logout">
-            <input type="hidden" name={CSRF_FIELD_NAME} value={csrfToken} />
-            <button
-              type="submit"
-              class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Logout
-            </button>
-          </form>
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import { type Handlers, type PageProps } from "$fresh/server.ts";
 import { getSessionFromRequest } from "../lib/auth/middleware.ts";
 import { getUserRegion } from "../lib/region.ts";
 import SettingsPage from "../islands/SettingsPage.tsx";
+import SEO from "../components/SEO.tsx";
 
 interface SettingsPageProps {
   isAuthenticated: boolean;
@@ -143,5 +144,15 @@ export const handler: Handlers<SettingsPageProps> = {
 };
 
 export default function Settings({ data }: PageProps<SettingsPageProps>) {
-  return <SettingsPage {...data} />;
+  return (
+    <>
+      <SEO
+        title="Settings"
+        description="Manage your Stream Owl account settings, region preferences, and subscription."
+        url="/settings"
+        noIndex={true}
+      />
+      <SettingsPage {...data} />
+    </>
+  );
 }
