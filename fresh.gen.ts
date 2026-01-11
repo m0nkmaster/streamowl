@@ -4,8 +4,10 @@
 
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
+import * as $admin_analytics from "./routes/admin/analytics.tsx";
 import * as $api_docs from "./routes/api-docs.tsx";
 import * as $api_path_ from "./routes/api/[...path].ts";
+import * as $api_analytics_track from "./routes/api/analytics/track.ts";
 import * as $api_auth_google from "./routes/api/auth/google.ts";
 import * as $api_auth_google_callback from "./routes/api/auth/google/callback.ts";
 import * as $api_auth_resend_verification from "./routes/api/auth/resend-verification.ts";
@@ -68,9 +70,11 @@ import * as $login from "./routes/login.tsx";
 import * as $premium from "./routes/premium.tsx";
 import * as $profile_user_id_ from "./routes/profile/[user_id].tsx";
 import * as $reset_password from "./routes/reset-password.tsx";
+import * as $robots_txt from "./routes/robots.txt.ts";
 import * as $search from "./routes/search.tsx";
 import * as $settings from "./routes/settings.tsx";
 import * as $signup from "./routes/signup.tsx";
+import * as $sitemap_xml from "./routes/sitemap.xml.ts";
 import * as $AddToListButton from "./islands/AddToListButton.tsx";
 import * as $AddToWatchlistButton from "./islands/AddToWatchlistButton.tsx";
 import * as $BrowsePage from "./islands/BrowsePage.tsx";
@@ -97,6 +101,7 @@ import * as $SearchPage from "./islands/SearchPage.tsx";
 import * as $SettingsPage from "./islands/SettingsPage.tsx";
 import * as $ShareButton from "./islands/ShareButton.tsx";
 import * as $SignupForm from "./islands/SignupForm.tsx";
+import * as $SwipeableListItem from "./islands/SwipeableListItem.tsx";
 import * as $TagsComponent from "./islands/TagsComponent.tsx";
 import * as $ThemeToggle from "./islands/ThemeToggle.tsx";
 import * as $Toast from "./islands/Toast.tsx";
@@ -106,8 +111,10 @@ const manifest = {
   routes: {
     "./routes/_404.tsx": $_404,
     "./routes/_app.tsx": $_app,
+    "./routes/admin/analytics.tsx": $admin_analytics,
     "./routes/api-docs.tsx": $api_docs,
     "./routes/api/[...path].ts": $api_path_,
+    "./routes/api/analytics/track.ts": $api_analytics_track,
     "./routes/api/auth/google.ts": $api_auth_google,
     "./routes/api/auth/google/callback.ts": $api_auth_google_callback,
     "./routes/api/auth/resend-verification.ts": $api_auth_resend_verification,
@@ -175,9 +182,11 @@ const manifest = {
     "./routes/premium.tsx": $premium,
     "./routes/profile/[user_id].tsx": $profile_user_id_,
     "./routes/reset-password.tsx": $reset_password,
+    "./routes/robots.txt.ts": $robots_txt,
     "./routes/search.tsx": $search,
     "./routes/settings.tsx": $settings,
     "./routes/signup.tsx": $signup,
+    "./routes/sitemap.xml.ts": $sitemap_xml,
   },
   islands: {
     "./islands/AddToListButton.tsx": $AddToListButton,
@@ -206,6 +215,7 @@ const manifest = {
     "./islands/SettingsPage.tsx": $SettingsPage,
     "./islands/ShareButton.tsx": $ShareButton,
     "./islands/SignupForm.tsx": $SignupForm,
+    "./islands/SwipeableListItem.tsx": $SwipeableListItem,
     "./islands/TagsComponent.tsx": $TagsComponent,
     "./islands/ThemeToggle.tsx": $ThemeToggle,
     "./islands/Toast.tsx": $Toast,
