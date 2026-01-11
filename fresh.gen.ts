@@ -46,6 +46,7 @@ import * as $api_recommendations_mood from "./routes/api/recommendations/mood.ts
 import * as $api_reset_password from "./routes/api/reset-password.ts";
 import * as $api_search from "./routes/api/search.ts";
 import * as $api_search_providers from "./routes/api/search/providers.ts";
+import * as $api_settings_avatar from "./routes/api/settings/avatar.ts";
 import * as $api_settings_export from "./routes/api/settings/export.ts";
 import * as $api_settings_profile from "./routes/api/settings/profile.ts";
 import * as $api_settings_public_profile from "./routes/api/settings/public-profile.ts";
@@ -150,6 +151,7 @@ const manifest = {
     "./routes/api/reset-password.ts": $api_reset_password,
     "./routes/api/search.ts": $api_search,
     "./routes/api/search/providers.ts": $api_search_providers,
+    "./routes/api/settings/avatar.ts": $api_settings_avatar,
     "./routes/api/settings/export.ts": $api_settings_export,
     "./routes/api/settings/profile.ts": $api_settings_profile,
     "./routes/api/settings/public-profile.ts": $api_settings_public_profile,

@@ -52,6 +52,11 @@ export default function SettingsPage({
   const [nameLoading, setNameLoading] = useState(false);
   const [nameSaved, setNameSaved] = useState(false);
 
+  // Avatar upload state
+  const [avatarUrl, setAvatarUrl] = useState(userProfile.avatarUrl);
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+
   // Data export state
   const [exportLoading, setExportLoading] = useState(false);
   const [exportFormat, setExportFormat] = useState<"json" | "csv">("json");
@@ -196,6 +201,81 @@ export default function SettingsPage({
     setIsEditingName(false);
   };
 
+  const handleAvatarUpload = async (file: File) => {
+    setAvatarLoading(true);
+    setAvatarError(null);
+
+    try {
+      // Validate file type on client side
+      const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "image/webp",
+      ];
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error("Invalid file type. Allowed: JPEG, PNG, GIF, WebP");
+      }
+
+      // Validate file size (2MB max)
+      if (file.size > 2 * 1024 * 1024) {
+        throw new Error("File too large. Maximum size is 2MB");
+      }
+
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const response = await fetch("/api/settings/avatar", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to upload avatar");
+      }
+
+      const data = await response.json();
+      setAvatarUrl(data.avatarUrl);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      setAvatarError(
+        err instanceof Error ? err.message : "Failed to upload avatar",
+      );
+      setTimeout(() => setAvatarError(null), 5000);
+    } finally {
+      setAvatarLoading(false);
+    }
+  };
+
+  const handleAvatarRemove = async () => {
+    setAvatarLoading(true);
+    setAvatarError(null);
+
+    try {
+      const response = await fetch("/api/settings/avatar", {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Failed to remove avatar");
+      }
+
+      setAvatarUrl(null);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      setAvatarError(
+        err instanceof Error ? err.message : "Failed to remove avatar",
+      );
+      setTimeout(() => setAvatarError(null), 5000);
+    } finally {
+      setAvatarLoading(false);
+    }
+  };
+
   const handleExportData = async () => {
     setExportLoading(true);
     setError(null);
@@ -266,22 +346,125 @@ export default function SettingsPage({
               <div class="flex items-start gap-6">
                 {/* Avatar */}
                 <div class="flex-shrink-0">
-                  {userProfile.avatarUrl
-                    ? (
-                      <img
-                        src={userProfile.avatarUrl}
-                        alt="Profile avatar"
-                        class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
-                      />
-                    )
-                    : (
-                      <div class="w-20 h-20 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center border-2 border-gray-200 dark:border-gray-700">
-                        <span class="text-2xl font-medium text-indigo-600 dark:text-indigo-400">
-                          {(displayName || userProfile.email || "U").charAt(0)
-                            .toUpperCase()}
-                        </span>
+                  <div class="relative group">
+                    <input
+                      type="file"
+                      id="avatar-upload"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      class="sr-only"
+                      disabled={avatarLoading}
+                      onChange={(e) => {
+                        const file = e.currentTarget.files?.[0];
+                        if (file) {
+                          handleAvatarUpload(file);
+                          // Reset input so same file can be selected again
+                          e.currentTarget.value = "";
+                        }
+                      }}
+                    />
+                    <label
+                      htmlFor="avatar-upload"
+                      class={`block cursor-pointer ${
+                        avatarLoading ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                    >
+                      {avatarUrl
+                        ? (
+                          <img
+                            src={avatarUrl}
+                            alt="Profile avatar"
+                            class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700 group-hover:border-indigo-500 transition-colors"
+                          />
+                        )
+                        : (
+                          <div class="w-20 h-20 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center border-2 border-gray-200 dark:border-gray-700 group-hover:border-indigo-500 transition-colors">
+                            <span class="text-2xl font-medium text-indigo-600 dark:text-indigo-400">
+                              {(displayName || userProfile.email || "U").charAt(
+                                0,
+                              )
+                                .toUpperCase()}
+                            </span>
+                          </div>
+                        )}
+                      {/* Hover overlay */}
+                      <div class="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        {avatarLoading
+                          ? (
+                            <svg
+                              class="animate-spin h-6 w-6 text-white"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                class="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                stroke-width="4"
+                              />
+                              <path
+                                class="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              />
+                            </svg>
+                          )
+                          : (
+                            <svg
+                              class="h-6 w-6 text-white"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
+                              />
+                              <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"
+                              />
+                            </svg>
+                          )}
                       </div>
+                    </label>
+                    {/* Remove button */}
+                    {avatarUrl && !avatarLoading && (
+                      <button
+                        type="button"
+                        onClick={handleAvatarRemove}
+                        class="absolute -bottom-1 -right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 shadow-md transition-colors"
+                        title="Remove avatar"
+                      >
+                        <svg
+                          class="h-3 w-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
                     )}
+                  </div>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 text-center">
+                    Click to change
+                  </p>
+                  {avatarError && (
+                    <p class="text-xs text-red-600 dark:text-red-400 mt-1 text-center max-w-[120px]">
+                      {avatarError}
+                    </p>
+                  )}
                 </div>
 
                 {/* Profile Details */}
