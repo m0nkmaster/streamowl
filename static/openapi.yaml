@@ -1,0 +1,1507 @@
+openapi: 3.0.3
+info:
+  title: Stream Owl API
+  description: |
+    API for Stream Owl - a movie and TV show discovery and tracking platform.
+    
+    ## Authentication
+    
+    Most endpoints require authentication via session cookies. Session tokens are set 
+    automatically after successful login or signup. CSRF tokens are required for 
+    state-changing operations (POST, PUT, PATCH, DELETE) on form-based endpoints.
+    
+    ## Rate Limiting
+    
+    Authentication endpoints are rate-limited to prevent brute force attacks.
+    Free tier users are limited to 3 AI recommendations per day.
+    
+    ## Data Attribution
+    
+    Content data is provided by [TMDB](https://www.themoviedb.org/).
+  version: 1.0.0
+  contact:
+    name: Stream Owl
+  license:
+    name: MIT
+
+servers:
+  - url: /api
+    description: API endpoints
+
+tags:
+  - name: Authentication
+    description: User authentication and session management
+  - name: Search
+    description: Content search and discovery
+  - name: Content
+    description: Content details and user interactions
+  - name: Library
+    description: User library management (watchlist, watched, favourites)
+  - name: Lists
+    description: Custom list management
+  - name: Tags
+    description: User-defined tags for content organisation
+  - name: Recommendations
+    description: AI-powered content recommendations
+  - name: Settings
+    description: User settings and preferences
+  - name: Premium
+    description: Premium subscription features
+
+paths:
+  /signup:
+    post:
+      tags: [Authentication]
+      summary: Create a new user account
+      description: |
+        Register a new user with email and password. 
+        Sends verification email and creates session.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [email, password, csrf_token]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User's email address
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  description: Password (minimum 8 characters)
+                csrf_token:
+                  type: string
+                  description: CSRF token from form
+      responses:
+        '303':
+          description: Redirect to dashboard on success
+          headers:
+            Location:
+              schema:
+                type: string
+                example: /dashboard
+            Set-Cookie:
+              schema:
+                type: string
+                description: Session cookie
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /login:
+    post:
+      tags: [Authentication]
+      summary: Log in with email and password
+      description: Authenticate an existing user and create a session.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [email, password, csrf_token]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+                returnTo:
+                  type: string
+                  description: URL to redirect to after login
+                csrf_token:
+                  type: string
+      responses:
+        '303':
+          description: Redirect to dashboard or returnTo URL
+          headers:
+            Location:
+              schema:
+                type: string
+            Set-Cookie:
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /logout:
+    get:
+      tags: [Authentication]
+      summary: Log out (GET)
+      description: Clear session and redirect to homepage.
+      responses:
+        '302':
+          description: Redirect to homepage
+    post:
+      tags: [Authentication]
+      summary: Log out (POST)
+      description: Clear session and redirect to homepage. Requires CSRF token.
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                csrf_token:
+                  type: string
+      responses:
+        '302':
+          description: Redirect to homepage
+
+  /forgot-password:
+    post:
+      tags: [Authentication]
+      summary: Request password reset
+      description: |
+        Send a password reset email to the user. 
+        Always returns success to prevent user enumeration.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [email, csrf_token]
+              properties:
+                email:
+                  type: string
+                  format: email
+                csrf_token:
+                  type: string
+      responses:
+        '303':
+          description: Redirect to success page
+
+  /reset-password:
+    post:
+      tags: [Authentication]
+      summary: Reset password with token
+      description: Set a new password using the reset token from email.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [token, password, confirmPassword, csrf_token]
+              properties:
+                token:
+                  type: string
+                  description: Reset token from email
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                confirmPassword:
+                  type: string
+                  format: password
+                csrf_token:
+                  type: string
+      responses:
+        '303':
+          description: Redirect to login on success
+
+  /search:
+    get:
+      tags: [Search]
+      summary: Search movies and TV shows
+      description: |
+        Search for content across movies and TV shows. 
+        Results are combined and sorted by relevance.
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Search query
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number for pagination
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /trending:
+    get:
+      tags: [Search]
+      summary: Get trending content
+      description: Fetch trending movies and TV shows.
+      parameters:
+        - name: time_window
+          in: query
+          schema:
+            type: string
+            enum: [day, week]
+            default: day
+          description: Time window for trending calculation
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+      responses:
+        '200':
+          description: Trending content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentListResponse'
+
+  /new-releases:
+    get:
+      tags: [Search]
+      summary: Get new releases
+      description: Fetch recently released movies and TV shows (last 90 days).
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+      responses:
+        '200':
+          description: New release content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentListResponse'
+
+  /leaving-soon:
+    get:
+      tags: [Search]
+      summary: Get content leaving streaming services
+      description: Fetch content that will be removed from streaming services soon.
+      parameters:
+        - name: service_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Filter by streaming service
+        - name: days_ahead
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 90
+            default: 30
+          description: Number of days to look ahead
+      responses:
+        '200':
+          description: Leaving soon content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LeavingSoonResponse'
+
+  /content/{tmdb_id}/status:
+    get:
+      tags: [Content]
+      summary: Get user's status for content
+      description: Returns the user's watch status, rating, and watched date for content.
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TmdbId'
+      responses:
+        '200':
+          description: Content status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [watched, to_watch, favourite]
+                    nullable: true
+                  watched_at:
+                    type: string
+                    format: date-time
+                    nullable: true
+                  rating:
+                    type: number
+                    minimum: 0
+                    maximum: 10
+                    nullable: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /content/{tmdb_id}/watchlist:
+    post:
+      tags: [Content]
+      summary: Add to watchlist
+      description: Add content to user's watchlist (to watch).
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TmdbId'
+      responses:
+        '200':
+          description: Added to watchlist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [Content]
+      summary: Remove from watchlist
+      description: Remove content from user's watchlist.
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TmdbId'
+      responses:
+        '200':
+          description: Removed from watchlist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /content/{tmdb_id}/watched:
+    post:
+      tags: [Content]
+      summary: Mark as watched
+      description: Mark content as watched.
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TmdbId'
+      responses:
+        '200':
+          description: Marked as watched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags: [Content]
+      summary: Remove watched status
+      description: Remove content from watched history.
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TmdbId'
+      responses:
+        '200':
+          description: Removed from watched
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /content/{tmdb_id}/favourite:
+    post:
+      tags: [Content]
+      summary: Add to favourites
+      description: Mark content as a favourite.
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TmdbId'
+      responses:
+        '200':
+          description: Added to favourites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags: [Content]
+      summary: Remove from favourites
+      description: Remove content from favourites.
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TmdbId'
+      responses:
+        '200':
+          description: Removed from favourites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /content/{tmdb_id}/rating:
+    post:
+      tags: [Content]
+      summary: Set rating
+      description: Rate content on a 1-10 scale with half-point precision.
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TmdbId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rating]
+              properties:
+                rating:
+                  type: number
+                  minimum: 0
+                  maximum: 10
+                  description: Rating value (rounded to 0.5)
+      responses:
+        '200':
+          description: Rating set
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  rating:
+                    type: number
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    delete:
+      tags: [Content]
+      summary: Remove rating
+      description: Remove user's rating for content.
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TmdbId'
+      responses:
+        '200':
+          description: Rating removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /content/{tmdb_id}/notes:
+    post:
+      tags: [Content]
+      summary: Set notes
+      description: Add or update private notes for content.
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TmdbId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [notes]
+              properties:
+                notes:
+                  type: string
+                  maxLength: 10000
+      responses:
+        '200':
+          description: Notes saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /content/{tmdb_id}/tags:
+    get:
+      tags: [Content]
+      summary: Get tags for content
+      description: Get all tags applied to content by the user.
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TmdbId'
+      responses:
+        '200':
+          description: Content tags
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Tag'
+    post:
+      tags: [Content]
+      summary: Add tag to content
+      description: Apply a tag to content.
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TmdbId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tagId]
+              properties:
+                tagId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Tag applied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /content/{tmdb_id}/tags/{tag_id}:
+    delete:
+      tags: [Content]
+      summary: Remove tag from content
+      description: Remove a tag from content.
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TmdbId'
+        - name: tag_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Tag removed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /library/watchlist:
+    get:
+      tags: [Library]
+      summary: Get user's watchlist
+      description: Fetch all content marked as 'to watch'.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Watchlist content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LibraryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /library/watched:
+    get:
+      tags: [Library]
+      summary: Get watched history
+      description: Fetch all content marked as watched.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Watched content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LibraryResponse'
+
+  /library/favourites:
+    get:
+      tags: [Library]
+      summary: Get favourites
+      description: Fetch all content marked as favourite.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Favourite content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LibraryResponse'
+
+  /library/lists:
+    get:
+      tags: [Library]
+      summary: Get user's custom lists
+      description: Fetch all custom lists created by the user.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: User's lists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lists:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/List'
+
+  /lists:
+    post:
+      tags: [Lists]
+      summary: Create a custom list
+      description: |
+        Create a new custom list. 
+        Free tier users are limited to 3 lists.
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                description:
+                  type: string
+      responses:
+        '201':
+          description: List created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  list:
+                    $ref: '#/components/schemas/List'
+        '403':
+          description: List limit reached (free tier)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /lists/{list_id}:
+    patch:
+      tags: [Lists]
+      summary: Update list settings
+      description: Update list properties such as visibility.
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_public:
+                  type: boolean
+      responses:
+        '200':
+          description: List updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  list:
+                    $ref: '#/components/schemas/List'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /lists/{list_id}/items:
+    post:
+      tags: [Lists]
+      summary: Add item to list
+      description: Add content to a custom list.
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: list_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tmdb_id]
+              properties:
+                tmdb_id:
+                  type: integer
+                position:
+                  type: integer
+                  description: Position in list (optional)
+      responses:
+        '200':
+          description: Item added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /tags:
+    get:
+      tags: [Tags]
+      summary: Get user's tags
+      description: Fetch all tags created by the user.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: User's tags
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tags:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Tag'
+    post:
+      tags: [Tags]
+      summary: Create a tag
+      description: Create a new tag for organising content.
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  maxLength: 255
+                colour:
+                  type: string
+                  pattern: '^#[0-9A-Fa-f]{6}$'
+                  default: '#3B82F6'
+                  description: Hex colour code
+      responses:
+        '200':
+          description: Tag created or updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tag:
+                    $ref: '#/components/schemas/Tag'
+
+  /recommendations:
+    get:
+      tags: [Recommendations]
+      summary: Get daily recommendations
+      description: |
+        Get AI-powered personalised recommendations.
+        Free tier users receive 3 recommendations per day.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Recommendations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationsResponse'
+        '403':
+          description: Daily limit reached
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationsResponse'
+
+  /recommendations/{tmdb_id}/dismiss:
+    post:
+      tags: [Recommendations]
+      summary: Dismiss a recommendation
+      description: Mark a recommendation as not interested.
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/TmdbId'
+      responses:
+        '200':
+          description: Recommendation dismissed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+
+  /recommendations/mood:
+    post:
+      tags: [Recommendations]
+      summary: Get mood-based recommendations
+      description: Request recommendations based on mood or context.
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mood]
+              properties:
+                mood:
+                  type: string
+                  description: Description of mood or context
+      responses:
+        '200':
+          description: Mood-based recommendations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationsResponse'
+
+  /recommendations/chat:
+    post:
+      tags: [Recommendations]
+      summary: Chat about recommendations
+      description: |
+        Conversational AI interface for discussing recommendations.
+        Premium users only.
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [message]
+              properties:
+                message:
+                  type: string
+      responses:
+        '200':
+          description: AI response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: string
+                  recommendations:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Recommendation'
+
+  /settings/profile:
+    get:
+      tags: [Settings]
+      summary: Get user profile
+      description: Fetch user's profile information.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: User profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+    post:
+      tags: [Settings]
+      summary: Update profile
+      description: Update user's display name.
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                displayName:
+                  type: string
+                  maxLength: 255
+                  nullable: true
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  email:
+                    type: string
+                  displayName:
+                    type: string
+                    nullable: true
+                  avatarUrl:
+                    type: string
+                    nullable: true
+
+  /settings/region:
+    get:
+      tags: [Settings]
+      summary: Get region preference
+      description: Fetch user's streaming region preference.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Region preference
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  region:
+                    type: string
+                    enum: [US, GB, CA, AU, DE, FR]
+                    nullable: true
+    post:
+      tags: [Settings]
+      summary: Set region preference
+      description: Update user's streaming region.
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [region]
+              properties:
+                region:
+                  type: string
+                  enum: [US, GB, CA, AU, DE, FR]
+      responses:
+        '200':
+          description: Region updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  region:
+                    type: string
+
+  /settings/export:
+    get:
+      tags: [Settings, Premium]
+      summary: Export user data
+      description: |
+        Export all user data. Premium feature.
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum: [json, csv]
+            default: json
+      responses:
+        '200':
+          description: Exported data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExportData'
+            text/csv:
+              schema:
+                type: string
+        '403':
+          description: Premium required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /user/premium:
+    get:
+      tags: [Premium]
+      summary: Check premium status
+      description: Check if user has premium subscription.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Premium status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isPremium:
+                    type: boolean
+
+  /premium/checkout:
+    post:
+      tags: [Premium]
+      summary: Start checkout
+      description: Create a Stripe checkout session for premium subscription.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Checkout URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+
+  /premium/portal:
+    post:
+      tags: [Premium]
+      summary: Open billing portal
+      description: Get URL to Stripe billing portal for subscription management.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Portal URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    format: uri
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: session
+      description: Session cookie set after login
+
+  parameters:
+    TmdbId:
+      name: tmdb_id
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+      description: TMDB content ID
+
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties:
+            oneOf:
+              - type: string
+              - type: array
+                items:
+                  type: string
+        code:
+          type: string
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+    Content:
+      type: object
+      properties:
+        tmdb_id:
+          type: integer
+        type:
+          type: string
+          enum: [movie, tv, documentary]
+        title:
+          type: string
+        overview:
+          type: string
+          nullable: true
+        release_date:
+          type: string
+          format: date
+          nullable: true
+        poster_path:
+          type: string
+          nullable: true
+        backdrop_path:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          properties:
+            vote_average:
+              type: number
+            vote_count:
+              type: integer
+            genres:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+
+    SearchResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Content'
+        total_results:
+          type: integer
+        page:
+          type: integer
+        total_pages:
+          type: integer
+
+    ContentListResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Content'
+        total_results:
+          type: integer
+        page:
+          type: integer
+        total_pages:
+          type: integer
+
+    LeavingSoonResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/Content'
+              - type: object
+                properties:
+                  available_until:
+                    type: string
+                    format: date
+                  service_id:
+                    type: string
+                  service_name:
+                    type: string
+                  service_logo:
+                    type: string
+                    nullable: true
+                  region:
+                    type: string
+        streaming_services:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              logo_url:
+                type: string
+                nullable: true
+        total_results:
+          type: integer
+
+    LibraryContent:
+      type: object
+      properties:
+        tmdb_id:
+          type: integer
+        type:
+          type: string
+          enum: [movie, tv, documentary]
+        title:
+          type: string
+        poster_path:
+          type: string
+          nullable: true
+        release_date:
+          type: string
+          format: date
+          nullable: true
+        added_at:
+          type: string
+          format: date-time
+        rating:
+          type: number
+          nullable: true
+        tag_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    LibraryResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/LibraryContent'
+
+    List:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        is_public:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Tag:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        colour:
+          type: string
+          pattern: '^#[0-9A-Fa-f]{6}$'
+        created_at:
+          type: string
+          format: date-time
+
+    Recommendation:
+      type: object
+      properties:
+        tmdb_id:
+          type: integer
+        type:
+          type: string
+          enum: [movie, tv]
+        title:
+          type: string
+        overview:
+          type: string
+        poster_path:
+          type: string
+          nullable: true
+        release_date:
+          type: string
+          format: date
+          nullable: true
+        similarity_score:
+          type: number
+        explanation:
+          type: string
+          description: AI-generated explanation for recommendation
+
+    RecommendationsResponse:
+      type: object
+      properties:
+        recommendations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Recommendation'
+        rateLimitReached:
+          type: boolean
+        remainingRecommendations:
+          type: integer
+        upgradePrompt:
+          type: string
+
+    UserProfile:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        displayName:
+          type: string
+          nullable: true
+        avatarUrl:
+          type: string
+          format: uri
+          nullable: true
+
+    ExportData:
+      type: object
+      properties:
+        exportedAt:
+          type: string
+          format: date-time
+        user:
+          type: object
+          properties:
+            email:
+              type: string
+            displayName:
+              type: string
+              nullable: true
+            avatarUrl:
+              type: string
+              nullable: true
+            createdAt:
+              type: string
+              format: date-time
+        content:
+          type: array
+          items:
+            type: object
+            properties:
+              tmdbId:
+                type: integer
+              type:
+                type: string
+              title:
+                type: string
+              status:
+                type: string
+              rating:
+                type: number
+                nullable: true
+              notes:
+                type: string
+                nullable: true
+              watchedAt:
+                type: string
+                format: date-time
+                nullable: true
+              addedAt:
+                type: string
+                format: date-time
+        lists:
+          type: array
+          items:
+            type: object
+        tags:
+          type: array
+          items:
+            type: object
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: Access denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    TooManyRequests:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/Error'
+              - type: object
+                properties:
+                  rateLimitExceeded:
+                    type: boolean
+                  remainingSeconds:
+                    type: integer

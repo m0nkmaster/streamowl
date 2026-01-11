@@ -4,6 +4,7 @@
 
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
+import * as $api_docs from "./routes/api-docs.tsx";
 import * as $api_path_ from "./routes/api/[...path].ts";
 import * as $api_auth_google from "./routes/api/auth/google.ts";
 import * as $api_auth_google_callback from "./routes/api/auth/google/callback.ts";
@@ -102,6 +103,7 @@ const manifest = {
   routes: {
     "./routes/_404.tsx": $_404,
     "./routes/_app.tsx": $_app,
+    "./routes/api-docs.tsx": $api_docs,
     "./routes/api/[...path].ts": $api_path_,
     "./routes/api/auth/google.ts": $api_auth_google,
     "./routes/api/auth/google/callback.ts": $api_auth_google_callback,
