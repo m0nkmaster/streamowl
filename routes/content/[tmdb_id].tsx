@@ -1,3 +1,4 @@
+import { Head } from "$fresh/runtime.ts";
 import { type Handlers, type PageProps } from "$fresh/server.ts";
 import { getSessionFromRequest } from "../../lib/auth/middleware.ts";
 import {
@@ -65,6 +66,7 @@ interface ContentDetailPageProps {
   isAuthenticated: boolean;
   region: SupportedRegion;
   externalRatings: AggregateRatingsType | null;
+  canonicalUrl: string;
 }
 
 /**
@@ -224,6 +226,10 @@ export const handler: Handlers<ContentDetailPageProps> = {
       }
     }
 
+    // Build canonical URL for SEO
+    const baseUrl = Deno.env.get("APP_BASE_URL") || new URL(_req.url).origin;
+    const canonicalUrl = `${baseUrl}/content/${contentId}`;
+
     return ctx.render({
       content,
       contentType,
@@ -237,6 +243,7 @@ export const handler: Handlers<ContentDetailPageProps> = {
       isAuthenticated: session !== null,
       region,
       externalRatings,
+      canonicalUrl,
     });
   },
 };
@@ -348,6 +355,7 @@ export default function ContentDetailPage(
     isAuthenticated,
     region,
     externalRatings,
+    canonicalUrl,
   } = data;
   const isMovie = contentType === "movie";
   const title = isMovie
@@ -365,8 +373,52 @@ export default function ContentDetailPage(
   const backdropSrcSet = getBackdropSrcSet(content.backdrop_path);
   const backdropSrc = getBackdropUrl(content.backdrop_path, "w1280");
 
+  // SEO meta data
+  const pageTitle = `${title} - Stream Owl`;
+  const pageDescription = content.overview
+    ? content.overview.length > 160
+      ? content.overview.slice(0, 157) + "..."
+      : content.overview
+    : `Watch ${title} - find where to stream this ${
+        contentType === "movie" ? "movie" : "TV show"
+      } on Netflix, Disney+, Amazon Prime, and more.`;
+  // Use poster for og:image (better aspect ratio for social cards)
+  const ogImage = content.poster_path
+    ? `https://image.tmdb.org/t/p/w500${content.poster_path}`
+    : null;
+  // Use backdrop for Twitter large image card
+  const twitterImage = content.backdrop_path
+    ? `https://image.tmdb.org/t/p/w1280${content.backdrop_path}`
+    : ogImage;
+  const releaseYear = releaseDate ? new Date(releaseDate).getFullYear() : null;
+
   return (
-    <div class="min-h-screen bg-gray-50">
+    <>
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <link rel="canonical" href={canonicalUrl} />
+
+        {/* Open Graph meta tags for Facebook, LinkedIn, etc. */}
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:type" content={contentType === "movie" ? "video.movie" : "video.tv_show"} />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:site_name" content="Stream Owl" />
+        {ogImage && <meta property="og:image" content={ogImage} />}
+        {ogImage && <meta property="og:image:width" content="500" />}
+        {ogImage && <meta property="og:image:height" content="750" />}
+        {ogImage && <meta property="og:image:alt" content={`${title} poster`} />}
+        {releaseYear && <meta property="og:video:release_date" content={releaseDate!} />}
+
+        {/* Twitter Card meta tags */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        {twitterImage && <meta name="twitter:image" content={twitterImage} />}
+        {twitterImage && <meta name="twitter:image:alt" content={`${title} ${content.backdrop_path ? 'backdrop' : 'poster'}`} />}
+      </Head>
+      <div class="min-h-screen bg-gray-50">
       {/* Backdrop Image */}
       {backdropSrc && (
         <div class="relative h-96 overflow-hidden">
@@ -860,5 +912,6 @@ export default function ContentDetailPage(
         </div>
       </div>
     </div>
+    </>
   );
 }

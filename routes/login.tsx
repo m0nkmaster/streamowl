@@ -1,3 +1,4 @@
+import { Head } from "$fresh/runtime.ts";
 import { type Handlers, type PageProps } from "$fresh/server.ts";
 import {
   CSRF_FIELD_NAME as _CSRF_FIELD_NAME,
@@ -31,7 +32,22 @@ export default function LoginPage(props: PageProps<LoginPageProps>) {
   const { csrfToken, returnTo, resetSuccess } = props.data;
 
   return (
-    <div class="min-h-screen flex items-center justify-center bg-gray-50">
+    <>
+      <Head>
+        <title>Sign In - Stream Owl</title>
+        <meta
+          name="description"
+          content="Sign in to Stream Owl to access personalised movie and TV show recommendations."
+        />
+        <meta property="og:title" content="Sign In - Stream Owl" />
+        <meta property="og:description" content="Sign in to Stream Owl to access personalised movie and TV show recommendations." />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Stream Owl" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content="Sign In - Stream Owl" />
+        <meta name="twitter:description" content="Sign in to Stream Owl to access personalised movie and TV show recommendations." />
+      </Head>
+      <div class="min-h-screen flex items-center justify-center bg-gray-50">
       <div class="max-w-md w-full space-y-8 p-8">
         <div>
           <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -119,5 +135,6 @@ export default function LoginPage(props: PageProps<LoginPageProps>) {
         </div>
       </div>
     </div>
+    </>
   );
 }
