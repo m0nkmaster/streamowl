@@ -8,6 +8,7 @@ import {
 import CreateListModal from "./CreateListModal.tsx";
 import ContentGrid from "../components/ContentGrid.tsx";
 import SkeletonCard from "../components/SkeletonCard.tsx";
+import SwipeableListItem from "./SwipeableListItem.tsx";
 
 interface WatchedContent {
   tmdb_id: number;
@@ -84,6 +85,31 @@ export default function LibraryTabs(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [toast, setToast] = useState<
+    { message: string; type: "success" | "error" } | null
+  >(null);
+
+  // Detect mobile viewport
+  useEffect(() => {
+    if (!IS_BROWSER) return;
+
+    const checkMobile = () => {
+      setIsMobile(globalThis.innerWidth < 768); // md breakpoint
+    };
+
+    checkMobile();
+    globalThis.addEventListener("resize", checkMobile);
+    return () => globalThis.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Auto-dismiss toast
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   // Fetch custom lists and tags on mount
   useEffect(() => {
@@ -256,6 +282,51 @@ export default function LibraryTabs(
   // Clear all tag filters
   const clearTagFilters = () => {
     setSelectedTagIds(new Set());
+  };
+
+  // Handle swipe action completion
+  const handleSwipeAction = (action: string, success: boolean) => {
+    const actionMessages: Record<string, { success: string; error: string }> = {
+      watchlist: {
+        success: "Added to watchlist",
+        error: "Failed to add to watchlist",
+      },
+      favourite: {
+        success: "Added to favourites",
+        error: "Failed to add to favourites",
+      },
+      watched: {
+        success: "Marked as watched",
+        error: "Failed to mark as watched",
+      },
+      remove: { success: "Removed from list", error: "Failed to remove" },
+    };
+
+    const messages = actionMessages[action] ||
+      { success: "Action completed", error: "Action failed" };
+    setToast({
+      message: success ? messages.success : messages.error,
+      type: success ? "success" : "error",
+    });
+  };
+
+  // Remove item from watched list
+  const removeFromWatched = (tmdbId: number) => {
+    setWatchedContent((prev) => prev.filter((item) => item.tmdb_id !== tmdbId));
+  };
+
+  // Remove item from watchlist
+  const removeFromWatchlist = (tmdbId: number) => {
+    setWatchlistContent((prev) =>
+      prev.filter((item) => item.tmdb_id !== tmdbId)
+    );
+  };
+
+  // Remove item from favourites
+  const removeFromFavourites = (tmdbId: number) => {
+    setFavouritesContent((prev) =>
+      prev.filter((item) => item.tmdb_id !== tmdbId)
+    );
   };
 
   // Filter content by selected tags (AND filtering - content must have all selected tags)
@@ -488,46 +559,88 @@ export default function LibraryTabs(
               )}
 
               {!loading && !error && watchedContent.length > 0 && (
-                <ContentGrid>
-                  {filterContentByTags(watchedContent).map((item) => (
-                    <a
-                      href={`/content/${item.tmdb_id}`}
-                      key={`${item.type}-${item.tmdb_id}`}
-                      class="block group hover:scale-105 transition-transform"
-                    >
-                      <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        <img
-                          src={getPosterUrl(
-                            item.poster_path,
-                            getGridPosterSize(),
-                          )}
-                          srcSet={getPosterSrcSet(item.poster_path)}
-                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                          alt={item.title}
-                          class="w-full aspect-[2/3] object-cover"
-                          loading="lazy"
-                          width="300"
-                          height="450"
+                <>
+                  {/* Mobile: Swipeable list view */}
+                  {isMobile && (
+                    <div class="space-y-0">
+                      <p class="text-xs text-gray-500 mb-3 flex items-center gap-1">
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M7 16l-4-4m0 0l4-4m-4 4h18"
+                          />
+                        </svg>
+                        Swipe left for quick actions
+                      </p>
+                      {filterContentByTags(watchedContent).map((item) => (
+                        <SwipeableListItem
+                          key={`${item.type}-${item.tmdb_id}`}
+                          tmdbId={item.tmdb_id}
+                          type={item.type}
+                          title={item.title}
+                          posterPath={item.poster_path}
+                          subtitle={`Watched: ${formatDate(item.watched_at)}`}
+                          rating={item.rating}
+                          href={`/content/${item.tmdb_id}`}
+                          currentTab="watched"
+                          onAction={handleSwipeAction}
+                          onRemove={() => removeFromWatched(item.tmdb_id)}
                         />
-                        <div class="p-3">
-                          <h3 class="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-indigo-600">
-                            {item.title}
-                          </h3>
-                          <div class="mt-2 space-y-1">
-                            <p class="text-xs text-gray-500">
-                              Watched: {formatDate(item.watched_at)}
-                            </p>
-                            {item.rating !== null && (
-                              <p class="text-xs font-medium text-indigo-600">
-                                ⭐ {item.rating.toFixed(1)}/10
-                              </p>
-                            )}
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Desktop: Grid view */}
+                  {!isMobile && (
+                    <ContentGrid>
+                      {filterContentByTags(watchedContent).map((item) => (
+                        <a
+                          href={`/content/${item.tmdb_id}`}
+                          key={`${item.type}-${item.tmdb_id}`}
+                          class="block group hover:scale-105 transition-transform"
+                        >
+                          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                            <img
+                              src={getPosterUrl(
+                                item.poster_path,
+                                getGridPosterSize(),
+                              )}
+                              srcSet={getPosterSrcSet(item.poster_path)}
+                              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                              alt={item.title}
+                              class="w-full aspect-[2/3] object-cover"
+                              loading="lazy"
+                              width="300"
+                              height="450"
+                            />
+                            <div class="p-3">
+                              <h3 class="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-indigo-600">
+                                {item.title}
+                              </h3>
+                              <div class="mt-2 space-y-1">
+                                <p class="text-xs text-gray-500">
+                                  Watched: {formatDate(item.watched_at)}
+                                </p>
+                                {item.rating !== null && (
+                                  <p class="text-xs font-medium text-indigo-600">
+                                    ⭐ {item.rating.toFixed(1)}/10
+                                  </p>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    </a>
-                  ))}
-                </ContentGrid>
+                        </a>
+                      ))}
+                    </ContentGrid>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -576,46 +689,88 @@ export default function LibraryTabs(
               )}
 
               {!loading && !error && watchlistContent.length > 0 && (
-                <ContentGrid>
-                  {filterContentByTags(watchlistContent).map((item) => (
-                    <a
-                      href={`/content/${item.tmdb_id}`}
-                      key={`${item.type}-${item.tmdb_id}`}
-                      class="block group hover:scale-105 transition-transform"
-                    >
-                      <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        <img
-                          src={getPosterUrl(
-                            item.poster_path,
-                            getGridPosterSize(),
-                          )}
-                          srcSet={getPosterSrcSet(item.poster_path)}
-                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                          alt={item.title}
-                          class="w-full aspect-[2/3] object-cover"
-                          loading="lazy"
-                          width="300"
-                          height="450"
+                <>
+                  {/* Mobile: Swipeable list view */}
+                  {isMobile && (
+                    <div class="space-y-0">
+                      <p class="text-xs text-gray-500 mb-3 flex items-center gap-1">
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M7 16l-4-4m0 0l4-4m-4 4h18"
+                          />
+                        </svg>
+                        Swipe left for quick actions
+                      </p>
+                      {filterContentByTags(watchlistContent).map((item) => (
+                        <SwipeableListItem
+                          key={`${item.type}-${item.tmdb_id}`}
+                          tmdbId={item.tmdb_id}
+                          type={item.type}
+                          title={item.title}
+                          posterPath={item.poster_path}
+                          subtitle={`Added: ${formatDate(item.added_at)}`}
+                          rating={item.rating}
+                          href={`/content/${item.tmdb_id}`}
+                          currentTab="to_watch"
+                          onAction={handleSwipeAction}
+                          onRemove={() => removeFromWatchlist(item.tmdb_id)}
                         />
-                        <div class="p-3">
-                          <h3 class="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-indigo-600">
-                            {item.title}
-                          </h3>
-                          <div class="mt-2 space-y-1">
-                            <p class="text-xs text-gray-500">
-                              Added: {formatDate(item.added_at)}
-                            </p>
-                            {item.rating !== null && (
-                              <p class="text-xs font-medium text-indigo-600">
-                                ⭐ {item.rating.toFixed(1)}/10
-                              </p>
-                            )}
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Desktop: Grid view */}
+                  {!isMobile && (
+                    <ContentGrid>
+                      {filterContentByTags(watchlistContent).map((item) => (
+                        <a
+                          href={`/content/${item.tmdb_id}`}
+                          key={`${item.type}-${item.tmdb_id}`}
+                          class="block group hover:scale-105 transition-transform"
+                        >
+                          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                            <img
+                              src={getPosterUrl(
+                                item.poster_path,
+                                getGridPosterSize(),
+                              )}
+                              srcSet={getPosterSrcSet(item.poster_path)}
+                              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                              alt={item.title}
+                              class="w-full aspect-[2/3] object-cover"
+                              loading="lazy"
+                              width="300"
+                              height="450"
+                            />
+                            <div class="p-3">
+                              <h3 class="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-indigo-600">
+                                {item.title}
+                              </h3>
+                              <div class="mt-2 space-y-1">
+                                <p class="text-xs text-gray-500">
+                                  Added: {formatDate(item.added_at)}
+                                </p>
+                                {item.rating !== null && (
+                                  <p class="text-xs font-medium text-indigo-600">
+                                    ⭐ {item.rating.toFixed(1)}/10
+                                  </p>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    </a>
-                  ))}
-                </ContentGrid>
+                        </a>
+                      ))}
+                    </ContentGrid>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -664,46 +819,88 @@ export default function LibraryTabs(
               )}
 
               {!loading && !error && favouritesContent.length > 0 && (
-                <ContentGrid>
-                  {filterContentByTags(favouritesContent).map((item) => (
-                    <a
-                      href={`/content/${item.tmdb_id}`}
-                      key={`${item.type}-${item.tmdb_id}`}
-                      class="block group hover:scale-105 transition-transform"
-                    >
-                      <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                        <img
-                          src={getPosterUrl(
-                            item.poster_path,
-                            getGridPosterSize(),
-                          )}
-                          srcSet={getPosterSrcSet(item.poster_path)}
-                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                          alt={item.title}
-                          class="w-full aspect-[2/3] object-cover"
-                          loading="lazy"
-                          width="300"
-                          height="450"
+                <>
+                  {/* Mobile: Swipeable list view */}
+                  {isMobile && (
+                    <div class="space-y-0">
+                      <p class="text-xs text-gray-500 mb-3 flex items-center gap-1">
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M7 16l-4-4m0 0l4-4m-4 4h18"
+                          />
+                        </svg>
+                        Swipe left for quick actions
+                      </p>
+                      {filterContentByTags(favouritesContent).map((item) => (
+                        <SwipeableListItem
+                          key={`${item.type}-${item.tmdb_id}`}
+                          tmdbId={item.tmdb_id}
+                          type={item.type}
+                          title={item.title}
+                          posterPath={item.poster_path}
+                          subtitle={`Added: ${formatDate(item.added_at)}`}
+                          rating={item.rating}
+                          href={`/content/${item.tmdb_id}`}
+                          currentTab="favourites"
+                          onAction={handleSwipeAction}
+                          onRemove={() => removeFromFavourites(item.tmdb_id)}
                         />
-                        <div class="p-3">
-                          <h3 class="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-indigo-600">
-                            {item.title}
-                          </h3>
-                          <div class="mt-2 space-y-1">
-                            <p class="text-xs text-gray-500">
-                              Added: {formatDate(item.added_at)}
-                            </p>
-                            {item.rating !== null && (
-                              <p class="text-xs font-medium text-indigo-600">
-                                ⭐ {item.rating.toFixed(1)}/10
-                              </p>
-                            )}
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Desktop: Grid view */}
+                  {!isMobile && (
+                    <ContentGrid>
+                      {filterContentByTags(favouritesContent).map((item) => (
+                        <a
+                          href={`/content/${item.tmdb_id}`}
+                          key={`${item.type}-${item.tmdb_id}`}
+                          class="block group hover:scale-105 transition-transform"
+                        >
+                          <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                            <img
+                              src={getPosterUrl(
+                                item.poster_path,
+                                getGridPosterSize(),
+                              )}
+                              srcSet={getPosterSrcSet(item.poster_path)}
+                              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                              alt={item.title}
+                              class="w-full aspect-[2/3] object-cover"
+                              loading="lazy"
+                              width="300"
+                              height="450"
+                            />
+                            <div class="p-3">
+                              <h3 class="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-indigo-600">
+                                {item.title}
+                              </h3>
+                              <div class="mt-2 space-y-1">
+                                <p class="text-xs text-gray-500">
+                                  Added: {formatDate(item.added_at)}
+                                </p>
+                                {item.rating !== null && (
+                                  <p class="text-xs font-medium text-indigo-600">
+                                    ⭐ {item.rating.toFixed(1)}/10
+                                  </p>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                    </a>
-                  ))}
-                </ContentGrid>
+                        </a>
+                      ))}
+                    </ContentGrid>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -716,6 +913,54 @@ export default function LibraryTabs(
         onClose={() => setIsCreateModalOpen(false)}
         onListCreated={handleListCreated}
       />
+
+      {/* Toast notification for swipe actions */}
+      {toast && (
+        <div
+          class={`fixed bottom-20 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded-lg shadow-lg z-50 transition-opacity duration-300 ${
+            toast.type === "success"
+              ? "bg-green-600 text-white"
+              : "bg-red-600 text-white"
+          }`}
+          role="alert"
+          aria-live="polite"
+        >
+          <div class="flex items-center gap-2">
+            {toast.type === "success"
+              ? (
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              )
+              : (
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              )}
+            <span class="text-sm font-medium">{toast.message}</span>
+          </div>
+        </div>
+      )}
     </>
   );
 }
