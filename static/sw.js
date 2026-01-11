@@ -228,7 +228,7 @@ self.addEventListener("notificationclick", (event) => {
 
   // Determine the URL to open
   let targetUrl = "/";
-  
+
   if (data.url) {
     targetUrl = data.url;
   } else if (data.contentId) {
@@ -251,14 +251,14 @@ self.addEventListener("notificationclick", (event) => {
         return client.focus();
       }
     }
-    
+
     // Check if any window is open for our origin
     for (const client of windowClients) {
       if (client.url.startsWith(self.location.origin) && "navigate" in client) {
         return client.navigate(targetUrl).then((client) => client.focus());
       }
     }
-    
+
     // Open new window if needed
     if (self.clients.openWindow) {
       return self.clients.openWindow(targetUrl);

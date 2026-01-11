@@ -70,7 +70,11 @@ export const handler: Handlers = {
         total_pages: 1,
       };
 
-      return await handleConditionalRequest(req, response, CachePresets.PUBLIC_2H);
+      return await handleConditionalRequest(
+        req,
+        response,
+        CachePresets.PUBLIC_2H,
+      );
     } catch (error) {
       return createInternalServerErrorResponse(
         "Failed to fetch new releases",

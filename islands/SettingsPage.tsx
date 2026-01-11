@@ -29,6 +29,10 @@ interface SettingsPageProps {
     recommendations: boolean;
     watchlistAvailable: boolean;
   };
+  accountInfo: {
+    requiresPassword: boolean;
+    isOAuthOnly: boolean;
+  };
 }
 
 export default function SettingsPage({
@@ -42,6 +46,7 @@ export default function SettingsPage({
   subscriptionDetails,
   userProfile,
   notificationPreferences,
+  accountInfo,
 }: SettingsPageProps) {
   const [selectedRegion, setSelectedRegion] = useState<SupportedRegion>(
     currentRegion as SupportedRegion,
@@ -79,6 +84,13 @@ export default function SettingsPage({
     notificationPreferences.watchlistAvailable,
   );
   const [notifLoading, setNotifLoading] = useState<string | null>(null);
+
+  // Account deletion state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteConfirmEmail, setDeleteConfirmEmail] = useState("");
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Fetch current region preference on mount
   useEffect(() => {

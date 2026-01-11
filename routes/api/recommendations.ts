@@ -53,7 +53,11 @@ export const handler: Handlers = {
           recommendations: cached,
           remainingRecommendations: remaining,
         };
-        return await handleConditionalRequest(req, response, CachePresets.PRIVATE_1H);
+        return await handleConditionalRequest(
+          req,
+          response,
+          CachePresets.PRIVATE_1H,
+        );
       }
 
       // Check if user has reached daily limit (for free tier users)
@@ -99,7 +103,10 @@ export const handler: Handlers = {
               `Error generating explanation for ${candidate.title}`,
               req,
               error,
-              { candidateId: candidate.tmdb_id, candidateTitle: candidate.title },
+              {
+                candidateId: candidate.tmdb_id,
+                candidateTitle: candidate.title,
+              },
             );
             // Continue without explanation if generation fails
             return candidate;

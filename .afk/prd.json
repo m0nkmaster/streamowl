@@ -1194,7 +1194,7 @@
         "Step 3: Verify navigation options to return home",
         "Step 4: Verify search functionality available"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "logging-application",
@@ -1285,7 +1285,7 @@
         "Step 3: Verify spec validates correctly",
         "Step 4: Generate API docs page from spec"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "user-settings-page",
@@ -1311,7 +1311,7 @@
         "Step 3: Select image file and upload",
         "Step 4: Verify avatar displays throughout app"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "user-notification-preferences",
@@ -1324,7 +1324,7 @@
         "Step 3: Save preferences",
         "Step 4: Verify only enabled notifications are sent"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "user-delete-account",

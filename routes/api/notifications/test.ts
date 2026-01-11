@@ -39,7 +39,8 @@ export const handler: Handlers = {
       // Prepare test notification payload
       const payload = {
         title: "Stream Owl Test Notification",
-        body: "Push notifications are working! You'll receive updates about new releases and recommendations.",
+        body:
+          "Push notifications are working! You'll receive updates about new releases and recommendations.",
         icon: "/logo.svg",
         badge: "/logo.svg",
         tag: "test-notification",

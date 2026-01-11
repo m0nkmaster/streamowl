@@ -1,0 +1,124 @@
+{
+  "started_at": "2026-01-11T17:56:21.999778",
+  "iterations": 7,
+  "tasks": {
+    "data-export": {
+      "id": "data-export",
+      "source": "json:.afk/prd.json",
+      "status": "completed",
+      "started_at": "2026-01-11T17:56:21.999781",
+      "completed_at": "2026-01-11T18:03:18.136524",
+      "failure_count": 0,
+      "commits": [
+        "62f8c1a"
+      ],
+      "message": null,
+      "learnings": [
+        "Export API endpoint at /api/settings/export supports ?format=json|csv",
+        "Premium check uses preferences.premium from user record",
+        "CSV export creates sections for profile, content, lists, and tags"
+      ]
+    },
+    "performance-lighthouse-score": {
+      "id": "performance-lighthouse-score",
+      "source": "json:.afk/prd.json",
+      "status": "completed",
+      "started_at": "2026-01-11T18:03:19.144245",
+      "completed_at": "2026-01-11T18:19:52.599809",
+      "failure_count": 0,
+      "commits": [
+        "29e1d4f"
+      ],
+      "message": null,
+      "learnings": [
+        "Add preconnect/dns-prefetch hints for external domains (image.tmdb.org, themoviedb.org, youtube.com, esm.sh) in _app.tsx",
+        "All images need explicit width and height attributes to prevent CLS - poster images are 300x450, profile images 185x278, backdrop 1280x720",
+        "fetchpriority attribute is not yet typed in Preact's HTMLAttributes, use loading='eager' for above-the-fold images instead",
+        "Service worker already configured for cache-first strategy on static assets"
+      ]
+    },
+    "error-handling-404-page": {
+      "id": "error-handling-404-page",
+      "source": "json:.afk/prd.json",
+      "status": "completed",
+      "started_at": "2026-01-11T18:19:53.606449",
+      "completed_at": "2026-01-11T18:24:40.459194",
+      "failure_count": 0,
+      "commits": [
+        "b7bf63d"
+      ],
+      "message": null,
+      "learnings": [
+        "Fresh _404.tsx route handles 404 responses - must regenerate manifest with deno task manifest",
+        "Fresh wraps 404 page with _app.tsx layout automatically including navigation and footer",
+        "Search form uses action='/search' method='GET' to leverage existing search page functionality",
+        "Playwright browser navigation fails on 404 status - use page.evaluate with fetch for testing"
+      ]
+    },
+    "documentation-api": {
+      "id": "documentation-api",
+      "source": "json:.afk/prd.json",
+      "status": "completed",
+      "started_at": "2026-01-11T18:24:41.467270",
+      "completed_at": "2026-01-11T18:33:23.178656",
+      "failure_count": 0,
+      "commits": [
+        "a9f8169"
+      ],
+      "message": null,
+      "learnings": [
+        "OpenAPI 3.0 spec in static/openapi.yaml - validated with swagger-cli",
+        "API docs page at /api-docs uses Swagger UI from unpkg CDN",
+        "Fresh task is 'start' not 'dev' for running the server",
+        "Swagger UI supports dark mode with custom CSS media queries"
+      ]
+    },
+    "user-avatar-upload": {
+      "id": "user-avatar-upload",
+      "source": "json:.afk/prd.json",
+      "status": "completed",
+      "started_at": "2026-01-11T18:33:24.182398",
+      "completed_at": "2026-01-11T18:39:35.562257",
+      "failure_count": 0,
+      "commits": [
+        "921c5e0"
+      ],
+      "message": null,
+      "learnings": [
+        "Avatar upload API at /api/settings/avatar accepts multipart/form-data POST for upload and DELETE for removal",
+        "Store avatar as base64 data URL in avatar_url column - works with Deno Deploy without external storage",
+        "Max file size 2MB, allowed types: JPEG, PNG, GIF, WebP",
+        "SettingsPage island uses file input with hidden sr-only class, label triggers upload on click"
+      ]
+    },
+    "user-notification-preferences": {
+      "id": "user-notification-preferences",
+      "source": "json:.afk/prd.json",
+      "status": "completed",
+      "started_at": "2026-01-11T18:39:36.569699",
+      "completed_at": "2026-01-11T18:45:47.812867",
+      "failure_count": 0,
+      "commits": [
+        "ca8badb"
+      ],
+      "message": null,
+      "learnings": [
+        "Notification preferences API at /api/settings/notifications supports GET for fetching and POST for updating",
+        "Preferences stored in users.preferences JSONB column with keys: notification_new_releases, notification_recommendations, notification_watchlist_available",
+        "All notification types default to true (enabled) if not explicitly set to false",
+        "Toggle switches use optimistic updates with rollback on API failure"
+      ]
+    },
+    "user-delete-account": {
+      "id": "user-delete-account",
+      "source": "json:.afk/prd.json",
+      "status": "in_progress",
+      "started_at": "2026-01-11T18:45:48.821127",
+      "completed_at": null,
+      "failure_count": 0,
+      "commits": [],
+      "message": null,
+      "learnings": []
+    }
+  }
+}

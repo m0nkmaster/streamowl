@@ -64,7 +64,11 @@ export const handler: Handlers = {
         })),
       };
 
-      return await handleConditionalRequest(req, response, CachePresets.PRIVATE_5M);
+      return await handleConditionalRequest(
+        req,
+        response,
+        CachePresets.PRIVATE_5M,
+      );
     } catch (error) {
       console.error("Error fetching watched content:", error);
       return new Response(

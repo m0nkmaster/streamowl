@@ -93,7 +93,7 @@ function formatLogEntry(entry: LogEntry): string {
  */
 function writeLog(entry: LogEntry): void {
   const jsonLog = formatLogEntry(entry);
-  
+
   // Use appropriate console method based on level
   switch (entry.level) {
     case LogLevel.DEBUG:
@@ -168,7 +168,13 @@ export async function logDebug(
   req?: Request,
   metadata?: Record<string, unknown>,
 ): Promise<void> {
-  const entry = await createLogEntry(LogLevel.DEBUG, message, req, undefined, metadata);
+  const entry = await createLogEntry(
+    LogLevel.DEBUG,
+    message,
+    req,
+    undefined,
+    metadata,
+  );
   writeLog(entry);
 }
 
@@ -180,7 +186,13 @@ export async function logInfo(
   req?: Request,
   metadata?: Record<string, unknown>,
 ): Promise<void> {
-  const entry = await createLogEntry(LogLevel.INFO, message, req, undefined, metadata);
+  const entry = await createLogEntry(
+    LogLevel.INFO,
+    message,
+    req,
+    undefined,
+    metadata,
+  );
   writeLog(entry);
 }
 
@@ -193,7 +205,13 @@ export async function logWarn(
   error?: Error | unknown,
   metadata?: Record<string, unknown>,
 ): Promise<void> {
-  const entry = await createLogEntry(LogLevel.WARN, message, req, error, metadata);
+  const entry = await createLogEntry(
+    LogLevel.WARN,
+    message,
+    req,
+    error,
+    metadata,
+  );
   writeLog(entry);
 }
 
@@ -206,7 +224,13 @@ export async function logError(
   error?: Error | unknown,
   metadata?: Record<string, unknown>,
 ): Promise<void> {
-  const entry = await createLogEntry(LogLevel.ERROR, message, req, error, metadata);
+  const entry = await createLogEntry(
+    LogLevel.ERROR,
+    message,
+    req,
+    error,
+    metadata,
+  );
   writeLog(entry);
 }
 

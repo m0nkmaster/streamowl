@@ -9,7 +9,12 @@
  * 3. Logs are JSON formatted
  */
 
-import { logError, logInfo, logWarn, extractRequestContext } from "../lib/logging/logger.ts";
+import {
+  extractRequestContext,
+  logError,
+  logInfo,
+  logWarn,
+} from "../lib/logging/logger.ts";
 
 // Capture console output
 const logs: string[] = [];
@@ -38,16 +43,17 @@ async function testLogging() {
   // Test 1: Log error with stack trace
   console.log("Test 1: Logging error with stack trace");
   const testError = new Error("Test error message");
-  testError.stack = "Error: Test error message\n    at testLogging (test-logging.ts:50)";
-  
+  testError.stack =
+    "Error: Test error message\n    at testLogging (test-logging.ts:50)";
+
   await logError("Test error occurred", undefined, testError);
-  
-  const errorLog = logs.find(log => log.includes("ERROR:"));
+
+  const errorLog = logs.find((log) => log.includes("ERROR:"));
   if (!errorLog) {
     console.error("❌ FAIL: Error log not found");
     return false;
   }
-  
+
   try {
     const logEntry = JSON.parse(errorLog.replace("ERROR: ", ""));
     if (!logEntry.error || !logEntry.error.stack) {
@@ -73,8 +79,8 @@ async function testLogging() {
   });
 
   await logInfo("Test info message", testRequest);
-  
-  const infoLog = logs.find(log => log.includes("INFO:"));
+
+  const infoLog = logs.find((log) => log.includes("INFO:"));
   if (!infoLog) {
     console.error("❌ FAIL: Info log not found");
     return false;
@@ -82,7 +88,9 @@ async function testLogging() {
 
   try {
     const logEntry = JSON.parse(infoLog.replace("INFO: ", ""));
-    if (!logEntry.context || !logEntry.context.method || !logEntry.context.url) {
+    if (
+      !logEntry.context || !logEntry.context.method || !logEntry.context.url
+    ) {
       console.error("❌ FAIL: Log missing request context");
       console.error("Log entry:", JSON.stringify(logEntry, null, 2));
       return false;
@@ -105,8 +113,8 @@ async function testLogging() {
   // Test 3: Verify JSON format
   console.log("\nTest 3: Verifying JSON format");
   await logWarn("Test warning", undefined, new Error("Warning error"));
-  
-  const warnLog = logs.find(log => log.includes("WARN:"));
+
+  const warnLog = logs.find((log) => log.includes("WARN:"));
   if (!warnLog) {
     console.error("❌ FAIL: Warn log not found");
     return false;
@@ -153,7 +161,7 @@ testLogging()
     console.error = originalError;
     console.info = originalInfo;
     console.warn = originalWarn;
-    
+
     Deno.exit(success ? 0 : 1);
   })
   .catch((error) => {

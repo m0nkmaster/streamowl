@@ -41,7 +41,11 @@ export const handler: Handlers = {
       if (content.length === 0) {
         // Content not in database yet, return null status
         const response = { status: null };
-        return await handleConditionalRequest(req, response, CachePresets.PRIVATE_5M);
+        return await handleConditionalRequest(
+          req,
+          response,
+          CachePresets.PRIVATE_5M,
+        );
       }
 
       const contentId = content[0].id;
@@ -58,7 +62,11 @@ export const handler: Handlers = {
 
       if (userContent.length === 0) {
         const response = { status: null, rating: null };
-        return await handleConditionalRequest(req, response, CachePresets.PRIVATE_5M);
+        return await handleConditionalRequest(
+          req,
+          response,
+          CachePresets.PRIVATE_5M,
+        );
       }
 
       const response = {

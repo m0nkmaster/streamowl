@@ -53,7 +53,11 @@ export const handler: Handlers = {
         total_pages: trendingResults.total_pages,
       };
 
-      return await handleConditionalRequest(req, response, CachePresets.PUBLIC_1H);
+      return await handleConditionalRequest(
+        req,
+        response,
+        CachePresets.PUBLIC_1H,
+      );
     } catch (error) {
       return createInternalServerErrorResponse(
         "Failed to fetch trending content",

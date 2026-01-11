@@ -12,14 +12,14 @@
  * @returns ETag string (e.g., "W/\"abc123\"")
  */
 export async function generateETag(data: unknown): Promise<string> {
-  const dataString = typeof data === "string"
-    ? data
-    : JSON.stringify(data);
+  const dataString = typeof data === "string" ? data : JSON.stringify(data);
   const encoder = new TextEncoder();
   const dataBuffer = encoder.encode(dataString);
   const hashBuffer = await crypto.subtle.digest("SHA-256", dataBuffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join(
+    "",
+  );
   // Use weak ETag (W/) since content may vary slightly but be semantically equivalent
   return `W/"${hashHex.substring(0, 16)}"`;
 }

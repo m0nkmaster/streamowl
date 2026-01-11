@@ -117,7 +117,10 @@ export const handler: Handlers = {
       // Send email verification
       const baseUrl = new URL(req.url).origin;
       const verificationToken = await createEmailVerificationToken(newUser.id);
-      const verificationUrl = generateVerificationUrl(baseUrl, verificationToken);
+      const verificationUrl = generateVerificationUrl(
+        baseUrl,
+        verificationToken,
+      );
       sendVerificationEmail(newUser.email, verificationUrl);
 
       // Set session cookie and redirect to dashboard

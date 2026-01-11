@@ -28,7 +28,9 @@ async function main() {
     console.log(`VAPID_SUBJECT=mailto:your-email@example.com`);
     console.log("\n" + "=".repeat(60));
     console.log("\nNote: Keep your private key secret!");
-    console.log("The public key is shared with browsers for push subscriptions.");
+    console.log(
+      "The public key is shared with browsers for push subscriptions.",
+    );
   } catch (error) {
     console.error("Failed to generate VAPID keys:", error);
     Deno.exit(1);

@@ -39,7 +39,11 @@ export const handler: Handlers = {
       );
 
       const response = { tags };
-      return await handleConditionalRequest(req, response, CachePresets.PRIVATE_5M);
+      return await handleConditionalRequest(
+        req,
+        response,
+        CachePresets.PRIVATE_5M,
+      );
     } catch (error) {
       return createInternalServerErrorResponse(
         "Failed to fetch tags",

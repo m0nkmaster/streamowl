@@ -36,11 +36,14 @@ export default function NotificationPrompt({
     }
 
     // Check if user has dismissed the prompt before
-    const dismissedBefore = localStorage.getItem("notification-prompt-dismissed");
+    const dismissedBefore = localStorage.getItem(
+      "notification-prompt-dismissed",
+    );
     if (dismissedBefore) {
       // Check if it's been more than 7 days since dismissal
       const dismissedAt = parseInt(dismissedBefore, 10);
-      const daysSinceDismissal = (Date.now() - dismissedAt) / (1000 * 60 * 60 * 24);
+      const daysSinceDismissal = (Date.now() - dismissedAt) /
+        (1000 * 60 * 60 * 24);
       if (daysSinceDismissal < 7) {
         return;
       }
@@ -145,7 +148,10 @@ export default function NotificationPrompt({
    */
   const handleDismiss = () => {
     setDismissed(true);
-    localStorage.setItem("notification-prompt-dismissed", Date.now().toString());
+    localStorage.setItem(
+      "notification-prompt-dismissed",
+      Date.now().toString(),
+    );
     // Fade out animation then hide
     setTimeout(() => {
       setShowPrompt(false);

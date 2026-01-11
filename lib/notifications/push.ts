@@ -194,7 +194,9 @@ async function createVapidJwt(
 async function encryptPayload(
   payload: Uint8Array,
   subscription: PushSubscription,
-): Promise<{ ciphertext: Uint8Array; salt: Uint8Array; serverPublicKey: Uint8Array }> {
+): Promise<
+  { ciphertext: Uint8Array; salt: Uint8Array; serverPublicKey: Uint8Array }
+> {
   // Generate a new ECDH key pair for this message
   const serverKeyPair = await crypto.subtle.generateKey(
     { name: "ECDH", namedCurve: "P-256" },
@@ -384,7 +386,10 @@ export async function generateVapidKeys(): Promise<{
   const publicKey = uint8ArrayToBase64url(new Uint8Array(publicKeyBuffer));
 
   // Export private key
-  const privateKeyJwk = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
+  const privateKeyJwk = await crypto.subtle.exportKey(
+    "jwk",
+    keyPair.privateKey,
+  );
   const privateKey = privateKeyJwk.d || "";
 
   return { publicKey, privateKey };
