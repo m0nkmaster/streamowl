@@ -3,20 +3,20 @@ info:
   title: Stream Owl API
   description: |
     API for Stream Owl - a movie and TV show discovery and tracking platform.
-    
+
     ## Authentication
-    
-    Most endpoints require authentication via session cookies. Session tokens are set 
-    automatically after successful login or signup. CSRF tokens are required for 
+
+    Most endpoints require authentication via session cookies. Session tokens are set
+    automatically after successful login or signup. CSRF tokens are required for
     state-changing operations (POST, PUT, PATCH, DELETE) on form-based endpoints.
-    
+
     ## Rate Limiting
-    
+
     Authentication endpoints are rate-limited to prevent brute force attacks.
     Free tier users are limited to 3 AI recommendations per day.
-    
+
     ## Data Attribution
-    
+
     Content data is provided by [TMDB](https://www.themoviedb.org/).
   version: 1.0.0
   contact:
@@ -54,7 +54,7 @@ paths:
       tags: [Authentication]
       summary: Create a new user account
       description: |
-        Register a new user with email and password. 
+        Register a new user with email and password.
         Sends verification email and creates session.
       requestBody:
         required: true
@@ -77,7 +77,7 @@ paths:
                   type: string
                   description: CSRF token from form
       responses:
-        '303':
+        "303":
           description: Redirect to dashboard on success
           headers:
             Location:
@@ -88,16 +88,16 @@ paths:
               schema:
                 type: string
                 description: Session cookie
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '409':
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
           description: Email already registered
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
+                $ref: "#/components/schemas/Error"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /login:
     post:
@@ -124,7 +124,7 @@ paths:
                 csrf_token:
                   type: string
       responses:
-        '303':
+        "303":
           description: Redirect to dashboard or returnTo URL
           headers:
             Location:
@@ -133,12 +133,12 @@ paths:
             Set-Cookie:
               schema:
                 type: string
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
 
   /logout:
     get:
@@ -146,7 +146,7 @@ paths:
       summary: Log out (GET)
       description: Clear session and redirect to homepage.
       responses:
-        '302':
+        "302":
           description: Redirect to homepage
     post:
       tags: [Authentication]
@@ -161,7 +161,7 @@ paths:
                 csrf_token:
                   type: string
       responses:
-        '302':
+        "302":
           description: Redirect to homepage
 
   /forgot-password:
@@ -169,7 +169,7 @@ paths:
       tags: [Authentication]
       summary: Request password reset
       description: |
-        Send a password reset email to the user. 
+        Send a password reset email to the user.
         Always returns success to prevent user enumeration.
       requestBody:
         required: true
@@ -185,7 +185,7 @@ paths:
                 csrf_token:
                   type: string
       responses:
-        '303':
+        "303":
           description: Redirect to success page
 
   /reset-password:
@@ -214,7 +214,7 @@ paths:
                 csrf_token:
                   type: string
       responses:
-        '303':
+        "303":
           description: Redirect to login on success
 
   /search:
@@ -222,7 +222,7 @@ paths:
       tags: [Search]
       summary: Search movies and TV shows
       description: |
-        Search for content across movies and TV shows. 
+        Search for content across movies and TV shows.
         Results are combined and sorted by relevance.
       parameters:
         - name: q
@@ -239,14 +239,14 @@ paths:
             default: 1
           description: Page number for pagination
       responses:
-        '200':
+        "200":
           description: Search results
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SearchResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+                $ref: "#/components/schemas/SearchResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
 
   /trending:
     get:
@@ -268,12 +268,12 @@ paths:
             minimum: 1
             default: 1
       responses:
-        '200':
+        "200":
           description: Trending content
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ContentListResponse'
+                $ref: "#/components/schemas/ContentListResponse"
 
   /new-releases:
     get:
@@ -288,12 +288,12 @@ paths:
             minimum: 1
             default: 1
       responses:
-        '200':
+        "200":
           description: New release content
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ContentListResponse'
+                $ref: "#/components/schemas/ContentListResponse"
 
   /leaving-soon:
     get:
@@ -316,12 +316,12 @@ paths:
             default: 30
           description: Number of days to look ahead
       responses:
-        '200':
+        "200":
           description: Leaving soon content
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LeavingSoonResponse'
+                $ref: "#/components/schemas/LeavingSoonResponse"
 
   /content/{tmdb_id}/status:
     get:
@@ -331,9 +331,9 @@ paths:
       security:
         - sessionCookie: []
       parameters:
-        - $ref: '#/components/parameters/TmdbId'
+        - $ref: "#/components/parameters/TmdbId"
       responses:
-        '200':
+        "200":
           description: Content status
           content:
             application/json:
@@ -353,8 +353,8 @@ paths:
                     minimum: 0
                     maximum: 10
                     nullable: true
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /content/{tmdb_id}/watchlist:
     post:
@@ -364,18 +364,18 @@ paths:
       security:
         - sessionCookie: []
       parameters:
-        - $ref: '#/components/parameters/TmdbId'
+        - $ref: "#/components/parameters/TmdbId"
       responses:
-        '200':
+        "200":
           description: Added to watchlist
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
     delete:
       tags: [Content]
       summary: Remove from watchlist
@@ -383,16 +383,16 @@ paths:
       security:
         - sessionCookie: []
       parameters:
-        - $ref: '#/components/parameters/TmdbId'
+        - $ref: "#/components/parameters/TmdbId"
       responses:
-        '200':
+        "200":
           description: Removed from watchlist
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /content/{tmdb_id}/watched:
     post:
@@ -402,16 +402,16 @@ paths:
       security:
         - sessionCookie: []
       parameters:
-        - $ref: '#/components/parameters/TmdbId'
+        - $ref: "#/components/parameters/TmdbId"
       responses:
-        '200':
+        "200":
           description: Marked as watched
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
     delete:
       tags: [Content]
       summary: Remove watched status
@@ -419,14 +419,14 @@ paths:
       security:
         - sessionCookie: []
       parameters:
-        - $ref: '#/components/parameters/TmdbId'
+        - $ref: "#/components/parameters/TmdbId"
       responses:
-        '200':
+        "200":
           description: Removed from watched
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: "#/components/schemas/SuccessResponse"
 
   /content/{tmdb_id}/favourite:
     post:
@@ -436,16 +436,16 @@ paths:
       security:
         - sessionCookie: []
       parameters:
-        - $ref: '#/components/parameters/TmdbId'
+        - $ref: "#/components/parameters/TmdbId"
       responses:
-        '200':
+        "200":
           description: Added to favourites
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
     delete:
       tags: [Content]
       summary: Remove from favourites
@@ -453,14 +453,14 @@ paths:
       security:
         - sessionCookie: []
       parameters:
-        - $ref: '#/components/parameters/TmdbId'
+        - $ref: "#/components/parameters/TmdbId"
       responses:
-        '200':
+        "200":
           description: Removed from favourites
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: "#/components/schemas/SuccessResponse"
 
   /content/{tmdb_id}/rating:
     post:
@@ -470,7 +470,7 @@ paths:
       security:
         - sessionCookie: []
       parameters:
-        - $ref: '#/components/parameters/TmdbId'
+        - $ref: "#/components/parameters/TmdbId"
       requestBody:
         required: true
         content:
@@ -485,7 +485,7 @@ paths:
                   maximum: 10
                   description: Rating value (rounded to 0.5)
       responses:
-        '200':
+        "200":
           description: Rating set
           content:
             application/json:
@@ -496,8 +496,8 @@ paths:
                     type: boolean
                   rating:
                     type: number
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
     delete:
       tags: [Content]
       summary: Remove rating
@@ -505,14 +505,14 @@ paths:
       security:
         - sessionCookie: []
       parameters:
-        - $ref: '#/components/parameters/TmdbId'
+        - $ref: "#/components/parameters/TmdbId"
       responses:
-        '200':
+        "200":
           description: Rating removed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: "#/components/schemas/SuccessResponse"
 
   /content/{tmdb_id}/notes:
     post:
@@ -522,7 +522,7 @@ paths:
       security:
         - sessionCookie: []
       parameters:
-        - $ref: '#/components/parameters/TmdbId'
+        - $ref: "#/components/parameters/TmdbId"
       requestBody:
         required: true
         content:
@@ -535,14 +535,14 @@ paths:
                   type: string
                   maxLength: 10000
       responses:
-        '200':
+        "200":
           description: Notes saved
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /content/{tmdb_id}/tags:
     get:
@@ -552,9 +552,9 @@ paths:
       security:
         - sessionCookie: []
       parameters:
-        - $ref: '#/components/parameters/TmdbId'
+        - $ref: "#/components/parameters/TmdbId"
       responses:
-        '200':
+        "200":
           description: Content tags
           content:
             application/json:
@@ -564,7 +564,7 @@ paths:
                   tags:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Tag'
+                      $ref: "#/components/schemas/Tag"
     post:
       tags: [Content]
       summary: Add tag to content
@@ -572,7 +572,7 @@ paths:
       security:
         - sessionCookie: []
       parameters:
-        - $ref: '#/components/parameters/TmdbId'
+        - $ref: "#/components/parameters/TmdbId"
       requestBody:
         required: true
         content:
@@ -585,12 +585,12 @@ paths:
                   type: string
                   format: uuid
       responses:
-        '200':
+        "200":
           description: Tag applied
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: "#/components/schemas/SuccessResponse"
 
   /content/{tmdb_id}/tags/{tag_id}:
     delete:
@@ -600,7 +600,7 @@ paths:
       security:
         - sessionCookie: []
       parameters:
-        - $ref: '#/components/parameters/TmdbId'
+        - $ref: "#/components/parameters/TmdbId"
         - name: tag_id
           in: path
           required: true
@@ -608,12 +608,12 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Tag removed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: "#/components/schemas/SuccessResponse"
 
   /library/watchlist:
     get:
@@ -623,14 +623,14 @@ paths:
       security:
         - sessionCookie: []
       responses:
-        '200':
+        "200":
           description: Watchlist content
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LibraryResponse'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
+                $ref: "#/components/schemas/LibraryResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /library/watched:
     get:
@@ -640,12 +640,12 @@ paths:
       security:
         - sessionCookie: []
       responses:
-        '200':
+        "200":
           description: Watched content
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LibraryResponse'
+                $ref: "#/components/schemas/LibraryResponse"
 
   /library/favourites:
     get:
@@ -655,12 +655,12 @@ paths:
       security:
         - sessionCookie: []
       responses:
-        '200':
+        "200":
           description: Favourite content
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LibraryResponse'
+                $ref: "#/components/schemas/LibraryResponse"
 
   /library/lists:
     get:
@@ -670,7 +670,7 @@ paths:
       security:
         - sessionCookie: []
       responses:
-        '200':
+        "200":
           description: User's lists
           content:
             application/json:
@@ -680,14 +680,14 @@ paths:
                   lists:
                     type: array
                     items:
-                      $ref: '#/components/schemas/List'
+                      $ref: "#/components/schemas/List"
 
   /lists:
     post:
       tags: [Lists]
       summary: Create a custom list
       description: |
-        Create a new custom list. 
+        Create a new custom list.
         Free tier users are limited to 3 lists.
       security:
         - sessionCookie: []
@@ -705,7 +705,7 @@ paths:
                 description:
                   type: string
       responses:
-        '201':
+        "201":
           description: List created
           content:
             application/json:
@@ -713,13 +713,13 @@ paths:
                 type: object
                 properties:
                   list:
-                    $ref: '#/components/schemas/List'
-        '403':
+                    $ref: "#/components/schemas/List"
+        "403":
           description: List limit reached (free tier)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /lists/{list_id}:
     patch:
@@ -745,7 +745,7 @@ paths:
                 is_public:
                   type: boolean
       responses:
-        '200':
+        "200":
           description: List updated
           content:
             application/json:
@@ -753,11 +753,11 @@ paths:
                 type: object
                 properties:
                   list:
-                    $ref: '#/components/schemas/List'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                    $ref: "#/components/schemas/List"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /lists/{list_id}/items:
     post:
@@ -787,12 +787,12 @@ paths:
                   type: integer
                   description: Position in list (optional)
       responses:
-        '200':
+        "200":
           description: Item added
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: "#/components/schemas/SuccessResponse"
 
   /tags:
     get:
@@ -802,7 +802,7 @@ paths:
       security:
         - sessionCookie: []
       responses:
-        '200':
+        "200":
           description: User's tags
           content:
             application/json:
@@ -812,7 +812,7 @@ paths:
                   tags:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Tag'
+                      $ref: "#/components/schemas/Tag"
     post:
       tags: [Tags]
       summary: Create a tag
@@ -832,11 +832,11 @@ paths:
                   maxLength: 255
                 colour:
                   type: string
-                  pattern: '^#[0-9A-Fa-f]{6}$'
-                  default: '#3B82F6'
+                  pattern: "^#[0-9A-Fa-f]{6}$"
+                  default: "#3B82F6"
                   description: Hex colour code
       responses:
-        '200':
+        "200":
           description: Tag created or updated
           content:
             application/json:
@@ -844,7 +844,7 @@ paths:
                 type: object
                 properties:
                   tag:
-                    $ref: '#/components/schemas/Tag'
+                    $ref: "#/components/schemas/Tag"
 
   /recommendations:
     get:
@@ -856,18 +856,18 @@ paths:
       security:
         - sessionCookie: []
       responses:
-        '200':
+        "200":
           description: Recommendations
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RecommendationsResponse'
-        '403':
+                $ref: "#/components/schemas/RecommendationsResponse"
+        "403":
           description: Daily limit reached
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RecommendationsResponse'
+                $ref: "#/components/schemas/RecommendationsResponse"
 
   /recommendations/{tmdb_id}/dismiss:
     post:
@@ -877,14 +877,14 @@ paths:
       security:
         - sessionCookie: []
       parameters:
-        - $ref: '#/components/parameters/TmdbId'
+        - $ref: "#/components/parameters/TmdbId"
       responses:
-        '200':
+        "200":
           description: Recommendation dismissed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SuccessResponse'
+                $ref: "#/components/schemas/SuccessResponse"
 
   /recommendations/mood:
     post:
@@ -905,12 +905,12 @@ paths:
                   type: string
                   description: Description of mood or context
       responses:
-        '200':
+        "200":
           description: Mood-based recommendations
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RecommendationsResponse'
+                $ref: "#/components/schemas/RecommendationsResponse"
 
   /recommendations/chat:
     post:
@@ -932,7 +932,7 @@ paths:
                 message:
                   type: string
       responses:
-        '200':
+        "200":
           description: AI response
           content:
             application/json:
@@ -944,7 +944,7 @@ paths:
                   recommendations:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Recommendation'
+                      $ref: "#/components/schemas/Recommendation"
 
   /settings/profile:
     get:
@@ -954,12 +954,12 @@ paths:
       security:
         - sessionCookie: []
       responses:
-        '200':
+        "200":
           description: User profile
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserProfile'
+                $ref: "#/components/schemas/UserProfile"
     post:
       tags: [Settings]
       summary: Update profile
@@ -978,7 +978,7 @@ paths:
                   maxLength: 255
                   nullable: true
       responses:
-        '200':
+        "200":
           description: Profile updated
           content:
             application/json:
@@ -1004,7 +1004,7 @@ paths:
       security:
         - sessionCookie: []
       responses:
-        '200':
+        "200":
           description: Region preference
           content:
             application/json:
@@ -1033,7 +1033,7 @@ paths:
                   type: string
                   enum: [US, GB, CA, AU, DE, FR]
       responses:
-        '200':
+        "200":
           description: Region updated
           content:
             application/json:
@@ -1044,6 +1044,74 @@ paths:
                     type: boolean
                   region:
                     type: string
+
+  /settings/notifications:
+    get:
+      tags: [Settings]
+      summary: Get notification preferences
+      description: Fetch user's notification preferences.
+      security:
+        - sessionCookie: []
+      responses:
+        "200":
+          description: Notification preferences
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notifications_enabled:
+                    type: boolean
+                    description: Whether push notifications are enabled
+                  notification_new_releases:
+                    type: boolean
+                    description: Receive notifications for new releases
+                  notification_recommendations:
+                    type: boolean
+                    description: Receive notifications for recommendations
+                  notification_watchlist_available:
+                    type: boolean
+                    description: Receive notifications when watchlist items become available
+    post:
+      tags: [Settings]
+      summary: Update notification preferences
+      description: Update user's notification preferences.
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notificationNewReleases:
+                  type: boolean
+                  description: Receive notifications for new releases
+                notificationRecommendations:
+                  type: boolean
+                  description: Receive notifications for recommendations
+                notificationWatchlistAvailable:
+                  type: boolean
+                  description: Receive notifications when watchlist items become available
+      responses:
+        "200":
+          description: Notification preferences updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  notifications_enabled:
+                    type: boolean
+                  notification_new_releases:
+                    type: boolean
+                  notification_recommendations:
+                    type: boolean
+                  notification_watchlist_available:
+                    type: boolean
 
   /settings/export:
     get:
@@ -1061,21 +1129,21 @@ paths:
             enum: [json, csv]
             default: json
       responses:
-        '200':
+        "200":
           description: Exported data
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ExportData'
+                $ref: "#/components/schemas/ExportData"
             text/csv:
               schema:
                 type: string
-        '403':
+        "403":
           description: Premium required
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: "#/components/schemas/Error"
 
   /user/premium:
     get:
@@ -1085,7 +1153,7 @@ paths:
       security:
         - sessionCookie: []
       responses:
-        '200':
+        "200":
           description: Premium status
           content:
             application/json:
@@ -1103,7 +1171,7 @@ paths:
       security:
         - sessionCookie: []
       responses:
-        '200':
+        "200":
           description: Checkout URL
           content:
             application/json:
@@ -1122,7 +1190,7 @@ paths:
       security:
         - sessionCookie: []
       responses:
-        '200':
+        "200":
           description: Portal URL
           content:
             application/json:
@@ -1224,7 +1292,7 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/Content'
+            $ref: "#/components/schemas/Content"
         total_results:
           type: integer
         page:
@@ -1238,7 +1306,7 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/Content'
+            $ref: "#/components/schemas/Content"
         total_results:
           type: integer
         page:
@@ -1253,7 +1321,7 @@ components:
           type: array
           items:
             allOf:
-              - $ref: '#/components/schemas/Content'
+              - $ref: "#/components/schemas/Content"
               - type: object
                 properties:
                   available_until:
@@ -1318,7 +1386,7 @@ components:
         content:
           type: array
           items:
-            $ref: '#/components/schemas/LibraryContent'
+            $ref: "#/components/schemas/LibraryContent"
 
     List:
       type: object
@@ -1350,7 +1418,7 @@ components:
           type: string
         colour:
           type: string
-          pattern: '^#[0-9A-Fa-f]{6}$'
+          pattern: "^#[0-9A-Fa-f]{6}$"
         created_at:
           type: string
           format: date-time
@@ -1386,7 +1454,7 @@ components:
         recommendations:
           type: array
           items:
-            $ref: '#/components/schemas/Recommendation'
+            $ref: "#/components/schemas/Recommendation"
         rateLimitReached:
           type: boolean
         remainingRecommendations:
@@ -1469,28 +1537,28 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
 
     Unauthorized:
       description: Authentication required
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
 
     Forbidden:
       description: Access denied
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
 
     NotFound:
       description: Resource not found
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: "#/components/schemas/Error"
 
     TooManyRequests:
       description: Rate limit exceeded
@@ -1498,7 +1566,7 @@ components:
         application/json:
           schema:
             allOf:
-              - $ref: '#/components/schemas/Error'
+              - $ref: "#/components/schemas/Error"
               - type: object
                 properties:
                   rateLimitExceeded:

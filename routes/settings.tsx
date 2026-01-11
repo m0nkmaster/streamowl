@@ -22,6 +22,12 @@ interface SettingsPageProps {
     displayName: string | null;
     avatarUrl: string | null;
   };
+  notificationPreferences: {
+    notificationsEnabled: boolean;
+    newReleases: boolean;
+    recommendations: boolean;
+    watchlistAvailable: boolean;
+  };
 }
 
 /**
@@ -73,6 +79,15 @@ export const handler: Handlers<SettingsPageProps> = {
     const publicProfileEnabled = preferences.public_profile_enabled === true;
     const isPremium = preferences.premium === true;
 
+    // Extract notification preferences with defaults (enabled by default)
+    const notificationPreferences = {
+      notificationsEnabled: preferences.notifications_enabled === true,
+      newReleases: preferences.notification_new_releases !== false,
+      recommendations: preferences.notification_recommendations !== false,
+      watchlistAvailable:
+        preferences.notification_watchlist_available !== false,
+    };
+
     // Get subscription details if user has premium
     let subscriptionDetails = null;
     if (isPremium) {
@@ -101,6 +116,7 @@ export const handler: Handlers<SettingsPageProps> = {
       isPremium,
       subscriptionDetails,
       userProfile,
+      notificationPreferences,
     });
   },
 };

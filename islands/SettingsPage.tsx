@@ -23,6 +23,12 @@ interface SettingsPageProps {
     displayName: string | null;
     avatarUrl: string | null;
   };
+  notificationPreferences: {
+    notificationsEnabled: boolean;
+    newReleases: boolean;
+    recommendations: boolean;
+    watchlistAvailable: boolean;
+  };
 }
 
 export default function SettingsPage({
@@ -35,6 +41,7 @@ export default function SettingsPage({
   isPremium,
   subscriptionDetails,
   userProfile,
+  notificationPreferences,
 }: SettingsPageProps) {
   const [selectedRegion, setSelectedRegion] = useState<SupportedRegion>(
     currentRegion as SupportedRegion,
@@ -60,6 +67,18 @@ export default function SettingsPage({
   // Data export state
   const [exportLoading, setExportLoading] = useState(false);
   const [exportFormat, setExportFormat] = useState<"json" | "csv">("json");
+
+  // Notification preferences state
+  const [notifNewReleases, setNotifNewReleases] = useState(
+    notificationPreferences.newReleases,
+  );
+  const [notifRecommendations, setNotifRecommendations] = useState(
+    notificationPreferences.recommendations,
+  );
+  const [notifWatchlistAvailable, setNotifWatchlistAvailable] = useState(
+    notificationPreferences.watchlistAvailable,
+  );
+  const [notifLoading, setNotifLoading] = useState<string | null>(null);
 
   // Fetch current region preference on mount
   useEffect(() => {
@@ -320,6 +339,66 @@ export default function SettingsPage({
       setTimeout(() => setError(null), 5000);
     } finally {
       setExportLoading(false);
+    }
+  };
+
+  const handleNotificationPreferenceChange = async (
+    preference: "newReleases" | "recommendations" | "watchlistAvailable",
+    enabled: boolean,
+  ) => {
+    setNotifLoading(preference);
+    setError(null);
+
+    // Optimistically update state
+    const prevValue = preference === "newReleases"
+      ? notifNewReleases
+      : preference === "recommendations"
+      ? notifRecommendations
+      : notifWatchlistAvailable;
+
+    if (preference === "newReleases") setNotifNewReleases(enabled);
+    else if (preference === "recommendations") setNotifRecommendations(enabled);
+    else setNotifWatchlistAvailable(enabled);
+
+    try {
+      const body: Record<string, boolean> = {};
+      if (preference === "newReleases") body.notificationNewReleases = enabled;
+      else if (preference === "recommendations") {
+        body.notificationRecommendations = enabled;
+      } else body.notificationWatchlistAvailable = enabled;
+
+      const response = await fetch("/api/settings/notifications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(
+          data.message || "Failed to update notification preference",
+        );
+      }
+
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      // Revert on error
+      if (preference === "newReleases") setNotifNewReleases(prevValue);
+      else if (preference === "recommendations") {
+        setNotifRecommendations(prevValue);
+      } else setNotifWatchlistAvailable(prevValue);
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to update notification preference",
+      );
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setNotifLoading(null);
     }
   };
 
@@ -916,6 +995,155 @@ export default function SettingsPage({
                   </p>
                 </div>
               )}
+            </div>
+
+            {/* Notification Preferences Section */}
+            <div class="mb-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+              <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                Notification Preferences
+              </h2>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                Choose which notifications you'd like to receive. Push
+                notifications must be enabled in your browser first.
+              </p>
+
+              {!notificationPreferences.notificationsEnabled && (
+                <div class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+                  <p class="text-sm text-yellow-800 dark:text-yellow-200">
+                    Push notifications are not enabled. Enable them in your
+                    browser to receive notifications.
+                  </p>
+                </div>
+              )}
+
+              <div class="space-y-4">
+                {/* New Releases */}
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      New Releases
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      Get notified when new content is available on your
+                      streaming services
+                    </p>
+                  </div>
+                  <label class="flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={notifNewReleases}
+                      onChange={(e) =>
+                        handleNotificationPreferenceChange(
+                          "newReleases",
+                          e.currentTarget.checked,
+                        )}
+                      disabled={notifLoading === "newReleases"}
+                      class="sr-only"
+                    />
+                    <div
+                      class={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        notifNewReleases
+                          ? "bg-indigo-600"
+                          : "bg-gray-300 dark:bg-gray-600"
+                      } ${notifLoading === "newReleases" ? "opacity-50" : ""}`}
+                    >
+                      <span
+                        class={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          notifNewReleases ? "translate-x-6" : "translate-x-1"
+                        }`}
+                      />
+                    </div>
+                  </label>
+                </div>
+
+                {/* Recommendations */}
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      Recommendations
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      Get notified about personalised recommendations based on
+                      your taste
+                    </p>
+                  </div>
+                  <label class="flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={notifRecommendations}
+                      onChange={(e) =>
+                        handleNotificationPreferenceChange(
+                          "recommendations",
+                          e.currentTarget.checked,
+                        )}
+                      disabled={notifLoading === "recommendations"}
+                      class="sr-only"
+                    />
+                    <div
+                      class={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        notifRecommendations
+                          ? "bg-indigo-600"
+                          : "bg-gray-300 dark:bg-gray-600"
+                      } ${
+                        notifLoading === "recommendations" ? "opacity-50" : ""
+                      }`}
+                    >
+                      <span
+                        class={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          notifRecommendations
+                            ? "translate-x-6"
+                            : "translate-x-1"
+                        }`}
+                      />
+                    </div>
+                  </label>
+                </div>
+
+                {/* Watchlist Available */}
+                <div class="flex items-center justify-between">
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      Watchlist Availability
+                    </h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      Get notified when items on your watchlist become available
+                      to stream
+                    </p>
+                  </div>
+                  <label class="flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={notifWatchlistAvailable}
+                      onChange={(e) =>
+                        handleNotificationPreferenceChange(
+                          "watchlistAvailable",
+                          e.currentTarget.checked,
+                        )}
+                      disabled={notifLoading === "watchlistAvailable"}
+                      class="sr-only"
+                    />
+                    <div
+                      class={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        notifWatchlistAvailable
+                          ? "bg-indigo-600"
+                          : "bg-gray-300 dark:bg-gray-600"
+                      } ${
+                        notifLoading === "watchlistAvailable"
+                          ? "opacity-50"
+                          : ""
+                      }`}
+                    >
+                      <span
+                        class={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          notifWatchlistAvailable
+                            ? "translate-x-6"
+                            : "translate-x-1"
+                        }`}
+                      />
+                    </div>
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
         </div>
