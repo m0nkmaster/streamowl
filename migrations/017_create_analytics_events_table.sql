@@ -36,8 +36,8 @@ CREATE INDEX idx_analytics_events_created_at ON analytics_events(created_at);
 CREATE INDEX idx_analytics_events_session_id ON analytics_events(session_id);
 CREATE INDEX idx_analytics_events_page_path ON analytics_events(page_path);
 
--- Composite index for common queries (daily event counts by type)
-CREATE INDEX idx_analytics_events_type_date ON analytics_events(event_type, (created_at::date));
+-- Composite index for common queries (events by type and time)
+CREATE INDEX idx_analytics_events_type_created ON analytics_events(event_type, created_at);
 
 -- Comment on table
 COMMENT ON TABLE analytics_events IS 'Stores analytics events for page views and user actions';

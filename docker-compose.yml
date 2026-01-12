@@ -1,0 +1,24 @@
+# Local development database for Stream Owl
+# Usage: docker compose up -d
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: stream-owl-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: streamowl
+      POSTGRES_PASSWORD: streamowl_dev
+      POSTGRES_DB: streamowl
+    ports:
+      - "5432:5432"
+    volumes:
+      - stream_owl_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U streamowl -d streamowl"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  stream_owl_data:

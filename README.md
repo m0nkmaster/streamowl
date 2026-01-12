@@ -65,7 +65,7 @@ Stream Owl solves the fragmented streaming landscape problem by providing:
    ```
 
    Edit `.env` and configure:
-   - `DATABASE_URL`: PostgreSQL connection string
+   - `DATABASE_URL`: PostgreSQL connection string (pre-filled for local Docker)
    - `JWT_SECRET`: Secret key for JWT tokens (generate with
      `openssl rand -hex 32`)
    - `TMDB_API_KEY`: Your TMDB API key
@@ -78,10 +78,25 @@ Stream Owl solves the fragmented streaming landscape problem by providing:
 
 3. **Set up the database**
 
+   Start the local PostgreSQL database (requires Docker):
+
+   ```bash
+   docker compose up -d
+   ```
+
+   This starts a PostgreSQL 16 instance with the pgvector extension on port
+   5432. The database credentials are pre-configured in `.env.example`.
+
    Run migrations to create the database schema:
 
    ```bash
    deno task migrate
+   ```
+
+   Verify the database connection:
+
+   ```bash
+   deno task test:db
    ```
 
 4. **Start the development server**

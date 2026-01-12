@@ -4,6 +4,20 @@
 
 [Description to be added]
 
+## Local Development Setup
+
+The project uses PostgreSQL with pgvector extension. To set up locally:
+
+```bash
+cp .env.example .env         # Create .env file (DATABASE_URL pre-configured)
+docker compose up -d         # Start PostgreSQL container
+deno task migrate            # Run database migrations
+deno task test:db            # Verify connection
+deno task start              # Start the dev server
+```
+
+To stop the database: `docker compose down` (add `-v` to also remove data)
+
 ## Beads - Task manager
 
 This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get

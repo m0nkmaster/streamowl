@@ -2,7 +2,12 @@
 -- Description: Creates streaming_services and content_streaming tables for availability tracking
 
 -- Create enum type for streaming availability type
-CREATE TYPE IF NOT EXISTS streaming_type AS ENUM ('subscription', 'rent', 'buy');
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'streaming_type') THEN
+    CREATE TYPE streaming_type AS ENUM ('subscription', 'rent', 'buy');
+  END IF;
+END$$;
 
 -- Create streaming_services table
 CREATE TABLE IF NOT EXISTS streaming_services (
