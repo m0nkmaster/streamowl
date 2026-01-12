@@ -174,6 +174,10 @@ export default function RecommendationFeed() {
         setRecommendations(originalRecommendations);
         throw new Error("Failed to dismiss recommendation");
       }
+
+      // Fetch fresh recommendations to replace the dismissed one
+      // Cache was invalidated by the dismiss API
+      fetchRecommendations();
     } catch (err) {
       // Revert on error
       setRecommendations(originalRecommendations);

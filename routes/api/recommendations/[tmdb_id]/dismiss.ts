@@ -9,6 +9,7 @@ import {
   type TvDetails,
 } from "../../../../lib/tmdb/client.ts";
 import { createBadRequestResponse } from "../../../../lib/api/errors.ts";
+import { redisCache } from "../../../../lib/cache/redis.ts";
 
 /**
  * API endpoint to dismiss a recommendation
@@ -66,6 +67,11 @@ export const handler: Handlers = {
          ON CONFLICT (user_id, content_id) DO NOTHING`,
         [userId, contentId],
       );
+
+      // Invalidate recommendations cache so fresh recommendations can be fetched
+      const today = new Date().toISOString().split("T")[0];
+      const cacheKey = `recommendations:${userId}:${today}`;
+      await redisCache.delete(cacheKey);
 
       return new Response(
         JSON.stringify({ success: true, message: "Recommendation dismissed" }),
