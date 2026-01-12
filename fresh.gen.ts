@@ -5,8 +5,10 @@
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $admin_analytics from "./routes/admin/analytics.tsx";
+import * as $analytics from "./routes/analytics.tsx";
 import * as $api_docs from "./routes/api-docs.tsx";
 import * as $api_path_ from "./routes/api/[...path].ts";
+import * as $api_analytics_summary from "./routes/api/analytics/summary.ts";
 import * as $api_analytics_track from "./routes/api/analytics/track.ts";
 import * as $api_auth_google from "./routes/api/auth/google.ts";
 import * as $api_auth_google_callback from "./routes/api/auth/google/callback.ts";
@@ -48,9 +50,12 @@ import * as $api_recommendations_mood from "./routes/api/recommendations/mood.ts
 import * as $api_reset_password from "./routes/api/reset-password.ts";
 import * as $api_search from "./routes/api/search.ts";
 import * as $api_search_providers from "./routes/api/search/providers.ts";
+import * as $api_settings_account from "./routes/api/settings/account.ts";
 import * as $api_settings_avatar from "./routes/api/settings/avatar.ts";
+import * as $api_settings_delete_account from "./routes/api/settings/delete-account.ts";
 import * as $api_settings_export from "./routes/api/settings/export.ts";
 import * as $api_settings_notification_preferences from "./routes/api/settings/notification-preferences.ts";
+import * as $api_settings_notifications from "./routes/api/settings/notifications.ts";
 import * as $api_settings_profile from "./routes/api/settings/profile.ts";
 import * as $api_settings_public_profile from "./routes/api/settings/public-profile.ts";
 import * as $api_settings_region from "./routes/api/settings/region.ts";
@@ -79,6 +84,8 @@ import * as $sitemap_xml from "./routes/sitemap.xml.ts";
 import * as $terms from "./routes/terms.tsx";
 import * as $AddToListButton from "./islands/AddToListButton.tsx";
 import * as $AddToWatchlistButton from "./islands/AddToWatchlistButton.tsx";
+import * as $Analytics from "./islands/Analytics.tsx";
+import * as $AnalyticsDashboard from "./islands/AnalyticsDashboard.tsx";
 import * as $BrowsePage from "./islands/BrowsePage.tsx";
 import * as $ContinueWatching from "./islands/ContinueWatching.tsx";
 import * as $CreateListModal from "./islands/CreateListModal.tsx";
@@ -104,6 +111,7 @@ import * as $SearchPage from "./islands/SearchPage.tsx";
 import * as $SettingsPage from "./islands/SettingsPage.tsx";
 import * as $ShareButton from "./islands/ShareButton.tsx";
 import * as $SignupForm from "./islands/SignupForm.tsx";
+import * as $SwipeableLibraryCard from "./islands/SwipeableLibraryCard.tsx";
 import * as $SwipeableListItem from "./islands/SwipeableListItem.tsx";
 import * as $TagsComponent from "./islands/TagsComponent.tsx";
 import * as $ThemeToggle from "./islands/ThemeToggle.tsx";
@@ -115,8 +123,10 @@ const manifest = {
     "./routes/_404.tsx": $_404,
     "./routes/_app.tsx": $_app,
     "./routes/admin/analytics.tsx": $admin_analytics,
+    "./routes/analytics.tsx": $analytics,
     "./routes/api-docs.tsx": $api_docs,
     "./routes/api/[...path].ts": $api_path_,
+    "./routes/api/analytics/summary.ts": $api_analytics_summary,
     "./routes/api/analytics/track.ts": $api_analytics_track,
     "./routes/api/auth/google.ts": $api_auth_google,
     "./routes/api/auth/google/callback.ts": $api_auth_google_callback,
@@ -163,10 +173,13 @@ const manifest = {
     "./routes/api/reset-password.ts": $api_reset_password,
     "./routes/api/search.ts": $api_search,
     "./routes/api/search/providers.ts": $api_search_providers,
+    "./routes/api/settings/account.ts": $api_settings_account,
     "./routes/api/settings/avatar.ts": $api_settings_avatar,
+    "./routes/api/settings/delete-account.ts": $api_settings_delete_account,
     "./routes/api/settings/export.ts": $api_settings_export,
     "./routes/api/settings/notification-preferences.ts":
       $api_settings_notification_preferences,
+    "./routes/api/settings/notifications.ts": $api_settings_notifications,
     "./routes/api/settings/profile.ts": $api_settings_profile,
     "./routes/api/settings/public-profile.ts": $api_settings_public_profile,
     "./routes/api/settings/region.ts": $api_settings_region,
@@ -197,6 +210,8 @@ const manifest = {
   islands: {
     "./islands/AddToListButton.tsx": $AddToListButton,
     "./islands/AddToWatchlistButton.tsx": $AddToWatchlistButton,
+    "./islands/Analytics.tsx": $Analytics,
+    "./islands/AnalyticsDashboard.tsx": $AnalyticsDashboard,
     "./islands/BrowsePage.tsx": $BrowsePage,
     "./islands/ContinueWatching.tsx": $ContinueWatching,
     "./islands/CreateListModal.tsx": $CreateListModal,
@@ -222,6 +237,7 @@ const manifest = {
     "./islands/SettingsPage.tsx": $SettingsPage,
     "./islands/ShareButton.tsx": $ShareButton,
     "./islands/SignupForm.tsx": $SignupForm,
+    "./islands/SwipeableLibraryCard.tsx": $SwipeableLibraryCard,
     "./islands/SwipeableListItem.tsx": $SwipeableListItem,
     "./islands/TagsComponent.tsx": $TagsComponent,
     "./islands/ThemeToggle.tsx": $ThemeToggle,

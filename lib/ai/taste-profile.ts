@@ -22,8 +22,9 @@ export async function calculateAndStoreTasteProfile(
 ): Promise<number[] | null> {
   // Fetch watched content with embeddings and ratings
   // Only include content that has embeddings (content_embedding IS NOT NULL)
+  // Note: pgvector returns embeddings as strings like "[0.1,0.2,...]"
   const watchedContent = await query<{
-    content_embedding: number[];
+    content_embedding: string | number[];
     rating: number | null;
   }>(
     `SELECT 
@@ -58,7 +59,12 @@ export async function calculateAndStoreTasteProfile(
     // Add small epsilon to ensure minimum weight for very low ratings
     const weight = Math.max(0.1, rating / 10);
 
-    embeddings.push(item.content_embedding);
+    // Parse embedding from string if needed (pgvector returns as string)
+    const embedding = typeof item.content_embedding === "string"
+      ? JSON.parse(item.content_embedding) as number[]
+      : item.content_embedding;
+
+    embeddings.push(embedding);
     weights.push(weight);
   }
 

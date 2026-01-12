@@ -42,7 +42,8 @@ export async function generateRecommendationCandidates(
   limit: number = 20,
 ): Promise<RecommendationCandidate[]> {
   // Step 1: Get user's taste profile
-  const userResult = await query<{ taste_embedding: number[] | null }>(
+  // Note: pgvector returns embeddings as strings like "[0.1,0.2,...]"
+  const userResult = await query<{ taste_embedding: string | number[] | null }>(
     `SELECT taste_embedding FROM users WHERE id = $1`,
     [userId],
   );
@@ -51,12 +52,17 @@ export async function generateRecommendationCandidates(
     throw new Error(`User not found: ${userId}`);
   }
 
-  const tasteEmbedding = userResult[0].taste_embedding;
+  const rawTasteEmbedding = userResult[0].taste_embedding;
 
   // If user has no taste profile, return empty array
-  if (!tasteEmbedding) {
+  if (!rawTasteEmbedding) {
     return [];
   }
+
+  // Parse embedding from string if needed (pgvector returns as string)
+  const tasteEmbedding = typeof rawTasteEmbedding === "string"
+    ? JSON.parse(rawTasteEmbedding) as number[]
+    : rawTasteEmbedding;
 
   // Step 2: Query pgvector for similar content
   // Exclude already watched content
